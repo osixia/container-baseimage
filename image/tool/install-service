@@ -1,0 +1,45 @@
+#!/bin/bash -e
+
+if [ $IS_MULTIPLE_PROCESS ]; then
+  install-service-available runit syslog-ng-core logrotate cron
+fi
+
+# Auto run install script if available
+if [ -f "/osixia/service/install.sh" ]; then
+  echo "Processing file /osixia/install.sh"
+  ./osixia/service/install.sh
+  rm -f /osixia/service/install.sh
+fi
+
+nbDirectories=$(find /osixia/service -type d -mindepth 1 -maxdepth 1 | wc -l )
+echo "$nbDirectories services found"
+echo "IS_MULTIPLE_PROCESS: $IS_MULTIPLE_PROCESS"
+
+if [ $nbDirectories -gt 1 ] && [ ! $IS_MULTIPLE_PROCESS ]; then
+  echo "This image is configured to run one single process, to run serveral services please add \"ENV IS_MULTIPLE_PROCESS true\" in the Dockerfile"
+  exit 1
+fi
+
+# Auto add container-start script to /etc/my_init.d/ if available
+# Auto add service runit daemon if available
+for d in $(find /osixia/service -type d -mindepth 1 -maxdepth 1); do
+  echo "Processing directory ${d}"
+
+  service=$(basename $d)
+  echo "service: $service"
+
+  if [ -f "${d}/container-start.sh" ]; then
+    echo "link $service container-start.sh to /etc/my_init.d/$service"
+    ln -s ${d}/container-start.sh /etc/my_init.d/$service
+  fi
+
+  if [ $IS_MULTIPLE_PROCESS ]; then
+      echo "link $service daemon to /etc/service/$service/run"
+      mkdir -p /etc/service/$service
+      ln -s ${d}/daemon.sh /etc/service/$service/run
+    else
+      echo "link $service daemon to /etc/service"
+      ln -s ${d}/daemon.sh /etc/service
+  fi
+
+done

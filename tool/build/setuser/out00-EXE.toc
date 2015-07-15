@@ -1,0 +1,9 @@
+('/home/bgouny/pop/docker-light-baseimage/tool/build/setuser/setuser',
+ True,
+ False,
+ None,
+ None,
+ [],
+ None,
+ False,
+ 1436968439)

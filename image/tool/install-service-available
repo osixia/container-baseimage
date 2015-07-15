@@ -1,0 +1,28 @@
+#!/bin/bash -e
+
+# Usage :
+# RUN /sbin/enable-service [service1] [service2] ...
+
+for i in $@
+do
+
+  if [ -f /osixia/service-available/$i/install.sh ]; then
+    echo "run  /osixia/service-available/$i/install.sh"
+    /osixia/service-available/$i/install.sh
+
+    if [ -f /osixia/service-available/$i/daemon.sh ]; then
+      mkdir /etc/service/$i
+      echo "link /osixia/service-available/$i/daemon.sh to /etc/service/$i/run"
+      ln -s /osixia/service-available/$i/daemon.sh /etc/service/$i/run
+    fi
+
+    if [ -f /osixia/service-available/$i/container-start.sh ]; then
+      echo "link /osixia/service-available/$i/container-start.sh to /etc/my_init.d/$i"
+      ln -s /osixia/service-available/$i/container-start.sh /etc/my_init.d/$i
+    fi
+
+  else
+    echo "enable-service: $i service not found, file /osixia/service-available/$i/install.sh missing"
+    exit 1
+  fi
+done
