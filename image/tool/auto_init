@@ -1,7 +1,0 @@
-#!/bin/bash -e
-
-if [ $IS_MULTIPLE_PROCESS ]; then
-    my_init $@
-  else
-    my_init_light $@
-fi

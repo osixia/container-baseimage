@@ -3,7 +3,6 @@
 ## Install osixia tools
 ln -s /osixia/tool/install-service /sbin/install-service
 ln -s /osixia/tool/install-service-available /sbin/install-service-available
-ln -s /osixia/tool/my_init_light /sbin/my_init_light
 
 ln -s /osixia/tool/py_tools/my_init /sbin/my_init
 ln -s /etc/service
@@ -15,6 +14,8 @@ chmod 700 /etc/container_environment
 groupadd -g 8377 docker_env
 chown :docker_env /etc/container_environment.sh
 chmod 640 /etc/container_environment.sh
+
+mkdir -p /etc/decode-envvar/
 
 ln -s /osixia/tool/py_tools/setuser /sbin/setuser
 
@@ -53,6 +54,8 @@ $minimal_apt_get_install apt-utils
 
 ## Upgrade all packages.
 apt-get dist-upgrade -y --no-install-recommends
+
+/sbin/install-service-available runit syslog-ng-core logrotate cron
 
 apt-get clean
 rm -rf /osixia/build.sh /osixia/Dockerfile
