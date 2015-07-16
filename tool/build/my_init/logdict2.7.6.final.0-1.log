@@ -581,20 +581,10 @@ nt: None -> None
   DEL nt
 nt: None -> None
   DEL nt
-__main__: <PyScript '__main__' /usr/local/lib/python2.7/dist-packages/PyInstaller/loader/pyi_os_path.py imports=[('sys', 0, 0, -1), ('posix.environ', 0, 1, -1), ('nt.listdir', 0, 1, -1), ('nt.environ', 0, 1, -1), ('posix', 0, 1, -1), ('posix.listdir', 0, 1, -1), ('nt', 0, 1, -1)] binaries=[] datas=[]> -> <PyScript '__main__' my_init.py imports=[('re', 0, 0, -1), ('json', 0, 0, -1), ('sys', 0, 0, -1), ('os.path', 0, 0, -1), ('os', 0, 0, -1), ('ast', 0, 0, -1), ('yaml', 0, 0, -1), ('argparse', 0, 0, -1), ('stat', 0, 0, -1), ('errno', 0, 0, -1), ('signal', 0, 0, -1), ('time', 0, 0, -1)] binaries=[] datas=[]>
-json: None -> <PkgModule 'json' /usr/lib/python2.7/json/__init__.pyc imports=[('encoder', 0, 0, 1), ('encoder.JSONEncoder', 0, 0, 1), ('decoder.JSONDecoder', 0, 0, 1), ('decoder', 0, 0, 1)] binaries=[] datas=[]>
+__main__: <PyScript '__main__' /usr/local/lib/python2.7/dist-packages/PyInstaller/loader/pyi_os_path.py imports=[('sys', 0, 0, -1), ('posix.environ', 0, 1, -1), ('nt.listdir', 0, 1, -1), ('nt.environ', 0, 1, -1), ('posix', 0, 1, -1), ('posix.listdir', 0, 1, -1), ('nt', 0, 1, -1)] binaries=[] datas=[]> -> <PyScript '__main__' my_init.py imports=[('re', 0, 0, -1), ('sys', 0, 0, -1), ('os.path', 0, 0, -1), ('os', 0, 0, -1), ('ast', 0, 0, -1), ('yaml', 0, 0, -1), ('argparse', 0, 0, -1), ('stat', 0, 0, -1), ('errno', 0, 0, -1), ('signal', 0, 0, -1), ('time', 0, 0, -1)] binaries=[] datas=[]>
 ast: None -> <PyModule 'ast' /usr/lib/python2.7/ast.pyc imports=[('_ast', 0, 0, -1), ('inspect', 1, 1, -1), ('collections.deque', 1, 0, -1), ('_ast.*', 0, 0, -1), ('collections', 1, 0, -1), ('_ast.__version__', 0, 0, -1)] binaries=[] datas=[]>
 yaml: None -> <PkgModule 'yaml' /usr/local/lib/python2.7/dist-packages/yaml/__init__.pyc imports=[('cyaml', 0, 0, -1), ('nodes.*', 0, 0, -1), ('events.*', 0, 0, -1), ('tokens', 0, 0, -1), ('events', 0, 0, -1), ('loader.*', 0, 0, -1), ('StringIO.StringIO', 1, 1, -1), ('nodes', 0, 0, -1), ('StringIO', 1, 1, -1), ('error.*', 0, 0, -1), ('tokens.*', 0, 0, -1), ('cStringIO', 1, 1, -1), ('loader', 0, 0, -1), ('dumper', 0, 0, -1), ('cStringIO.StringIO', 1, 1, -1), ('dumper.*', 0, 0, -1), ('cyaml.*', 0, 0, -1), ('error', 0, 0, -1)] binaries=[] datas=[]>
 argparse: None -> <PyModule 'argparse' /usr/lib/python2.7/argparse.pyc imports=[('collections', 0, 0, -1), ('re', 0, 0, -1), ('sys', 0, 0, -1), ('copy', 0, 0, -1), ('os', 0, 0, -1), ('warnings', 1, 1, -1), ('gettext.gettext', 0, 0, -1), ('textwrap', 0, 0, -1), ('gettext', 0, 0, -1), ('warnings', 1, 0, -1)] binaries=[] datas=[]>
-json.encoder: None -> <PyModule 'json.encoder' /usr/lib/python2.7/json/encoder.pyc imports=[('_json.encode_basestring_ascii', 0, 0, -1), ('_json', 0, 0, -1), ('re', 0, 0, -1), ('_json.make_encoder', 0, 0, -1)] binaries=[] datas=[]>
-json.decoder: None -> <PyModule 'json.decoder' /usr/lib/python2.7/json/decoder.pyc imports=[('re', 0, 0, -1), ('json', 0, 0, -1), ('sys', 0, 0, -1), ('_json.scanstring', 0, 0, -1), ('struct', 0, 0, -1), ('json.scanner', 0, 0, -1), ('_json', 0, 0, -1)] binaries=[] datas=[]>
-json._json: None -> None
-_json: None -> <ExtensionModule '_json' /usr/lib/python2.7/lib-dynload/_json.x86_64-linux-gnu.so imports=[] binaries=[] datas=[]>
-json.re: None -> None
-json.json: None -> None
-json.sys: None -> None
-json.struct: None -> None
-json.scanner: None -> <PyModule 'json.scanner' /usr/lib/python2.7/json/scanner.pyc imports=[('_json', 0, 0, -1), ('re', 0, 0, -1), ('_json.make_scanner', 0, 0, -1)] binaries=[] datas=[]>
 _emx_link: None -> None
   DEL _emx_link
 _emx_link: None -> None

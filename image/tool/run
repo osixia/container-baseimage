@@ -1,0 +1,27 @@
+#!/bin/bash -e
+
+# Single process image: /etc/service/run and runit is not installed
+if [ -e "/etc/service/run" ] && [ ! -e "/sbin/runit" ]; then
+
+  echo "Execute /sbin/my_init --single-process"
+  /sbin/my_init --single-process || true
+
+  echo "Include /etc/container_environment.sh"
+  source /etc/container_environment.sh
+
+  echo "Execute /etc/service/run"
+  source /etc/service/run
+
+else
+
+  # No process specified and runit is not installed: run bash
+  if [ ! -e "/sbin/runit" ]; then
+    echo "Execute /sbin/my_init --skip-runit bash"
+    exec /sbin/my_init --skip-runit bash
+
+  # Multiple process image
+  else
+    echo "Execute /sbin/my_init"
+    exec /sbin/my_init
+  fi
+fi

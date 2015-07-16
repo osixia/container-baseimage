@@ -1,5 +1,5 @@
 #!/usr/bin/python3 -u
-import os, os.path, sys, stat, signal, errno, argparse, time, json, re, yaml, ast
+import os, os.path, sys, stat, signal, errno, argparse, time, re, yaml, ast
 
 KILL_PROCESS_TIMEOUT = 5
 KILL_ALL_PROCESSES_TIMEOUT = 5
@@ -102,9 +102,9 @@ def python_to_bash_envvar(name, value):
 				os.environ[name] = xstr(value)
 
 def decode_python_envvars():
-	for envfile in listdir("/etc/decode-envvar"):
-		name = os.path.basename(envfile)
-		python_to_bash_envvar(name, os.environ[name])
+	_environ = dict(os.environ)
+	for name, value in _environ.items():
+		python_to_bash_envvar(name, value)
 
 def import_etc_yaml_envvars():
 	if os.path.isfile("/etc/env.yml"):
@@ -113,11 +113,6 @@ def import_etc_yaml_envvars():
 		etc_env_vars = yaml.load(etc_env_vars_yaml)
 
 		for name, value in etc_env_vars.items():
-
-			# if variable must be decoded as bash env variable
-			if isinstance(value,list) or isinstance(value,dict):
-				open("/etc/decode-envvar/" + name, "w")
-
 			if not name in os.environ:
 				os.environ[name] = xstr(value)
 
@@ -140,6 +135,7 @@ def import_envvars(clear_existing_environment = True, override_existing_environm
 			os.environ[name] = value
 
 	import_etc_yaml_envvars()
+	decode_python_envvars()
 
 def export_envvars(to_dir = True):
 	if not os.path.exists("/etc/container_environment"):
@@ -154,8 +150,6 @@ def export_envvars(to_dir = True):
 		shell_dump += "export " + sanitize_shenvname(name) + "=" + shquote(value) + "\n"
 	with open("/etc/container_environment.sh", "w") as f:
 		f.write(shell_dump)
-	with open("/etc/container_environment.json", "w") as f:
-		f.write(json.dumps(dict(os.environ)))
 
 _find_unsafe = re.compile(r'[^\w@%+=:,./-]').search
 
@@ -320,53 +314,56 @@ def wait_for_runit_services():
 
 def main(args):
 	import_envvars(False, False)
-	decode_python_envvars()
 	export_envvars()
 
 	if not args.skip_startup_files:
 		run_startup_files()
 
-	runit_exited = False
-	exit_code = None
+	with open("/etc/my_init_startup_files_completed", "w") as f:
+		f.write("1")
 
-	if not args.skip_runit:
-		runit_pid = start_runit()
-	try:
-		exit_status = None
-		if len(args.main_command) == 0:
-			runit_exited, exit_code = wait_for_runit_or_interrupt(runit_pid)
-			if runit_exited:
-				if exit_code is None:
-					info("Runit exited with unknown status")
-					exit_status = 1
-				else:
-					exit_status = os.WEXITSTATUS(exit_code)
-					info("Runit exited with status %d" % exit_status)
-		else:
-			info("Running %s..." % " ".join(args.main_command))
-			pid = os.spawnvp(os.P_NOWAIT, args.main_command[0], args.main_command)
-			try:
-				exit_code = waitpid_reap_other_children(pid)
-				if exit_code is None:
-					info("%s exited with unknown status." % args.main_command[0])
-					exit_status = 1
-				else:
-					exit_status = os.WEXITSTATUS(exit_code)
-					info("%s exited with status %d." % (args.main_command[0], exit_status))
-			except KeyboardInterrupt:
-				stop_child_process(args.main_command[0], pid)
-				raise
-			except BaseException as s:
-				warn("An error occurred. Aborting.")
-				stop_child_process(args.main_command[0], pid)
-				raise
-		sys.exit(exit_status)
-	finally:
+	if not args.single_process:
+		runit_exited = False
+		exit_code = None
+
 		if not args.skip_runit:
-			shutdown_runit_services()
-			if not runit_exited:
-				stop_child_process("runit daemon", runit_pid)
-			wait_for_runit_services()
+			runit_pid = start_runit()
+		try:
+			exit_status = None
+			if len(args.main_command) == 0:
+				runit_exited, exit_code = wait_for_runit_or_interrupt(runit_pid)
+				if runit_exited:
+					if exit_code is None:
+						info("Runit exited with unknown status")
+						exit_status = 1
+					else:
+						exit_status = os.WEXITSTATUS(exit_code)
+						info("Runit exited with status %d" % exit_status)
+			else:
+				info("Running %s..." % " ".join(args.main_command))
+				pid = os.spawnvp(os.P_NOWAIT, args.main_command[0], args.main_command)
+				try:
+					exit_code = waitpid_reap_other_children(pid)
+					if exit_code is None:
+						info("%s exited with unknown status." % args.main_command[0])
+						exit_status = 1
+					else:
+						exit_status = os.WEXITSTATUS(exit_code)
+						info("%s exited with status %d." % (args.main_command[0], exit_status))
+				except KeyboardInterrupt:
+					stop_child_process(args.main_command[0], pid)
+					raise
+				except BaseException as s:
+					warn("An error occurred. Aborting.")
+					stop_child_process(args.main_command[0], pid)
+					raise
+			sys.exit(exit_status)
+		finally:
+			if not args.skip_runit:
+				shutdown_runit_services()
+				if not runit_exited:
+					stop_child_process("runit daemon", runit_pid)
+				wait_for_runit_services()
 
 # Parse options.
 parser = argparse.ArgumentParser(description = 'Initialize the system.')
@@ -384,6 +381,9 @@ parser.add_argument('--no-kill-all-on-exit', dest = 'kill_all_on_exit',
 parser.add_argument('--quiet', dest = 'log_level',
 	action = 'store_const', const = LOG_LEVEL_WARN, default = LOG_LEVEL_INFO,
 	help = 'Only print warnings and errors')
+parser.add_argument('--single-process', dest = 'single_process',
+	action = 'store_const', const = True, default = False,
+	help = 'Only run /etc/my_init.d/* and /etc/rc.local scripts and export envvar')
 args = parser.parse_args()
 log_level = args.log_level
 
