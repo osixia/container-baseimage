@@ -1,6 +1,8 @@
 #!/bin/bash -ex
 
 ## Install osixia tools
+mkdir -p /etc/service
+
 ln -s /osixia/tool/install-service /sbin/install-service
 ln -s /osixia/tool/install-service-available /sbin/install-service-available
 
