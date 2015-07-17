@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # Usage
-# /sbin/ssl-kit crt key [--env-var-prefix=SSL_CRT_] [--ca-crt=/path/to/cert.pem] [--openssl] [--gnutls]
+# /sbin/ssl-helper crt key [--env-var-prefix=SSL_CRT_] [--ca-crt=/path/to/cert.pem] [--openssl] [--gnutls]
 
 # This script check if files "crt" and "key" exists
 

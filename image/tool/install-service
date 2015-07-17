@@ -20,7 +20,7 @@ for d in $(find /osixia/service -type d -mindepth 1 -maxdepth 1); do
     ln -s ${d}/container-start.sh /etc/my_init.d/$service
   fi
 
-  if [ -f "${d}/container-start.sh" ]; then
+  if [ -f "${d}/daemon.sh" ]; then
     echo "link $service daemon to /etc/service/$service/run"
     mkdir -p /etc/service/$service
     ln -s ${d}/daemon.sh /etc/service/$service/run
@@ -31,7 +31,9 @@ done
 nbDirectories=$(find /etc/service -mindepth 1 -maxdepth 1 -type d | wc -l )
 echo "$nbDirectories service(s) found"
 
-if [ "$nbDirectories" -gt 1 ]; then
-  echo "This image is has multiple process, install runit, syslog-ng-core, logrotate, cron"
-  /sbin/install-service-available runit syslog-ng-core logrotate cron
+if [ "$nbDirectories" -gt 1 ] && [ ! -e "/etc/multiple_process_stack_installed" ]; then
+  echo "This image has multiple process,"
+  echo "For better image build consider adding :"
+  echo "\"/sbin/install-multiple-process-stack after\" an apt-get update in your dockerfile."
+  /sbin/install-multiple-process-stack
 fi

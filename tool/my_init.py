@@ -107,8 +107,8 @@ def decode_python_envvars():
 		python_to_bash_envvar(name, value)
 
 def import_etc_yaml_envvars():
-	if os.path.isfile("/etc/env.yml"):
-		with open("/etc/env.yml", "r") as f:
+	if os.path.isfile("/etc/env.yaml"):
+		with open("/etc/env.yaml", "r") as f:
 			etc_env_vars_yaml = f.read()
 		etc_env_vars = yaml.load(etc_env_vars_yaml)
 
@@ -364,6 +364,11 @@ def main(args):
 				if not runit_exited:
 					stop_child_process("runit daemon", runit_pid)
 				wait_for_runit_services()
+
+try:
+    os.remove("/etc/my_init_startup_files_completed")
+except OSError:
+    pass
 
 # Parse options.
 parser = argparse.ArgumentParser(description = 'Initialize the system.')
