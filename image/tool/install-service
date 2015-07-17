@@ -7,9 +7,7 @@ if [ -f "/osixia/service/install.sh" ]; then
   rm -f /osixia/service/install.sh
 fi
 
-# Auto add container-start script to /etc/my_init.d/ if available
-# Auto add service runit daemon if available
-for d in $(find /osixia/service -type d -mindepth 1 -maxdepth 1); do
+for d in $(find /osixia/service -mindepth 1 -maxdepth 1 -type d); do
   echo "Processing directory ${d}"
 
   service=$(basename $d)

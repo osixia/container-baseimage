@@ -7,7 +7,7 @@ ln -s /osixia/tool/install-multiple-process-stack /sbin/install-multiple-process
 ln -s /osixia/tool/install-service /sbin/install-service
 ln -s /osixia/tool/install-service-available /sbin/install-service-available
 
-ln -s /osixia/tool/py_tools/my_init /sbin/my_init
+ln -s /osixia/tool/py_tool/my_init /sbin/my_init
 ln -s /etc/service
 mkdir -p /etc/my_init.d
 mkdir -p /etc/container_environment
@@ -18,7 +18,7 @@ groupadd -g 8377 docker_env
 chown :docker_env /etc/container_environment.sh
 chmod 640 /etc/container_environment.sh
 
-ln -s /osixia/tool/py_tools/setuser /sbin/setuser
+ln -s /osixia/tool/py_tool/setuser /sbin/setuser
 
 export LC_ALL=C
 export DEBIAN_FRONTEND=noninteractive
