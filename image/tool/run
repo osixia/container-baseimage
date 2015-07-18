@@ -13,7 +13,7 @@ elif [ "$nbDirectories" -eq 1 ]; then
   SERVICE=$(find /etc/service -mindepth 1 -maxdepth 1 -type d)
 
   echo "Execute /sbin/my_init --single-process"
-  /sbin/my_init --single-process || true
+  /sbin/my_init --single-process
 
   echo "Include /etc/container_environment.sh"
   source /etc/container_environment.sh
