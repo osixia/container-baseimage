@@ -1,6 +1,6 @@
 # -*- mode: python -*-
-a = Analysis(['my_init.py'],
-             pathex=['/usr/local/lib/python2.7/dist-packages/', '/home/hello/workspace/project/docker-light-baseimage/tool'],
+a = Analysis(['/home/hello/workspace/project/docker-light-baseimage/src/py_tool/my_init.py'],
+             pathex=['/usr/local/lib/python2.7/dist-packages/', '/home/hello/workspace/project/docker-light-baseimage/src/py_tool'],
              hiddenimports=[],
              hookspath=None,
              runtime_hooks=None)

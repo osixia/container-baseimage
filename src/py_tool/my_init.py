@@ -142,7 +142,7 @@ def export_envvars(to_dir = True):
 		return
 	shell_dump = ""
 	for name, value in os.environ.items():
-		if name in ['HOME', 'USER', 'GROUP', 'UID', 'GID', 'SHELL']:
+		if name in ['HOME', 'USER', 'GROUP', 'UID', 'GID', 'SHELL', 'SHLVL', 'PYTHONPATH', 'LD_LIBRARY_PATH']:
 			continue
 		if to_dir:
 			with open("/etc/container_environment/" + name, "w") as f:
@@ -395,6 +395,9 @@ log_level = args.log_level
 if args.skip_runit and len(args.main_command) == 0:
 	error("When --skip-runit is given, you must also pass a main command.")
 	sys.exit(1)
+
+if args.single_process:
+	args.kill_all_on_exit = False
 
 # Run main function.
 signal.signal(signal.SIGTERM, lambda signum, frame: ignore_signals_and_raise_keyboard_interrupt('SIGTERM'))

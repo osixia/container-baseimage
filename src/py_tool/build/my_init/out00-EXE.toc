@@ -1,4 +1,4 @@
-('/home/hello/workspace/project/docker-light-baseimage/tool/build/my_init/my_init',
+('/home/hello/workspace/project/docker-light-baseimage/src/py_tool/build/my_init/my_init',
  True,
  False,
  None,
@@ -6,4 +6,4 @@
  [],
  None,
  False,
- 1437125977)
+ 1437246609)

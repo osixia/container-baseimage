@@ -30,6 +30,7 @@ W: __all__ is built strangely at line 0 - tokenize (/usr/lib/python2.7/tokenize.
 W: __all__ is built strangely at line 0 - tokenize (/usr/lib/python2.7/tokenize.pyc)
 W: delayed  __import__ hack detected at line 0 - pickle (/usr/lib/python2.7/pickle.pyc)
 W: delayed  __import__ hack detected at line 0 - pickle (/usr/lib/python2.7/pickle.pyc)
+W: __all__ is built strangely at line 0 - types (/usr/lib/python2.7/types.pyc)
 W: delayed  __import__ hack detected at line 0 - encodings (/usr/lib/python2.7/encodings/__init__.pyc)
 W: delayed  __import__ hack detected at line 0 - pydoc (/usr/lib/python2.7/pydoc.pyc)
 W: delayed  __import__ hack detected at line 0 - pydoc (/usr/lib/python2.7/pydoc.pyc)

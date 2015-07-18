@@ -13,8 +13,8 @@ sed -i -e "s/;listen.group = www-data/listen.group = www-data/g" /etc/php5/fpm/p
 if [ -d "/etc/nginx" ]; then
 
   mkdir /etc/nginx/common
-  ln -s /etc/services-available/php5-fpm/config/nginx/php5-fpm.conf /etc/nginx/common/php5-fpm.conf
-  
+  ln -s /osixia/service-available/php5-fpm/config/nginx/php5-fpm.conf /etc/nginx/common/php5-fpm.conf
+
 fi
 
 # apache2 is installed
@@ -27,7 +27,7 @@ if [ -d "/etc/apache2" ]; then
 
   a2enmod fastcgi actions alias
 
-  ln -s /etc/services-available/php5-fpm/config/apache2/php5-fpm.conf /etc/apache2/conf-available/php5-fpm.conf
+  ln -s /osixia/service-available/php5-fpm/config/apache2/php5-fpm.conf /etc/apache2/conf-available/php5-fpm.conf
   a2enconf php5-fpm
 
 fi

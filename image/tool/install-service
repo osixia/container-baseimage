@@ -27,7 +27,7 @@ for d in $(find /osixia/service -mindepth 1 -maxdepth 1 -type d); do
 done
 
 nbDirectories=$(find /etc/service -mindepth 1 -maxdepth 1 -type d | wc -l )
-echo "$nbDirectories service(s) found"
+echo "Total number of service: $nbDirectories"
 
 if [ "$nbDirectories" -gt 1 ] && [ ! -e "/etc/multiple_process_stack_installed" ]; then
   echo "This image has multiple process,"
