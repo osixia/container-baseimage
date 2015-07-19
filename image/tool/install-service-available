@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # Usage :
-# RUN /sbin/enable-service [service1] [service2] ...
+# RUN /sbin/install-service-available [service1] [service2] ...
 
 for i in $@
 do
