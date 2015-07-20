@@ -21,6 +21,14 @@ chmod 640 /etc/container_environment.sh
 
 ln -s /osixia/tool/py_tool/setuser /sbin/setuser
 
+# dpkg
+cp /osixia/file/dpkg_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
+cp /osixia/file/dpkg_nolocales /etc/dpkg/dpkg.cfg.d/01_nolocales
+
+# Remove file directory
+rm -rf /osixia/file
+
+# General config
 export LC_ALL=C
 export DEBIAN_FRONTEND=noninteractive
 minimal_apt_get_install='apt-get install -y --no-install-recommends'
