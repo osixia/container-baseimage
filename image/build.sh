@@ -6,6 +6,7 @@ mkdir -p /etc/service
 ln -s /osixia/tool/install-multiple-process-stack /sbin/install-multiple-process-stack
 ln -s /osixia/tool/install-service /sbin/install-service
 ln -s /osixia/tool/install-service-available /sbin/install-service-available
+ln -s /osixia/tool/add-host /sbin/add-host
 
 ln -s /osixia/tool/py_tool/my_init /sbin/my_init
 ln -s /etc/service
