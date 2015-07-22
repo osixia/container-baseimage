@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+echo "install-service"
+
 # Auto run global install script if available
 if [ -f "/osixia/service/install.sh" ]; then
   echo "Processing file /osixia/service/install.sh"
@@ -7,37 +9,40 @@ if [ -f "/osixia/service/install.sh" ]; then
   rm -f /osixia/service/install.sh
 fi
 
-for d in $(find /osixia/service -mindepth 1 -maxdepth 1 -type d); do
+# Process install of services in /osixia/service
+for d in $(find /osixia/service -mindepth 1 -maxdepth 1 -type d | sort); do
   echo "Processing directory ${d}"
-
   service=$(basename $d)
-  echo "service: $service"
 
+  # Service install script
   if [ -f "${d}/install.sh" ]; then
-    echo "run $service install.sh script"
+    echo "run ${d}/install.sh"
     ${d}/install.sh
     rm -f ${d}/install.sh
   fi
 
+  # Service container start script
   if [ -f "${d}/container-start.sh" ]; then
-    echo "link $service container-start.sh to /etc/my_init.d/$service"
+    echo "link ${d}/container-start.sh to /etc/my_init.d/$service"
     ln -s ${d}/container-start.sh /etc/my_init.d/$service
   fi
 
+  # Service process
   if [ -f "${d}/daemon.sh" ]; then
-    echo "link $service daemon to /etc/service/$service/run"
+    echo "link ${d}/daemon.sh to /etc/service/$service/run"
     mkdir -p /etc/service/$service
     ln -s ${d}/daemon.sh /etc/service/$service/run
   fi
 
 done
 
+echo "Searching process..."
 nbDirectories=$(find /etc/service -mindepth 1 -maxdepth 1 -type d | wc -l )
-echo "Total number of service: $nbDirectories"
+echo "$nbDirectories process found"
 
 if [ "$nbDirectories" -gt 1 ] && [ ! -e "/etc/multiple_process_stack_installed" ]; then
   echo "This image has multiple process."
-  /sbin/install-multiple-process-stack
+  /sbin/add-multiple-process-stack
   echo "For better image build consider adding :"
-  echo "\"/sbin/install-multiple-process-stack after\" an apt-get update in your dockerfile."
+  echo "\"/sbin/add-multiple-process-stack after\" an apt-get update in your dockerfile."
 fi

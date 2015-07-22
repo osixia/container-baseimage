@@ -1,15 +1,17 @@
 #!/bin/bash -ex
 
-## Install osixia tools
-mkdir -p /etc/service
-
-ln -s /osixia/tool/install-multiple-process-stack /sbin/install-multiple-process-stack
-ln -s /osixia/tool/install-service /sbin/install-service
-ln -s /osixia/tool/install-service-available /sbin/install-service-available
+## Add bash tools
 ln -s /osixia/tool/add-host /sbin/add-host
+ln -s /osixia/tool/add-multiple-process-stack /sbin/add-multiple-process-stack
+ln -s /osixia/tool/add-service-available /sbin/add-service-available
+ln -s /osixia/tool/install-service /sbin/install-service
 
+ln -s /osixia/tool/remove-service /sbin/remove-service
+ln -s /osixia/tool/remove-service-available /sbin/remove-service-available
+
+# Add python tools and needed directories
 ln -s /osixia/tool/py_tool/my_init /sbin/my_init
-ln -s /etc/service
+mkdir -p /etc/service
 mkdir -p /etc/my_init.d
 mkdir -p /etc/container_environment
 touch /etc/container_environment.sh

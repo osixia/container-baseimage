@@ -1,0 +1,24 @@
+#!/bin/bash -e
+
+# Remove service-available-directory
+
+for i in $@
+do
+
+  echo "remove-service: $i"
+
+  if [ -d /osixia/service/$i ]; then
+    echo "remove folder /osixia/service/$i"
+    rm -rf /osixia/service/$i
+  fi
+
+  if [ -d /etc/service/$i ]; then
+    echo "remove folder /etc/service/$i"
+    rm -rf /etc/service/$i
+  fi
+
+  if [ -f /etc/my_init.d/$i ]; then
+    echo "remove file /etc/my_init.d/$i"
+    rm -f /etc/my_init.d/$i
+  fi
+done
