@@ -2,6 +2,8 @@
 
 echo "install-service"
 
+apt-get -y update
+
 # Auto run global install script if available
 if [ -f "/osixia/service/install.sh" ]; then
   echo "Processing file /osixia/service/install.sh"

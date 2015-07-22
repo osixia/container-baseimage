@@ -1,25 +1,4 @@
 #!/bin/bash -e
 
-# Usage :
-# RUN /sbin/remove-service-available [service1] [service2] ...
-
-for i in $@
-do
-
-  echo "remove-service-available: $i"
-
-  if [ -d /osixia/service-available/$i ]; then
-    echo "remove folder /osixia/service-available/$i"
-    rm -rf /osixia/service-available/$i
-  fi
-
-  if [ -d /etc/service/$i ]; then
-    echo "remove folder /etc/service/$i"
-    rm -rf /etc/service/$i
-  fi
-
-  if [ -f /etc/my_init.d/$i ]; then
-    echo "remove file /etc/my_init.d/$i"
-    rm -f /etc/my_init.d/$i
-  fi
-done
+apt-get clean
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
