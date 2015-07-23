@@ -1,15 +1,14 @@
 #!/bin/bash -e
 
-# Remove service-available-directory
-
+# Remove a service
 for i in $@
 do
 
   echo "remove-service: $i"
 
-  if [ -d /osixia/service/$i ]; then
-    echo "remove folder /osixia/service/$i"
-    rm -rf /osixia/service/$i
+  if [ -d /container/service/$i ]; then
+    echo "remove folder /container/service/$i"
+    rm -rf /container/service/$i
   fi
 
   if [ -d /etc/service/$i ]; then

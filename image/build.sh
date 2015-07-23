@@ -1,16 +1,15 @@
 #!/bin/bash -ex
 
-## Add bash tools
-ln -s /osixia/tool/add-host /sbin/add-host
-ln -s /osixia/tool/add-multiple-process-stack /sbin/add-multiple-process-stack
-ln -s /osixia/tool/add-service-available /sbin/add-service-available
-ln -s /osixia/tool/install-service /sbin/install-service
-
-ln -s /osixia/tool/remove-service /sbin/remove-service
-ln -s /osixia/tool/remove-service-available /sbin/remove-service-available
+## Add bash tools to /sbin
+ln -s /container/tool/add-host /sbin/add-host
+ln -s /container/tool/install-multiple-process-stack /sbin/add-multiple-process-stack
+ln -s /container/tool/install-service /sbin/install-service
+ln -s /container/tool/install-service-available /sbin/add-service-available
+ln -s /container/tool/remove-service /sbin/remove-service
+ln -s /container/tool/run /sbin/run
 
 # Add python tools and needed directories
-ln -s /osixia/tool/py_tool/my_init /sbin/my_init
+ln -s /container/tool/py_tool/my_init /sbin/my_init
 mkdir -p /etc/service
 mkdir -p /etc/my_init.d
 mkdir -p /etc/container_environment
@@ -21,14 +20,15 @@ groupadd -g 8377 docker_env
 chown :docker_env /etc/container_environment.sh
 chmod 640 /etc/container_environment.sh
 
-ln -s /osixia/tool/py_tool/setuser /sbin/setuser
+ln -s /container/tool/py_tool/setuser /sbin/setuser
 
 # dpkg
-cp /osixia/file/dpkg_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
-cp /osixia/file/dpkg_nolocales /etc/dpkg/dpkg.cfg.d/01_nolocales
+cp /container/file/dpkg_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
+cp /container/file/dpkg_nolocales /etc/dpkg/dpkg.cfg.d/01_nolocales
 
-# Remove file directory
-rm -rf /osixia/file
+# Remove useless files
+rm -rf /container/file
+rm -rf /container/build.sh /container/Dockerfile
 
 # General config
 export LC_ALL=C
@@ -68,7 +68,6 @@ $minimal_apt_get_install apt-utils
 apt-get dist-upgrade -y --no-install-recommends
 
 apt-get clean
-rm -rf /osixia/build.sh /osixia/Dockerfile
 rm -rf /tmp/* /var/tmp/*
 rm -rf /var/lib/apt/lists/*
 rm -f /etc/dpkg/dpkg.cfg.d/02apt-speedup
