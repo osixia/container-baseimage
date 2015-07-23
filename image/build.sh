@@ -2,9 +2,9 @@
 
 ## Add bash tools to /sbin
 ln -s /container/tool/add-host /sbin/add-host
-ln -s /container/tool/install-multiple-process-stack /sbin/add-multiple-process-stack
+ln -s /container/tool/install-multiple-process-stack /sbin/install-multiple-process-stack
 ln -s /container/tool/install-service /sbin/install-service
-ln -s /container/tool/install-service-available /sbin/add-service-available
+ln -s /container/tool/install-service-available /sbin/install-service-available
 ln -s /container/tool/remove-service /sbin/remove-service
 ln -s /container/tool/run /sbin/run
 
