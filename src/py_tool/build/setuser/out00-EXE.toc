@@ -1,0 +1,9 @@
+('/home/hello/workspace/project/docker-light-baseimage/src/py_tool/build/setuser/setuser',
+ True,
+ False,
+ None,
+ None,
+ [],
+ None,
+ False,
+ 1437246610)

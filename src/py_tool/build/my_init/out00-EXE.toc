@@ -1,0 +1,9 @@
+('/home/hello/workspace/project/docker-light-baseimage/src/py_tool/build/my_init/my_init',
+ True,
+ False,
+ None,
+ None,
+ [],
+ None,
+ False,
+ 1437246609)
