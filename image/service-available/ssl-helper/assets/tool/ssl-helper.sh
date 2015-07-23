@@ -43,7 +43,7 @@ if [ ! -e $SSL_CRT ] || [ ! -e $SSL_KEY ]; then
   done
 
   # Get ssl vars
-  source /osixia/service/ssl-helper/assets/tool/get-ssl-env-var.sh
+  source /container/service-available/ssl-helper/assets/tool/get-ssl-env-var.sh
   get_ssl_env_var $SSL_ENV_VAR_PREFIX
 
   # OPENSSL
@@ -99,7 +99,7 @@ if [ ! -e $SSL_CRT ] || [ ! -e $SSL_KEY ]; then
 
       TMP_FILE="/tmp/docker-cert.cfg"
 
-      source /osixia/service/ssl-helper-gnutls/assets/tool/create-gnutls-crt-file-infos.sh
+      source /container/service-available/ssl-helper-gnutls/assets/tool/create-gnutls-crt-file-infos.sh
       create_gnutls_crt_file_infos $TMP_FILE
 
       # create public key

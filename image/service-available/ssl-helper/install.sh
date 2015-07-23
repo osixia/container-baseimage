@@ -9,5 +9,5 @@ fi
 
 if [ ! -e "/sbin/ssl-helper" ]; then
   # Add ssl-helper tool to sbin
-  ln -s /osixia/service/ssl-helper/assets/tool/ssl-helper.sh /sbin/ssl-helper
+  ln -s /container/service-available/ssl-helper/assets/tool/ssl-helper.sh /sbin/ssl-helper
 fi
