@@ -5,9 +5,6 @@ VERSION = 0.1.1
 
 all: build
 
-build-tool:
-	./src/py_tool/build.sh
-
 build:
 	docker build -t $(NAME):$(VERSION) --rm image
 

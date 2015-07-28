@@ -1,15 +1,9 @@
 #!/bin/bash -ex
 
 ## Add bash tools to /sbin
-ln -s /container/tool/add-host /sbin/add-host
-ln -s /container/tool/install-multiple-process-stack /sbin/install-multiple-process-stack
-ln -s /container/tool/install-service /sbin/install-service
-ln -s /container/tool/install-service-available /sbin/install-service-available
-ln -s /container/tool/remove-service /sbin/remove-service
-ln -s /container/tool/run /sbin/run
+ln -s /container/tool/* /sbin/
 
 # Add python tools and needed directories
-ln -s /container/tool/py_tool/my_init /sbin/my_init
 mkdir -p /etc/service
 mkdir -p /etc/my_init.d
 mkdir -p /etc/container_environment
@@ -19,8 +13,6 @@ chmod 700 /etc/container_environment
 groupadd -g 8377 docker_env
 chown :docker_env /etc/container_environment.sh
 chmod 640 /etc/container_environment.sh
-
-ln -s /container/tool/py_tool/setuser /sbin/setuser
 
 # dpkg
 cp /container/file/dpkg_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
@@ -62,7 +54,7 @@ dpkg-divert --local --rename --add /usr/bin/ischroot
 ln -sf /bin/true /usr/bin/ischroot
 
 ## Install apt-utils.
-$minimal_apt_get_install apt-utils
+$minimal_apt_get_install apt-utils python3
 
 ## Upgrade all packages.
 apt-get dist-upgrade -y --no-install-recommends
