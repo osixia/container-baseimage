@@ -142,7 +142,7 @@ def export_envvars(to_dir = True):
 		return
 	shell_dump = ""
 	for name, value in os.environ.items():
-		if name in ['HOME', 'USER', 'GROUP', 'UID', 'GID', 'SHELL']:
+		if name in ['USER', 'GROUP', 'UID', 'GID', 'SHELL']:
 			continue
 		if to_dir:
 			with open("/etc/container_environment/" + name, "w") as f:
