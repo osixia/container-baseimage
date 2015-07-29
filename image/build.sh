@@ -65,7 +65,6 @@ echo -n C.UTF-8 > /etc/container_environment/LANG
 echo -n C.UTF-8 > /etc/container_environment/LANGUAGE
 echo -n C.UTF-8 > /etc/container_environment/LC_CTYPE
 
-
 # install PyYAML
 tar -C /container/file/ -xvf /container/file/PyYAML-3.11.tar.gz
 cd /container/file/PyYAML-3.11/
