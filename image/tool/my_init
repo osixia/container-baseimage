@@ -142,7 +142,7 @@ def export_envvars(to_dir = True):
 		return
 	shell_dump = ""
 	for name, value in os.environ.items():
-		if name in ['HOME', 'USER', 'GROUP', 'UID', 'GID', 'SHELL', 'SHLVL', 'PYTHONPATH', 'LD_LIBRARY_PATH']:
+		if name in ['HOME', 'USER', 'GROUP', 'UID', 'GID', 'SHELL']:
 			continue
 		if to_dir:
 			with open("/etc/container_environment/" + name, "w") as f:
@@ -325,49 +325,47 @@ def main(args):
 	with open("/etc/my_init_startup_files_completed", "w") as f:
 		f.write("1")
 
-	if not args.single_process:
+	runit_exited = False
+	exit_code = None
 
-		runit_exited = False
-		exit_code = None
-
+	if not args.skip_runit:
+		runit_pid = start_runit()
+	try:
+		exit_status = None
+		if len(args.main_command) == 0:
+			runit_exited, exit_code = wait_for_runit_or_interrupt(runit_pid)
+			if runit_exited:
+				if exit_code is None:
+					info("Runit exited with unknown status")
+					exit_status = 1
+				else:
+					exit_status = os.WEXITSTATUS(exit_code)
+					info("Runit exited with status %d" % exit_status)
+		else:
+			info("Running %s..." % " ".join(args.main_command))
+			pid = os.spawnvp(os.P_NOWAIT, args.main_command[0], args.main_command)
+			try:
+				exit_code = waitpid_reap_other_children(pid)
+				if exit_code is None:
+					info("%s exited with unknown status." % args.main_command[0])
+					exit_status = 1
+				else:
+					exit_status = os.WEXITSTATUS(exit_code)
+					info("%s exited with status %d." % (args.main_command[0], exit_status))
+			except KeyboardInterrupt:
+				stop_child_process(args.main_command[0], pid)
+				raise
+			except BaseException as s:
+				warn("An error occurred. Aborting.")
+				stop_child_process(args.main_command[0], pid)
+				raise
+		sys.exit(exit_status)
+	finally:
 		if not args.skip_runit:
-			runit_pid = start_runit()
-		try:
-			exit_status = None
-			if len(args.main_command) == 0:
-				runit_exited, exit_code = wait_for_runit_or_interrupt(runit_pid)
-				if runit_exited:
-					if exit_code is None:
-						info("Runit exited with unknown status")
-						exit_status = 1
-					else:
-						exit_status = os.WEXITSTATUS(exit_code)
-						info("Runit exited with status %d" % exit_status)
-			else:
-				info("Running %s..." % " ".join(args.main_command))
-				pid = os.spawnvp(os.P_NOWAIT, args.main_command[0], args.main_command)
-				try:
-					exit_code = waitpid_reap_other_children(pid)
-					if exit_code is None:
-						info("%s exited with unknown status." % args.main_command[0])
-						exit_status = 1
-					else:
-						exit_status = os.WEXITSTATUS(exit_code)
-						info("%s exited with status %d." % (args.main_command[0], exit_status))
-				except KeyboardInterrupt:
-					stop_child_process(args.main_command[0], pid)
-					raise
-				except BaseException as s:
-					warn("An error occurred. Aborting.")
-					stop_child_process(args.main_command[0], pid)
-					raise
-			sys.exit(exit_status)
-		finally:
-			if not args.skip_runit:
-				shutdown_runit_services()
-				if not runit_exited:
-					stop_child_process("runit daemon", runit_pid)
-				wait_for_runit_services()
+			shutdown_runit_services()
+			if not runit_exited:
+				stop_child_process("runit daemon", runit_pid)
+			wait_for_runit_services()
 
 try:
     os.remove("/etc/my_init_startup_files_completed")
@@ -390,18 +388,13 @@ parser.add_argument('--no-kill-all-on-exit', dest = 'kill_all_on_exit',
 parser.add_argument('--quiet', dest = 'log_level',
 	action = 'store_const', const = LOG_LEVEL_WARN, default = LOG_LEVEL_INFO,
 	help = 'Only print warnings and errors')
-parser.add_argument('--single-process', dest = 'single_process',
-	action = 'store_const', const = True, default = False,
-	help = 'Only run /etc/my_init.d/* and /etc/rc.local scripts and export envvar')
+
 args = parser.parse_args()
 log_level = args.log_level
 
 if args.skip_runit and len(args.main_command) == 0:
 	error("When --skip-runit is given, you must also pass a main command.")
 	sys.exit(1)
-
-if args.single_process:
-	args.kill_all_on_exit = False
 
 # Run main function.
 signal.signal(signal.SIGTERM, lambda signum, frame: ignore_signals_and_raise_keyboard_interrupt('SIGTERM'))

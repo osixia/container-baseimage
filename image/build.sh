@@ -55,7 +55,22 @@ $minimal_apt_get_install apt-utils python locales
 ## Upgrade all packages.
 apt-get dist-upgrade -y --no-install-recommends
 
+# fix locale
+locale-gen en_US.UTF-8 en_us
+locale-gen C.UTF-8
 dpkg-reconfigure locales
+/usr/sbin/update-locale LANG=C.UTF-8
+
+echo -n C.UTF-8 > /etc/container_environment/LANG
+echo -n C.UTF-8 > /etc/container_environment/LANGUAGE
+echo -n C.UTF-8 > /etc/container_environment/LC_CTYPE
+
+
+# install PyYAML
+tar -C /container/file/ -xvf /container/file/PyYAML-3.11.tar.gz
+cd /container/file/PyYAML-3.11/
+python setup.py install
+cd -
 
 apt-get clean
 rm -rf /tmp/* /var/tmp/*
