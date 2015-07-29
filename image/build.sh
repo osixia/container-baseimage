@@ -18,10 +18,6 @@ chmod 640 /etc/container_environment.sh
 cp /container/file/dpkg_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
 cp /container/file/dpkg_nolocales /etc/dpkg/dpkg.cfg.d/01_nolocales
 
-# Remove useless files
-rm -rf /container/file
-rm -rf /container/build.sh /container/Dockerfile
-
 # General config
 export LC_ALL=C
 export DEBIAN_FRONTEND=noninteractive
@@ -54,12 +50,18 @@ dpkg-divert --local --rename --add /usr/bin/ischroot
 ln -sf /bin/true /usr/bin/ischroot
 
 ## Install apt-utils.
-$minimal_apt_get_install apt-utils python3
+$minimal_apt_get_install apt-utils python locales
 
 ## Upgrade all packages.
 apt-get dist-upgrade -y --no-install-recommends
+
+dpkg-reconfigure locales
 
 apt-get clean
 rm -rf /tmp/* /var/tmp/*
 rm -rf /var/lib/apt/lists/*
 rm -f /etc/dpkg/dpkg.cfg.d/02apt-speedup
+
+# Remove useless files
+rm -rf /container/file
+rm -rf /container/build.sh /container/Dockerfile

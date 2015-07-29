@@ -1,4 +1,4 @@
-#!/usr/bin/python3 -u
+#!/usr/bin/python -u
 import os, os.path, sys, stat, signal, errno, argparse, time, re, yaml, ast
 
 KILL_PROCESS_TIMEOUT = 5
