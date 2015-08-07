@@ -13,7 +13,7 @@ elif [ "$nbDirectories" -eq 1 ]; then
   SERVICE=$(find /etc/service -mindepth 1 -maxdepth 1 -type d)
 
   echo "Execute /container/tool/my_init --skip-runit bash $SERVICE/run"
-  exec /container/tool/my_init --skip-runit $SERVICE/run
+  exec /container/tool/my_init --skip-runit bash $SERVICE/run
 
 # No process set
 else
