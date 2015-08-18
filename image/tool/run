@@ -4,25 +4,19 @@ nbDirectories=$(find /etc/service -mindepth 1 -maxdepth 1 -type d | wc -l )
 
 # Multiple process image
 if [ "$nbDirectories" -gt 1 ]; then
-  echo "Execute /container/tool/py_tool/my_init"
-  exec /container/tool/py_tool/my_init
+  echo "Execute /container/tool/my_init"
+  exec /container/tool/my_init
 
 # Single process image
 elif [ "$nbDirectories" -eq 1 ]; then
 
   SERVICE=$(find /etc/service -mindepth 1 -maxdepth 1 -type d)
 
-  echo "Execute /container/tool/py_tool/my_init --single-process"
-  /container/tool/py_tool/my_init --single-process
-
-  echo "Include /etc/container_environment.sh"
-  source /etc/container_environment.sh
-
-  echo "Execute $SERVICE/run"
-  source $SERVICE/run
+  echo "Execute /container/tool/my_init --skip-runit bash $SERVICE/run"
+  exec /container/tool/my_init --skip-runit bash $SERVICE/run
 
 # No process set
 else
-  echo "Execute /container/tool/py_tool/my_init --skip-runit bash"
-  exec /container/tool/py_tool/my_init --skip-runit bash
+  echo "Execute /container/tool/my_init --skip-runit bash"
+  exec /container/tool/my_init --skip-runit bash
 fi

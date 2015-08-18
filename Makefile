@@ -1,12 +1,9 @@
 NAME = osixia/light-baseimage
-VERSION = 0.1.0
+VERSION = 0.1.1
 
 .PHONY: all build test tag_latest release build-tool
 
 all: build
-
-build-tool:
-	./src/py_tool/build.sh
 
 build:
 	docker build -t $(NAME):$(VERSION) --rm image
