@@ -3,7 +3,7 @@
 ## Add bash tools to /sbin
 ln -s /container/tool/* /sbin/
 
-# Add python tools and needed directories
+# Add needed directories & files
 mkdir -p /etc/service
 mkdir -p /etc/my_init.d
 mkdir -p /etc/container_environment
@@ -14,7 +14,7 @@ groupadd -g 8377 docker_env
 chown :docker_env /etc/container_environment.sh
 chmod 640 /etc/container_environment.sh
 
-# dpkg
+# dpkg options
 cp /container/file/dpkg_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
 cp /container/file/dpkg_nolocales /etc/dpkg/dpkg.cfg.d/01_nolocales
 
