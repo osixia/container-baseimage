@@ -6,13 +6,13 @@ ln -s /container/tool/* /sbin/
 # Add needed directories & files
 mkdir -p /etc/service
 mkdir -p /etc/my_init.d
-mkdir -p /etc/container_environment
-touch /etc/container_environment.sh
-chmod 700 /etc/container_environment
+mkdir -p /container/environment/import
+touch /container/environment/env.sh
+chmod 700 /container/environment/import
 
 groupadd -g 8377 docker_env
-chown :docker_env /etc/container_environment.sh
-chmod 640 /etc/container_environment.sh
+chown :docker_env /container/environment/env.sh
+chmod 640 /container/environment/env.sh
 
 # dpkg options
 cp /container/file/dpkg_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
@@ -32,8 +32,8 @@ fi
 ## https://journal.paul.querna.org/articles/2013/10/15/docker-ubuntu-on-rackspace/
 ## http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=594189
 export INITRD=no
-mkdir -p /etc/container_environment
-echo -n no > /etc/container_environment/INITRD
+mkdir -p /container/environment/import
+echo -n no > /container/environment/import/INITRD
 
 apt-get update
 
@@ -61,9 +61,9 @@ locale-gen C.UTF-8
 dpkg-reconfigure locales
 /usr/sbin/update-locale LANG=C.UTF-8
 
-echo -n C.UTF-8 > /etc/container_environment/LANG
-echo -n C.UTF-8 > /etc/container_environment/LANGUAGE
-echo -n C.UTF-8 > /etc/container_environment/LC_CTYPE
+echo -n C.UTF-8 > /container/environment/import/LANG
+echo -n C.UTF-8 > /container/environment/import/LANGUAGE
+echo -n C.UTF-8 > /container/environment/import/LC_CTYPE
 
 # install PyYAML
 tar -C /container/file/ -xvf /container/file/PyYAML-3.11.tar.gz

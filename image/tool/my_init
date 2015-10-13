@@ -106,9 +106,9 @@ def decode_python_envvars():
 	for name, value in _environ.items():
 		python_to_bash_envvar(name, value)
 
-def import_container_yaml_envvars():
-	if os.path.isfile("/container/environment.yaml"):
-		with open("/container/environment.yaml", "r") as f:
+def import_yaml_envvars():
+	if os.path.isfile("/container/environment/env.yaml"):
+		with open("/container/environment/env.yaml", "r") as f:
 			etc_env_vars_yaml = f.read()
 		etc_env_vars = yaml.load(etc_env_vars_yaml)
 
@@ -116,24 +116,13 @@ def import_container_yaml_envvars():
 			if not name in os.environ:
 				os.environ[name] = xstr(value)
 
-def import_container_envvars():
-	if not os.path.exists("/container/environment"):
-		return
-
-	for path, subdirs, files in os.walk("/container/environment"):
-	    for name in files:
-	        filePath = os.path.join(path, name)
-		with open(filePath, "r") as f:
-			value = re.sub('\n\Z', '', f.read())
-			os.environ[name] = value
-
 def import_envvars(clear_existing_environment = True, override_existing_environment = True):
-	if not os.path.exists("/etc/container_environment"):
+	if not os.path.exists("/container/environment/import"):
 		return
 	new_env = {}
-	for envfile in listdir("/etc/container_environment"):
+	for envfile in listdir("/container/environment/import"):
 		name = os.path.basename(envfile)
-		with open("/etc/container_environment/" + envfile, "r") as f:
+		with open("/container/environment/import/" + envfile, "r") as f:
 			# Text files often end with a trailing newline, which we
 			# don't want to include in the env variable value. See
 			# https://github.com/phusion/baseimage-docker/pull/49
@@ -145,25 +134,24 @@ def import_envvars(clear_existing_environment = True, override_existing_environm
 		if override_existing_environment or not name in os.environ:
 			os.environ[name] = value
 
-	import_container_yaml_envvars()
-	import_container_envvars()
+	import_yaml_envvars()
 	decode_python_envvars()
 
 def export_envvars(to_dir = True):
-	if not os.path.exists("/etc/container_environment"):
+	if not os.path.exists("/container/environment/import"):
 		return
 	shell_dump = ""
 	for name, value in os.environ.items():
 		if name in ['USER', 'GROUP', 'UID', 'GID', 'SHELL']:
 			continue
 		if to_dir:
-			with open("/etc/container_environment/" + name, "w") as f:
+			with open("/container/environment/import/" + name, "w") as f:
 				f.write(value)
 		shell_dump += "export " + sanitize_shenvname(name) + "=" + shquote(value) + "\n"
-	with open("/etc/container_environment.sh", "w") as f:
+	with open("/container/environment/env.sh", "w") as f:
 		f.write(shell_dump)
 
-	with open("/container/environment.sh", "w") as f:
+	with open("/container/environment/env.sh", "w") as f:
 		f.write(shell_dump)
 
 _find_unsafe = re.compile(r'[^\w@%+=:,./-]').search
