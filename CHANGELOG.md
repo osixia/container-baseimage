@@ -1,8 +1,8 @@
 # Changelog
 
 ## 0.1.2
-  - Load environment variable from /container/environment directory and subdirectories
-    to make the image more friendly with kubernetes secrets
+  - Load env.yaml file from /container/environment directory
+    to make the image more friendly with kubernetes secrets :)
 
 ## 0.1.1
   - Fix remove-service #1
