@@ -106,9 +106,9 @@ def decode_python_envvars():
 	for name, value in _environ.items():
 		python_to_bash_envvar(name, value)
 
-def import_etc_yaml_envvars():
-	if os.path.isfile("/etc/env.yaml"):
-		with open("/etc/env.yaml", "r") as f:
+def import_yaml_envvars():
+	if os.path.isfile("/container/environment/env.yaml"):
+		with open("/container/environment/env.yaml", "r") as f:
 			etc_env_vars_yaml = f.read()
 		etc_env_vars = yaml.load(etc_env_vars_yaml)
 
@@ -134,7 +134,7 @@ def import_envvars(clear_existing_environment = True, override_existing_environm
 		if override_existing_environment or not name in os.environ:
 			os.environ[name] = value
 
-	import_etc_yaml_envvars()
+	import_yaml_envvars()
 	decode_python_envvars()
 
 def export_envvars(to_dir = True):
