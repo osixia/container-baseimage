@@ -1,5 +1,5 @@
 #!/usr/bin/python -u
-import os, os.path, sys, stat, signal, errno, argparse, time, re, yaml, ast
+import os, os.path, sys, stat, signal, errno, argparse, time, re, yaml, ast, socket
 
 KILL_PROCESS_TIMEOUT = 5
 KILL_ALL_PROCESSES_TIMEOUT = 5
@@ -62,6 +62,11 @@ def xstr(s):
     if s is None:
         return ''
     return str(s)
+
+def set_env_hostname_to_etc_hosts():
+	if "HOSTNAME" in os.environ and socket.gethostname() and os.environ["HOSTNAME"] != socket.gethostname():
+		with open("/etc/hosts", "a") as myfile:
+			myfile.write("127.0.0.1 "+os.environ["HOSTNAME"]+"\n")
 
 def python_dict_to_bash_envvar(name, python_dict):
 
@@ -318,6 +323,7 @@ def wait_for_runit_services():
 def main(args):
 	import_envvars(False, False)
 	export_envvars()
+	set_env_hostname_to_etc_hosts()
 
 	if not args.skip_startup_files:
 		run_startup_files()
