@@ -1,5 +1,5 @@
-NAME = osixia/light-baseimage
-VERSION = 0.1.3
+NAME = osixia/ubuntu-light-baseimage
+VERSION = 0.1.0
 
 .PHONY: all build test tag_latest release build-tool
 

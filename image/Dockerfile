@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM ubuntu:14.04
 MAINTAINER Bertrand Gouny <bertrand.gouny@osixia.net>
 
 ADD . /container

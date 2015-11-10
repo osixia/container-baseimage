@@ -35,6 +35,9 @@ export INITRD=no
 mkdir -p /etc/container_environment
 echo -n no > /etc/container_environment/INITRD
 
+## Enable Ubuntu Universe and Multiverse.
+sed -i 's/^#\s*\(deb.*universe\)$/\1/g' /etc/apt/sources.list
+sed -i 's/^#\s*\(deb.*multiverse\)$/\1/g' /etc/apt/sources.list
 apt-get update
 
 ## Fix some issues with APT packages.
@@ -49,26 +52,26 @@ ln -sf /bin/true /sbin/initctl
 dpkg-divert --local --rename --add /usr/bin/ischroot
 ln -sf /bin/true /usr/bin/ischroot
 
-## Install apt-utils.
-$minimal_apt_get_install apt-utils python locales
+## Install HTTPS support for APT.
+$minimal_apt_get_install apt-transport-https ca-certificates
+
+## Install add-apt-repository
+$minimal_apt_get_install software-properties-common
 
 ## Upgrade all packages.
 apt-get dist-upgrade -y --no-install-recommends
 
-# fix locale
-locale-gen en_US.UTF-8 en_us
-locale-gen C.UTF-8
-dpkg-reconfigure locales
-/usr/sbin/update-locale LANG=C.UTF-8
-
-echo -n C.UTF-8 > /etc/container_environment/LANG
-echo -n C.UTF-8 > /etc/container_environment/LANGUAGE
-echo -n C.UTF-8 > /etc/container_environment/LC_CTYPE
+## Fix locale.
+$minimal_apt_get_install language-pack-en
+locale-gen en_US
+update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
+echo -n en_US.UTF-8 > /etc/container_environment/LANG
+echo -n en_US.UTF-8 > /etc/container_environment/LC_CTYPE
 
 # install PyYAML
 tar -C /container/file/ -xvf /container/file/PyYAML-3.11.tar.gz
 cd /container/file/PyYAML-3.11/
-python setup.py install
+python3 setup.py install
 cd -
 
 apt-get clean
