@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.5
+  - fix bug with host network 
+
 ## 0.1.4
   - Add run cmd arguments when it's a single process image
   - Remove bash from command when it's a single process image
