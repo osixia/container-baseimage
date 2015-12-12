@@ -17,12 +17,12 @@ do
     if [ -f /container/service-available/$i/daemon.sh ]; then
       echo "link /container/service-available/$i/daemon.sh to /etc/service/$i/run"
       mkdir /etc/service/$i
-      ln -s /container/service-available/$i/daemon.sh /etc/service/$i/run
+      ln -sf /container/service-available/$i/daemon.sh /etc/service/$i/run
     fi
 
     if [ -f /container/service-available/$i/container-start.sh ]; then
       echo "link /container/service-available/$i/container-start.sh to /etc/my_init.d/$i"
-      ln -s /container/service-available/$i/container-start.sh /etc/my_init.d/$i
+      ln -sf /container/service-available/$i/container-start.sh /etc/my_init.d/$i
     fi
 
   else
