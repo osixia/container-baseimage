@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.2.0
-  - Allow image more easy image inheritance
+  - Allow more easy image inheritance
 
 ## 0.1.5
   - fix bug with host network
