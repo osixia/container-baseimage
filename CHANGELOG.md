@@ -2,6 +2,7 @@
 
 ## 0.2.0
   - Allow more easy image inheritance
+  - Fix cron NUMBER OF HARD LINKS > 1
 
 ## 0.1.5
   - fix bug with host network
