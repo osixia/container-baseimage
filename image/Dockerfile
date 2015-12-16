@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:experimental
 MAINTAINER Bertrand Gouny <bertrand.gouny@osixia.net>
 
 ADD . /container
