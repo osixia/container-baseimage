@@ -15,7 +15,7 @@ if [ -n "$TO_INSTALL" ]; then
   LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libltdl-dev $TO_INSTALL
 fi
 
-curl -o /usr/sbin/cfssl -SL https://github.com/osixia/cfssl/raw/master/bin/cfssl
+curl -o /usr/sbin/cfssl -SL https://pkg.cfssl.org/R1.1/cfssl_linux-amd64
 chmod +x /usr/sbin/cfssl
 
 curl -o /usr/sbin/cfssljson -SL https://github.com/osixia/cfssl/raw/master/bin/cfssljson
