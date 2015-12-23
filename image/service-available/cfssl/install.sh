@@ -21,7 +21,7 @@ chmod +x /usr/sbin/cfssl
 curl -o /usr/sbin/cfssljson -SL https://github.com/osixia/cfssl/raw/master/bin/cfssljson
 chmod +x /usr/sbin/cfssljson
 
-ln -s tool/* /usr/bin
+ln -s /container/service-available/cfssl/assets/tool/* /usr/sbin
 
 if [ -n "$TO_INSTALL" ]; then
   apt-get remove -y --purge --auto-remove $TO_INSTALL

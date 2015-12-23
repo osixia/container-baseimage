@@ -1,0 +1,108 @@
+#!/bin/bash -e
+
+CERT_FILE=$1
+KEY_FILE=$2
+CA_FILE=$3
+
+if [ -z "$CERT_FILE" ] || [ -z "$KEY_FILE" ] || [ -z "$CA_FILE" ]; then
+  echo "Usage: cfssl-helper cert_file key_file ca_file"
+  exit 1
+fi
+
+source /container/service-available/cfssl/default-env
+
+if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
+
+  echo "No certificate file and certificate key provided, generate:"
+  echo "$CERT_FILE"
+  echo "$KEY_FILE"
+
+  CSR_FILE="/tmp/csr"
+  generateCsr
+  generateCert
+
+  rm -rf /tmp/*
+  echo "done"
+
+else
+  echo "Files $CERT_FILE or $KEY_FILE already exists,"
+  echo "do nothing."
+fi
+
+
+if [ ! -e "$CA_FILE" ]; then
+
+  echo "No CA certificate provided"
+
+  if [ -n "$CFSSL_REMOTE_SERVER" ]; then
+    echo "Try to get certificate from $CFSSL_REMOTE_SERVER"
+    
+
+  elif [ "$CFSSL_CA" = "default-ca" ]; then
+    "Link default-ca certificate to $CA_FILE"
+    ln -s /container/service-available/cfssl/assets/default-ca/default-ca.pem $CA_FILE
+  elif [ -n "$CFSSL_CA_CERT" ]
+    "Link custom cfssl CA cert to $CA_FILE"
+    ln -s $CFSSL_CA_CERT $CA_FILE
+  else
+    echo "unable to get a CA certificate"
+    exit 1
+  fi
+fi
+
+
+function generateCsr() {
+
+  cp /container/service-available/cfssl/assets/default-ca/config/req-csr.json.tmpl $CSR_FILE
+
+  sed -i "s|{{ CFSSL_CERT_KEY_ALGO }}|${CFSSL_CERT_KEY_ALGO}|g" $CSR_FILE
+  sed -i "s|{{ CFSSL_CERT_KEY_SIZE }}|${CFSSL_CERT_KEY_SIZE}|g" $CSR_FILE
+  sed -i "s|{{ CFSSL_CERT_ORGANIZATION }}|${CFSSL_CERT_ORGANIZATION}|g" $CSR_FILE
+  sed -i "s|{{ CFSSL_CERT_ORGANIZATION_UNIT }}|${CFSSL_CERT_ORGANIZATION_UNIT}|g" $CSR_FILE
+  sed -i "s|{{ CFSSL_CERT_LOCATION }}|${CFSSL_CERT_LOCATION}|g" $CSR_FILE
+  sed -i "s|{{ CFSSL_CERT_STATE }}|${CFSSL_CERT_STATE}|g" $CSR_FILE
+  sed -i "s|{{ CFSSL_CERT_COUNTRY }}|${CFSSL_CERT_COUNTRY}|g" $CSR_FILE
+  sed -i "s|{{ CFSSL_CERT_CN }}|${CFSSL_CERT_CN}|g" $CSR_FILE
+
+  # cert_cn is the first hostname
+  IFS=',' read -r -a host_array <<< "$CFSSL_CERT_HOSTS"
+  for host in "${host_array[@]}"
+  do
+    sed -i "s|\"{{ CFSSL_CERT_HOSTS }}\"|\"${host}\",\n    \"{{ CFSSL_CERT_HOSTS }}\"|g" $CSR_FILE
+    LAST_HOST=$host
+  done
+  sed -i "s|    \"$LAST_HOST\",|    \"$LAST_HOST\"|g" $CSR_FILE
+  sed -i "/{{ CFSSL_CERT_HOSTS }}/d" $CSR_FILE
+
+
+}
+
+
+function generateCert() {
+
+  if [ -n "$CFSSL_REMOTE_SERVER" ]; then
+    gencert -remote=$CFSSL_REMOTE_SERVER $CSR_FILE | cfssljson -bare /tmp/cert
+  else
+
+    if [ "$CFSSL_CA" = "default-ca" ]; then
+      CFSSL_CA_CERT="/container/service-available/cfssl/assets/default-ca/default-ca.pe"
+      CFSSL_CA_KEY="/container/service-available/cfssl/assets/default-ca/default-ca-key.pem"
+      CFSSL_CA_CONFIG="/container/service-available/cfssl/assets/default-ca/config/ca-config.json"
+    fi
+
+    CA_CERT_PARAM=""
+    CA_KEY_PARAM=""
+    CA_CONFIG_PARAM=""
+
+    [[ -n "$CFSSL_CA_CERT" ]] && CA_CERT_PARAM="-ca CFSSL_CA_CERT"
+    [[ -n "$CFSSL_CA_KEY" ]] && CA_KEY_PARAM="-ca-key $CFSSL_CA_KEY"
+    [[ -n "$CFSSL_CA_CONFIG" ]] && CA_CONFIG_PARAM="-config $CFSSL_CA_CONFIG"
+
+    gencert -remote=$CFSSL_REMOTE_SERVER $CA_CERT_PARAM $CA_KEY_PARAM $CA_CONFIG_PARAM $CSR_FILE | cfssljson -bare /tmp/cert
+  fi
+
+  # move generated files
+  mv /tmp/cert.pem $CERT_FILE
+  mv /tmp/cert-key.pem $KEY_FILE
+
+}
