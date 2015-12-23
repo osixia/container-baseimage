@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1
+  - Add cfssl as available service to generate ssl certs
+  - Warning: ssl-helper ssl-helper-openssl and ssl-helper-gnutls are now deprecated
+    and will be removed shortly
+
 ## 0.2.0
   - Allow more easy image inheritance
   - Fix cron NUMBER OF HARD LINKS > 1

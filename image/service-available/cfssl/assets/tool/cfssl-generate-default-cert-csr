@@ -1,0 +1,32 @@
+#!/bin/bash -e
+
+FILE_DEST=$1
+
+if [ -z "$FILE_DEST" ]; then
+  echo "Usage: $0 gen_file_destination"
+  echo "Example: $0 /etc/my-csr.json"
+  exit 1
+fi
+
+source /container/service-available/cfssl/default-env
+
+cp /container/service-available/cfssl/assets/default-ca/config/req-csr.json.tmpl $FILE_DEST
+
+sed -i "s|{{ KEY_ALGO }}|${KEY_ALGO}|g" $FILE_DEST
+sed -i "s|{{ KEY_SIZE }}|${KEY_SIZE}|g" $FILE_DEST
+sed -i "s|{{ ORGANIZATION }}|${ORGANIZATION}|g" $FILE_DEST
+sed -i "s|{{ ORGANIZATION_UNIT }}|${ORGANIZATION_UNIT}|g" $FILE_DEST
+sed -i "s|{{ LOCATION }}|${LOCATION}|g" $FILE_DEST
+sed -i "s|{{ STATE }}|${STATE}|g" $FILE_DEST
+sed -i "s|{{ COUNTRY }}|${COUNTRY}|g" $FILE_DEST
+sed -i "s|{{ CFSSL_CERT_CN }}|${CFSSL_CERT_CN}|g" $FILE_DEST
+
+# cert_cn is the first hostname
+IFS=',' read -r -a host_array <<< "$CFSSL_CERT_HOSTS"
+for host in "${host_array[@]}"
+do
+  sed -i "s|\"{{ CFSSL_CERT_HOSTS }}\"|\"${host}\",\n    \"{{ CFSSL_CERT_HOSTS }}\"|g" $FILE_DEST
+  LAST_HOST=$host
+done
+sed -i "s|    \"$LAST_HOST\",|    \"$LAST_HOST\"|g" $FILE_DEST
+sed -i "/{{ CFSSL_CERT_HOSTS }}/d" $FILE_DEST

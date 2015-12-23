@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+exec cfssl gencert -ca /container/service-available/cfssl/assets/default-ca/default-ca.pem -ca-key /container/service-available/cfssl/assets/default-ca/default-ca-key.pem -config /container/service-available/cfssl/assets/default-ca/config/ca-config.json "$@"
