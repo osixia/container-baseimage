@@ -137,7 +137,7 @@ def import_yaml_envvars():
 
 					for name, value in etc_env_vars.items():
 						if not name in os.environ:
-							os.environ[name] = xstr(value)
+							os.environ[name] = xstr('#PYTHON2BASH:' + value)
 
 def import_envvars(clear_existing_environment = True, override_existing_environment = True):
 	if not os.path.exists("/etc/container_environment"):
