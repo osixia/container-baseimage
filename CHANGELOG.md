@@ -2,8 +2,9 @@
 
 ## 0.2.1
   - Add cfssl as available service to generate ssl certs
-  - Warning: ssl-helper ssl-helper-openssl and ssl-helper-gnutls are now deprecated
-    and will be removed shortly
+    Warning: ssl-helper ssl-helper-openssl and ssl-helper-gnutls
+             have been removed
+  - Add #PYTHON2BASH: tag to envar, to convert phyton env var value var to bash env var
 
 ## 0.2.0
   - Allow more easy image inheritance

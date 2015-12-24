@@ -118,17 +118,26 @@ def python_to_bash_envvar(name, value):
 def decode_python_envvars():
 	_environ = dict(os.environ)
 	for name, value in _environ.items():
-		python_to_bash_envvar(name, value)
+		if value.startswith("#PYTHON2BASH:") :
+			value = value.replace("#PYTHON2BASH:","",1)
+			info('Convert python to bash env var: ' + name)
+			python_to_bash_envvar(name, value)
 
 def import_yaml_envvars():
-	if os.path.isfile("/container/environment/env.yaml"):
-		with open("/container/environment/env.yaml", "r") as f:
-			etc_env_vars_yaml = f.read()
-		etc_env_vars = yaml.load(etc_env_vars_yaml)
 
-		for name, value in etc_env_vars.items():
-			if not name in os.environ:
-				os.environ[name] = xstr(value)
+	for subdir, dirs, files in os.walk("/container/environment"):
+		for file in files:
+			filepath = subdir + os.sep + file
+
+			if filepath.endswith("env.yaml"):
+				info('Import env var from ' + filepath)
+				with open(filepath, "r") as f:
+					etc_env_vars_yaml = f.read()
+					etc_env_vars = yaml.load(etc_env_vars_yaml)
+
+					for name, value in etc_env_vars.items():
+						if not name in os.environ:
+							os.environ[name] = xstr(value)
 
 def import_envvars(clear_existing_environment = True, override_existing_environment = True):
 	if not os.path.exists("/etc/container_environment"):

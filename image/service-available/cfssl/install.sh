@@ -18,7 +18,7 @@ fi
 curl -o /usr/sbin/cfssl -SL https://pkg.cfssl.org/R1.1/cfssl_linux-amd64
 chmod +x /usr/sbin/cfssl
 
-curl -o /usr/sbin/cfssljson -SL https://github.com/osixia/cfssl/raw/master/bin/cfssljson
+curl -o /usr/sbin/cfssljson -SL https://pkg.cfssl.org/R1.1/cfssljson_linux-amd64
 chmod +x /usr/sbin/cfssljson
 
 ln -s /container/service-available/cfssl/assets/tool/* /usr/sbin

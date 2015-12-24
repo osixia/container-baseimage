@@ -1,19 +1,19 @@
 {
-  "CN": "{{ CFSSL_CERT_CN }}",
+  "CN": "{{ CFSSL_DEFAULT_CA_CSR_CN }}",
   "hosts": [
-    "{{ CFSSL_CERT_HOSTS }}"
+    "{{ CFSSL_DEFAULT_CA_CSR_CN }}"
   ],
   "key": {
-    "algo": "{{ CFSSL_CERT_KEY_ALGO }}",
-    "size": {{ CFSSL_CERT_KEY_SIZE }}
+    "algo": "{{ CFSSL_DEFAULT_CA_CSR_KEY_ALGO }}",
+    "size": {{ CFSSL_DEFAULT_CA_CSR_KEY_SIZE }}
   },
   "names": [
     {
-      "O": "{{ CFSSL_CERT_ORGANIZATION }}",
-      "OU": "{{ CFSSL_CERT_ORGANIZATION_UNIT }}",
-      "L": "{{ CFSSL_CERT_LOCATION }}",
-      "ST": "{{ CFSSL_CERT_STATE }}",
-      "C": "{{ CFSSL_CERT_COUNTRY }}"
+      "O": "{{ CFSSL_DEFAULT_CA_CSR_ORGANIZATION }}",
+      "OU": "{{ CFSSL_DEFAULT_CA_CSR_ORGANIZATION_UNIT }}",
+      "L": "{{ CFSSL_DEFAULT_CA_CSR_LOCATION }}",
+      "ST": "{{ CFSSL_DEFAULT_CA_CSR_STATE }}",
+      "C": "{{ CFSSL_DEFAULT_CA_CSR_COUNTRY }}"
     }
   ]
 }
