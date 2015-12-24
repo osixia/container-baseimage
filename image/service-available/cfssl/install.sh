@@ -12,8 +12,10 @@ if [ $(dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok in
 fi
 
 if [ -n "$TO_INSTALL" ]; then
-  LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libltdl-dev $TO_INSTALL
+  LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $TO_INSTALL
 fi
+
+LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libltdl-dev
 
 curl -o /usr/sbin/cfssl -SL https://pkg.cfssl.org/R1.1/cfssl_linux-amd64
 chmod +x /usr/sbin/cfssl
