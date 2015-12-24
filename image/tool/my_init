@@ -134,10 +134,14 @@ def import_yaml_envvars():
 				with open(filepath, "r") as f:
 					etc_env_vars_yaml = f.read()
 					etc_env_vars = yaml.load(etc_env_vars_yaml)
+					info('-> successfully converted to python')
 
 					for name, value in etc_env_vars.items():
 						if not name in os.environ:
-							os.environ[name] = '#PYTHON2BASH:' + xstr(value)
+							if isinstance(value, list) or isinstance(value, dict):
+								os.environ[name] = '#PYTHON2BASH:' + xstr(value)
+							else:
+								os.environ[name] = xstr(value)
 
 def import_envvars(clear_existing_environment = True, override_existing_environment = True):
 	if not os.path.exists("/etc/container_environment"):
