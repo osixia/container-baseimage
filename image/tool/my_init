@@ -123,18 +123,33 @@ def decode_python_envvars():
 			info('Convert python to bash env var: ' + name)
 			python_to_bash_envvar(name, value)
 
+def print_yaml_envvars_file_order():
+
+	info('Environment files will be proccessed in this order :')
+	sys.stderr.write('Caution: previously defined variables will not be overriden\n')
+
+	file_found = False
+	for subdir, dirs, files in sorted(os.walk("/container/environment")):
+
+		for file in files:
+			file_found = True
+			filepath = subdir + os.sep + file
+			sys.stderr.write(filepath + '\n')
+	if not file_found:
+		sys.stderr.write('No env file found, that was a useless message... sorry.\n')
+
+
 def import_yaml_envvars():
 
-	for subdir, dirs, files in os.walk("/container/environment"):
+	for subdir, dirs, files in sorted(os.walk("/container/environment")):
+
 		for file in files:
 			filepath = subdir + os.sep + file
 
 			if filepath.endswith("env.yaml"):
-				info('Import env var from ' + filepath)
 				with open(filepath, "r") as f:
 					etc_env_vars_yaml = f.read()
 					etc_env_vars = yaml.load(etc_env_vars_yaml)
-					info('-> successfully converted to python')
 
 					for name, value in etc_env_vars.items():
 						if not name in os.environ:
@@ -343,6 +358,7 @@ def wait_for_runit_services():
 			time.sleep(0.1)
 
 def main(args):
+	print_yaml_envvars_file_order()
 	import_envvars(False, False)
 	export_envvars()
 	set_env_hostname_to_etc_hosts()
