@@ -1,5 +1,5 @@
 #!/usr/bin/python -u
-import os, os.path, sys, stat, signal, errno, argparse, time, re, yaml, ast, socket
+import os, os.path, sys, stat, signal, errno, argparse, time, re, yaml, json, ast, socket
 
 KILL_PROCESS_TIMEOUT = 5
 KILL_ALL_PROCESSES_TIMEOUT = 5
@@ -120,8 +120,18 @@ def decode_python_envvars():
 	for name, value in _environ.items():
 		if value.startswith("#PYTHON2BASH:") :
 			value = value.replace("#PYTHON2BASH:","",1)
-			info('Convert python to bash env var: ' + name)
 			python_to_bash_envvar(name, value)
+
+def decode_json_envvars():
+	_environ = dict(os.environ)
+	for name, value in _environ.items():
+		if value.startswith("#JSON2BASH:") :
+			value = value.replace("#JSON2BASH:","",1)
+			try:
+				value = json.loads(value)
+				python_to_bash_envvar(name,value)
+			except:
+				os.environ[name] = xstr(value)
 
 def print_yaml_envvars_file_order():
 
@@ -132,31 +142,41 @@ def print_yaml_envvars_file_order():
 	for subdir, dirs, files in sorted(os.walk("/container/environment")):
 
 		for file in files:
-			file_found = True
 			filepath = subdir + os.sep + file
-			sys.stderr.write(filepath + '\n')
+			if filepath.endswith("env.yaml") or filepath.endswith("env.json"):
+				file_found = True
+				filepath = subdir + os.sep + file
+				sys.stderr.write(filepath + '\n')
 	if not file_found:
 		sys.stderr.write('No env file found, that was a useless message... sorry.\n')
 
 
-def import_yaml_envvars():
+def import_env_files():
 
 	for subdir, dirs, files in sorted(os.walk("/container/environment")):
 
 		for file in files:
-			filepath = subdir + os.sep + file
 
-			if filepath.endswith("env.yaml"):
-				with open(filepath, "r") as f:
-					etc_env_vars_yaml = f.read()
-					etc_env_vars = yaml.load(etc_env_vars_yaml)
+			if file.endswith("env.yaml") or file.endswith("env.json"):
+				filepath = subdir + os.sep + file
 
-					for name, value in etc_env_vars.items():
-						if not name in os.environ:
-							if isinstance(value, list) or isinstance(value, dict):
-								os.environ[name] = '#PYTHON2BASH:' + xstr(value)
-							else:
-								os.environ[name] = xstr(value)
+				try:
+					with open(filepath, "r") as f:
+
+						if file.endswith("env.yaml"):
+							env_vars = yaml.load(f)
+
+						elif file.endswith("env.json"):
+							env_vars = json.load(f)
+
+						for name, value in env_vars.items():
+							if not name in os.environ:
+								if isinstance(value, list) or isinstance(value, dict):
+									os.environ[name] = '#PYTHON2BASH:' + xstr(value)
+								else:
+									os.environ[name] = xstr(value)
+				except:
+					info('failed to parse: ' + filepath)
 
 def import_envvars(clear_existing_environment = True, override_existing_environment = True):
 	if not os.path.exists("/etc/container_environment"):
@@ -176,8 +196,10 @@ def import_envvars(clear_existing_environment = True, override_existing_environm
 		if override_existing_environment or not name in os.environ:
 			os.environ[name] = value
 
-	import_yaml_envvars()
+	import_env_files()
+	decode_json_envvars()
 	decode_python_envvars()
+
 
 def export_envvars(to_dir = True):
 	if not os.path.exists("/etc/container_environment"):
