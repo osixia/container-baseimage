@@ -4,7 +4,9 @@
   - Add cfssl as available service to generate ssl certs
     Warning: ssl-helper ssl-helper-openssl and ssl-helper-gnutls
              have been removed
-  - Add #PYTHON2BASH: tag to envar, to convert phyton env var value var to bash env var
+  - Add tag #PYTHON2BASH and #JSON2BASH to convert env var to bash
+  - Add multiple env file importation
+  - Add json env file support
 
 ## 0.2.0
   - Allow more easy image inheritance
@@ -12,14 +14,14 @@
   - Makefile with build no cache
 
 ## 0.1.5
-  - fix bug with host network
+  - Fix bug with host network
 
 ## 0.1.4
   - Add run cmd arguments when it's a single process image
   - Remove bash from command when it's a single process image
 
 ## 0.1.3
-  - add hostname env variable to /etc/hosts
+  - Add hostname env variable to /etc/hosts
     to make the image more friendly with kubernetes again :)
 
 ## 0.1.2

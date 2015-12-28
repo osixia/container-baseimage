@@ -133,7 +133,7 @@ def decode_json_envvars():
 			except:
 				os.environ[name] = xstr(value)
 
-def print_yaml_envvars_file_order():
+def print_env_files_order():
 
 	info('Environment files will be proccessed in this order :')
 	sys.stderr.write('Caution: previously defined variables will not be overriden\n')
@@ -143,7 +143,7 @@ def print_yaml_envvars_file_order():
 
 		for file in files:
 			filepath = subdir + os.sep + file
-			if filepath.endswith("env.yaml") or filepath.endswith("env.json"):
+			if filepath.endswith(".yaml") or filepath.endswith(".json"):
 				file_found = True
 				filepath = subdir + os.sep + file
 				sys.stderr.write(filepath + '\n')
@@ -157,16 +157,16 @@ def import_env_files():
 
 		for file in files:
 
-			if file.endswith("env.yaml") or file.endswith("env.json"):
+			if file.endswith(".yaml") or file.endswith(".json"):
 				filepath = subdir + os.sep + file
 
 				try:
 					with open(filepath, "r") as f:
 
-						if file.endswith("env.yaml"):
+						if file.endswith(".yaml"):
 							env_vars = yaml.load(f)
 
-						elif file.endswith("env.json"):
+						elif file.endswith(".json"):
 							env_vars = json.load(f)
 
 						for name, value in env_vars.items():
@@ -380,7 +380,7 @@ def wait_for_runit_services():
 			time.sleep(0.1)
 
 def main(args):
-	print_yaml_envvars_file_order()
+	print_env_files_order()
 	import_envvars(False, False)
 	export_envvars()
 	set_env_hostname_to_etc_hosts()
