@@ -44,9 +44,9 @@ function isRow() {
 function getRowKey() {
   local ENV_VAR=$1
   if [ $(complex-bash-env isRow "$ENV_VAR") = true ]; then
-    local ENV_VAR=$(complex-bash-env stripRowPrefix $ENV_VAR)
+    local ENV_VAR=$(complex-bash-env stripRowPrefix "$ENV_VAR")
     local ENV_VAR_TABLE=($ENV_VAR)
-    echo "${ENV_VAR_TABLE[0]}"
+    echo "${!ENV_VAR_TABLE[0]}"
   else
     echo "$ENV_VAR is not a complex bash env row"
   fi
@@ -55,9 +55,9 @@ function getRowKey() {
 function getRowValue() {
   local ENV_VAR=$1
   if [ $(complex-bash-env isRow "$ENV_VAR") = true ]; then
-    local ENV_VAR=$(complex-bash-env stripRowPrefix $ENV_VAR)
+    local ENV_VAR=$(complex-bash-env stripRowPrefix "$ENV_VAR")
     local ENV_VAR_TABLE=($ENV_VAR)
-    echo "${ENV_VAR_TABLE[1]}"
+    echo "${!ENV_VAR_TABLE[1]}"
   else
     echo "$ENV_VAR is not a complex bash env row"
   fi
