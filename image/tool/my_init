@@ -80,22 +80,22 @@ def set_env_hostname_to_etc_hosts():
 def python_dict_to_bash_envvar(name, python_dict):
 
 		for value in python_dict:
-				python_to_bash_envvar(name+"_KEY", value)
-				python_to_bash_envvar(name+"_VALUE", python_dict.get(value))
+			python_to_bash_envvar(name+"_KEY", value)
+			python_to_bash_envvar(name+"_VALUE", python_dict.get(value))
 
-		values = name+"_KEY "+name+"_VALUE"
+		values = "#COMPLEX_BASH_ENV:ROW: "+name+"_KEY "+name+"_VALUE"
 		os.environ[name] = xstr(values)
 
 def python_list_to_bash_envvar(name, python_list):
 
-		values=""
+		values="#COMPLEX_BASH_ENV:TABLE:"
 
 		i=1
 		for value in python_list:
-				child_name = name + "_" + str(i)
-				values += " " + child_name
-				python_to_bash_envvar(child_name, value)
-				i = i +1
+			child_name = name + "_ROW_" + str(i)
+			values += " " + child_name
+			python_to_bash_envvar(child_name, value)
+			i = i +1
 
 		os.environ[name] = xstr(values)
 
