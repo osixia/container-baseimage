@@ -122,12 +122,15 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
   [[ -n "$CFSSL_PROFILE" ]] && PROFILE_PARAM="-profile $CFSSL_PROFILE"
   [[ -n "$CFSSL_LABEL" ]] && LABEL_PARAM="-label $CFSSL_LABEL"
 
-  echo "cfssl gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE"
+  echo "cfssl gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME"
   cfssl gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME
   echo ""
 
   # move generated files
+  echo "move /tmp/$CERT_NAME.pem to $CERT_FILE"
   mv /tmp/$CERT_NAME.pem $CERT_FILE
+
+  echo "move /tmp/$CERT_NAME-key.pem to $KEY_FILE"
   mv /tmp/$CERT_NAME-key.pem $KEY_FILE
 
   # delete tmp files
@@ -140,6 +143,7 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
       echo "Get CA certificate from $CFSSL_REMOTE"
       echo "cfssl info $REMOTE_PARAM $CONFIG_PARAM $PROFILE_PARAM $LABEL_PARAM"
       cfssl info $REMOTE_PARAM $CONFIG_PARAM $PROFILE_PARAM $LABEL_PARAM | sed -e "s/.*certificate\":\"\(.*-----\)\".*/\1/g" | sed 's/\\n/\n/g' > $CA_FILE
+      echo "CA certificate returned save as $CA_FILE"
 
     elif [ -n "$CFSSL_CA_CERT" ]; then
       echo "Link $CFSSL_CA_CERT to $CA_FILE"
