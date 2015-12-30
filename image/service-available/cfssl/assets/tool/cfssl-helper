@@ -5,7 +5,7 @@ CERT_FILE=$2
 KEY_FILE=$3
 CA_FILE=$4
 
-echo "cfssl-helper"
+echo "cfssl-helper is launched, everybody on the floor !"
 
 if [ -z "$PREFIX" ] || [ -z "$CERT_FILE" ] || [ -z "$KEY_FILE" ] || [ -z "$CA_FILE" ]; then
   echo "Usage: cfssl-helper prefix cert_file key_file ca_file"
@@ -15,8 +15,7 @@ fi
 if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
 
   echo "No certificate file and certificate key provided, generate:"
-  echo "- $CERT_FILE"
-  echo "- $KEY_FILE"
+  echo "$CERT_FILE and $KEY_FILE"
   echo ""
 
   # set env vars
