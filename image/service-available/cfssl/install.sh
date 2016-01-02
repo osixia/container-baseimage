@@ -18,12 +18,13 @@ fi
 LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libltdl-dev
 
 curl -o /usr/sbin/cfssl -SL https://pkg.cfssl.org/R1.1/cfssl_linux-amd64
-chmod +x /usr/sbin/cfssl
+chmod 700 /usr/sbin/cfssl
 
 curl -o /usr/sbin/cfssljson -SL https://pkg.cfssl.org/R1.1/cfssljson_linux-amd64
-chmod +x /usr/sbin/cfssljson
+chmod 700 /usr/sbin/cfssljson
 
 ln -s /container/service-available/cfssl/assets/tool/* /usr/sbin
+chmod 700 /container/service-available/cfssl/assets/tool/*
 
 if [ -n "$TO_INSTALL" ]; then
   apt-get remove -y --purge --auto-remove $TO_INSTALL
