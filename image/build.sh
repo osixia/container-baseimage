@@ -2,7 +2,6 @@
 
 ## Add bash tools to /sbin
 ln -s /container/tool/* /sbin/
-chmod 700 /container/tool/*
 
 # Add needed directories & files
 mkdir -p /etc/service
@@ -14,8 +13,6 @@ chmod 700 /etc/container_environment
 groupadd -g 8377 docker_env
 chown :docker_env /etc/container_environment.sh
 chmod 640 /etc/container_environment.sh
-
-find /container/service-available/ -type f -name install.sh -exec chmod 700 {} \;
 
 # dpkg options
 cp /container/file/dpkg_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
