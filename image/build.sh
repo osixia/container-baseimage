@@ -6,9 +6,11 @@ ln -s /container/tool/* /sbin/
 # Add needed directories & files
 mkdir -p /etc/service
 mkdir -p /etc/my_init.d
-mkdir -p /etc/container_environment
+mkdir -p /etc/container_environment/secret
 touch /etc/container_environment.sh
 chmod 700 /etc/container_environment
+
+chmod -x /etc/rc.local
 
 groupadd -g 8377 docker_env
 chown :docker_env /etc/container_environment.sh
