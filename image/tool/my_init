@@ -336,6 +336,7 @@ def run_command_killable(*argv):
 
 def run_command_killable_and_import_envvars(*argv):
 	run_command_killable(*argv)
+	debug_env(" reset environment ---")
 	import_envvars()
 	export_envvars(False)
 
