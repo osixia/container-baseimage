@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-nbDirectories=$(find /etc/service -mindepth 1 -maxdepth 1 -type d | wc -l )
+nbDirectories=$(find /container/run/service -mindepth 1 -maxdepth 1 -type d | wc -l )
 
 # Multiple process image
 if [ "$nbDirectories" -gt 1 ]; then
@@ -10,7 +10,7 @@ if [ "$nbDirectories" -gt 1 ]; then
 # Single process image
 elif [ "$nbDirectories" -eq 1 ]; then
 
-  SERVICE=$(find /etc/service -mindepth 1 -maxdepth 1 -type d)
+  SERVICE=$(find /container/run/service -mindepth 1 -maxdepth 1 -type d)
 
   echo "Execute /container/tool/my_init --skip-runit $SERVICE/run"
   exec /container/tool/my_init --skip-runit $SERVICE/run $@

@@ -6,14 +6,14 @@ do
 
   echo "remove-service: $i"
 
-  if [ -d /etc/service/$i ]; then
-    echo "remove folder /etc/service/$i"
-    rm -rf /etc/service/$i
+  if [ -d /container/run/service/$i ]; then
+    echo "remove folder /container/run/service/$i"
+    rm -rf /container/run/service/$i
   fi
 
-  if [ -f /etc/my_init.d/$i ]; then
-    echo "remove file /etc/my_init.d/$i"
-    rm -f /etc/my_init.d/$i
+  if [ -f /container/run/startup/$i ]; then
+    echo "remove file /container/run/startup/$i"
+    rm -f /container/run/startup/$i
   fi
 
   if [ -d /container/service/$i ]; then

@@ -23,21 +23,21 @@ for d in $(find /container/service -mindepth 1 -maxdepth 1 -type d | sort); do
 
   # Service container start script
   if [ -f "${d}/container-start.sh" ]; then
-    echo "link ${d}/container-start.sh to /etc/my_init.d/$service"
-    ln -fs ${d}/container-start.sh /etc/my_init.d/$service
+    echo "link ${d}/container-start.sh to /container/run/startup/$service"
+    ln -fs ${d}/container-start.sh /container/run/startup/$service
   fi
 
   # Service process
   if [ -f "${d}/daemon.sh" ]; then
-    echo "link ${d}/daemon.sh to /etc/service/$service/run"
-    mkdir -p /etc/service/$service
-    ln -fs ${d}/daemon.sh /etc/service/$service/run
+    echo "link ${d}/daemon.sh to /container/run/service/$service/run"
+    mkdir -p /container/run/service/$service
+    ln -fs ${d}/daemon.sh /container/run/service/$service/run
   fi
 
 done
 
 echo "Searching process..."
-nbDirectories=$(find /etc/service -mindepth 1 -maxdepth 1 -type d | wc -l )
+nbDirectories=$(find /container/run/service -mindepth 1 -maxdepth 1 -type d | wc -l )
 echo "$nbDirectories process found"
 
 if [ "$nbDirectories" -gt 1 ] && [ ! -e "/etc/multiple_process_stack_installed" ]; then

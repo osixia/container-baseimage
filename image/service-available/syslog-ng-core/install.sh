@@ -12,5 +12,5 @@ rm -f /etc/syslog-ng/syslog-ng.conf
 ln -s /container/service-available/syslog-ng-core/assets/config/syslog-ng.conf /etc/syslog-ng/syslog-ng.conf
 
 ## Install syslog to "docker logs" forwarder.
-mkdir /etc/service/syslog-forwarder
-ln -s /container/service-available/syslog-ng-core/daemon-syslog-forwarder.sh /etc/service/syslog-forwarder/run
+mkdir /container/run/service/syslog-forwarder
+ln -s /container/service-available/syslog-ng-core/daemon-syslog-forwarder.sh /container/run/service/syslog-forwarder/run

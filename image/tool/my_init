@@ -11,8 +11,14 @@ LOG_LEVEL_DEBUG = 3
 
 SHENV_NAME_WHITELIST_REGEX = re.compile('[^\w\-_\.]')
 
+yamlExtensions = ('.yaml', '.yaml.startup')
+jsonExtensions = ('.json', '.json.startup')
+startupExtensions = ('.yaml.startup', '.json.startup')
+
 log_level = None
 debug_env = False
+
+environ_backup = dict(os.environ)
 
 terminated_child_processes = {}
 
@@ -37,14 +43,14 @@ def debug(message):
 
 def debug_env_info(message):
 	if debug_env:
-		sys.stderr.write("--- env: %s\n" % message)
+		sys.stderr.write("%s\n" % message)
 
 def debug_env_dump():
 	if debug_env:
-		debug_env_info("environment dump ---")
+		debug_env_info("--- Environment dump ---")
 		for name, value in os.environ.items():
 			debug_env_info(name + " = " +  value)
-		debug_env_info("environment dump ended ---")
+		debug_env_info("------------------------")
 
 def ignore_signals_and_raise_keyboard_interrupt(signame):
 	signal.signal(signal.SIGTERM, signal.SIG_IGN)
@@ -150,89 +156,75 @@ def decode_json_envvars():
 				debug_env_info("failed to parse : " + xstr(value))
 				debug_env_info("set : " + name + " = "+ os.environ[name])
 
-def print_env_files_order():
+def decode_envvars():
+	decode_json_envvars()
+	decode_python_envvars()
 
-	info('Environment files will be proccessed in this order :')
-	sys.stderr.write('Caution: previously defined variables will not be overriden.\n')
+def print_env_files_order(fileExtensions):
+
+	to_print = 'Caution: previously defined variables will not be overriden.\n'
 
 	file_found = False
 	for subdir, dirs, files in sorted(os.walk("/container/environment")):
 		for file in files:
 			filepath = subdir + os.sep + file
-			if filepath.endswith(".yaml") or filepath.endswith(".json"):
+			if filepath.endswith(fileExtensions):
 				file_found = True
 				filepath = subdir + os.sep + file
-				sys.stderr.write(filepath + '\n')
+				to_print+=filepath + '\n'
 
-	if not file_found:
-		sys.stderr.write('No env file found, that was a useless message... sorry.\n')
+	if file_found:
+		info('Environment files will be proccessed in this order :')
+		sys.stderr.write(to_print+'\n')
+		sys.stderr.write('To see how this files are processed and environment variables values,\n')
+		sys.stderr.write('run this image with --env DEBUG_ENV=true\n\n')
 
-	sys.stderr.write('\nNotice: if this image contains secret environment files (not listed here),\n')
-	sys.stderr.write('variables defined in theses files will override existing values.\n')
-	sys.stderr.write('More info : https://github.com/osixia/docker-light-baseimage\n\n')
-	sys.stderr.write('To see how this files are processed and environment variables values run this image with --env DEBUG_ENV=true\n\n')
+def remove_startup_env_files():
 
-	if debug_env:
-		info('Secret environment files will be proccessed in this order :')
-		sys.stderr.write('Caution: previously defined variables will be overriden.\n')
-
-		file_found = False
-		for subdir, dirs, files in sorted(os.walk("/container/environment")):
-			for file in files:
-				filepath = subdir + os.sep + file
-				if filepath.endswith(".yaml.secret") or filepath.endswith(".yaml.secret"):
-					file_found = True
-					filepath = subdir + os.sep + file
-					sys.stderr.write(filepath + '\n')
-		if not file_found:
-			sys.stderr.write('No secret env file found, that was a useless message... sorry.\n\n')
-
-def remove_secret_files():
-	for envfile in listdir('/etc/container_environment/secret'):
-		os.remove('/etc/container_environment/secret'+envfile)
+	shutil.rmtree('/container/environment/startup')
 
 	for subdir, dirs, files in sorted(os.walk("/container/environment")):
 		for file in files:
 			filepath = subdir + os.sep + file
-			if filepath.endswith(".yaml.secret") or filepath.endswith(".yaml.secret"):
+			if filepath.endswith(startupExtensions):
 				os.remove(filepath)
 
-def generic_import_env_files(yamlExtension = ".yaml", jsonExtension = ".json", override_existing_environment = False):
-
-	for subdir, dirs, files in sorted(os.walk("/container/environment")):
-		for file in files:
-			if file.endswith(yamlExtension) or file.endswith(jsonExtension):
-				filepath = subdir + os.sep + file
-
-				try:
-					with open(filepath, "r") as f:
-
-						debug_env_info("process file : " + filepath)
-
-						if file.endswith(yamlExtension):
-							env_vars = yaml.load(f)
-
-						elif file.endswith(jsonExtension):
-							env_vars = json.load(f)
-
-						for name, value in env_vars.items():
-							if override_existing_environment or not name in os.environ:
-								if isinstance(value, list) or isinstance(value, dict):
-									os.environ[name] = '#PYTHON2BASH:' + xstr(value)
-								else:
-									os.environ[name] = xstr(value)
-								debug_env_info("set : " + name + " = "+ os.environ[name])
-							else:
-								debug_env_info("ignore : " + name + " = " + xstr(value) + " (keep " + name + " = " + os.environ[name] + " )")
-				except:
-					info('failed to parse: ' + filepath)
-
-def import_secret_env_files():
-	generic_import_env_files(".yaml.secret", ".json.secret", True)
-	decode_python_envvars()
+def clear_run_envvars():
+	shutil.rmtree('/container/run/environment')
+	os.makedirs('/container/run/environment')
 
 def import_env_files():
-	generic_import_env_files()
+
+		fileExtensions = yamlExtensions + jsonExtensions
+		print_env_files_order(fileExtensions)
+
+		for subdir, dirs, files in sorted(os.walk("/container/environment")):
+			for file in files:
+				if file.endswith(fileExtensions):
+					filepath = subdir + os.sep + file
+
+					try:
+						with open(filepath, "r") as f:
+
+							debug_env_info("--- process file : " + filepath+ " ---")
+
+							if file.endswith(yamlExtensions):
+								env_vars = yaml.load(f)
+
+							elif file.endswith(jsonExtensions):
+								env_vars = json.load(f)
+
+							for name, value in env_vars.items():
+								if not name in os.environ:
+									if isinstance(value, list) or isinstance(value, dict):
+										os.environ[name] = '#PYTHON2BASH:' + xstr(value)
+									else:
+										os.environ[name] = xstr(value)
+									debug_env_info("set : " + name + " = "+ os.environ[name])
+								else:
+									debug_env_info("ignore : " + name + " = " + xstr(value) + " (keep " + name + " = " + os.environ[name] + " )")
+					except:
+						info('failed to parse: ' + filepath)
 
 def generic_import_envvars(path, override_existing_environment):
 	if not os.path.exists(path):
@@ -257,31 +249,45 @@ def generic_import_envvars(path, override_existing_environment):
 		else:
 			debug_env_info("ignore : " + name + " = " + xstr(value) + " (keep " + name + " = " + os.environ[name] + " )")
 
-def import_envvars(clear_existing_environment = True, override_existing_environment = True):
+def restore_environ():
+	clear_environ()
+	debug_env_info("--- Restore initial environment ---")
+	os.environ.update(environ_backup)
 
-	if clear_existing_environment:
-		debug_env_info("clear existing environment ---")
-		os.environ.clear()
+def clear_environ():
+	debug_env_info("--- Clear existing environment ---")
+	os.environ.clear()
 
-	generic_import_envvars("/etc/container_environment", override_existing_environment)
-	generic_import_envvars("/etc/container_environment/secret", True)
+def import_run_envvars():
+	clear_environ()
+	generic_import_envvars("/container/run/environment", True)
 
-def export_envvars(to_dir = True):
-	if not os.path.exists("/etc/container_environment"):
+def import_envvars():
+	generic_import_envvars("/container/environment", False)
+	generic_import_envvars("/container/environment/startup", False)
+
+def export_run_envvars(to_dir = True):
+	if not os.path.exists("/container/run/environment"):
 		return
 	shell_dump = ""
 	for name, value in os.environ.items():
 		if name in ['HOME', 'USER', 'GROUP', 'UID', 'GID', 'SHELL']:
 			continue
 		if to_dir:
-			with open("/etc/container_environment/" + name, "w") as f:
+			with open("/container/run/environment/" + name, "w") as f:
 				f.write(value)
-			debug_env_info("export " + name + " to /etc/container_environment/" + name + " --- ")
+			debug_env_info("export " + name + " to /container/run/environment/" + name + " --- ")
 		shell_dump += "export " + sanitize_shenvname(name) + "=" + shquote(value) + "\n"
 
-	with open("/etc/container_environment.sh", "w") as f:
+	with open("/container/run/environment.sh", "w") as f:
 		f.write(shell_dump)
-	debug_env_info("export /etc/container_environment.sh --- ")
+	debug_env_info("export /container/run/environment.sh --- ")
+
+def create_run_envvars():
+		import_envvars()
+		import_env_files()
+		decode_envvars()
+		export_run_envvars()
 
 _find_unsafe = re.compile(r'[^\w@%+=:,./-]').search
 
@@ -377,12 +383,10 @@ def run_command_killable(*argv):
 			error("%s failed with status %d\n" % (filename, os.WEXITSTATUS(status)))
 		sys.exit(1)
 
-def run_command_killable_and_import_envvars(*argv):
-	import_secret_env_files()
+def run_command_killable_and_import_run_envvars(*argv):
 	run_command_killable(*argv)
-	debug_env_info("reload environment ---")
-	import_envvars()
-	export_envvars(False)
+	import_run_envvars()
+	export_run_envvars(False)
 
 def kill_all_processes(time_limit):
 	info("Killing all processes...")
@@ -412,23 +416,23 @@ def kill_all_processes(time_limit):
 		signal.alarm(0)
 
 def run_startup_files():
-	# Run /etc/my_init.d/*
-	for name in listdir("/etc/my_init.d"):
-		filename = "/etc/my_init.d/" + name
+	# Run /container/run/startup/*
+	for name in listdir("/container/run/startup"):
+		filename = "/container/run/startup/" + name
 		if is_exe(filename):
 			info("Running %s..." % filename)
-			run_command_killable_and_import_envvars(filename)
+			run_command_killable_and_import_run_envvars(filename)
 
-	# Run /etc/rc.local.
-	if is_exe("/etc/rc.local"):
-		info("Running /etc/rc.local...")
-		run_command_killable_and_import_envvars("/etc/rc.local")
+	# Run /container/run/startup.sh.
+	if is_exe("/container/run/startup.sh"):
+		info("Running /container/run/startup.sh...")
+		run_command_killable_and_import_run_envvars("/container/run/startup.sh")
 
 def start_runit():
 	info("Booting runit daemon...")
 	debug_env_dump()
 	pid = os.spawnl(os.P_NOWAIT, "/usr/bin/runsvdir", "/usr/bin/runsvdir",
-		"-P", "/etc/service")
+		"-P", "/container/run/service")
 	info("Runit started as PID %d" % pid)
 	return pid
 
@@ -441,33 +445,35 @@ def wait_for_runit_or_interrupt(pid):
 
 def shutdown_runit_services():
 	debug("Begin shutting down runit services...")
-	os.system("/usr/bin/sv down /etc/service/*")
+	os.system("/usr/bin/sv down /container/run/service/*")
 
 def wait_for_runit_services():
 	debug("Waiting for runit services to exit...")
 	done = False
 	while not done:
-		done = os.system("/usr/bin/sv status /etc/service/* | grep -q '^run:'") != 0
+		done = os.system("/usr/bin/sv status /container/run/service/* | grep -q '^run:'") != 0
 		if not done:
 			time.sleep(0.1)
 
 def main(args):
 
-	print_env_files_order()
-	import_envvars(False, False)
-	import_env_files()
-	decode_json_envvars()
-	decode_python_envvars()
-	export_envvars()
+	info("Set environment for startup scripts")
+	clear_run_envvars() # clear previous environment
+	create_run_envvars() # create run envvars with all env files
+
 	set_env_hostname_to_etc_hosts()
 
 	if not args.skip_startup_files:
 		run_startup_files()
 
-	remove_secret_files()
+	info("Set environment for container process")
+	remove_startup_env_files()
+	clear_run_envvars()
 
-	with open("/etc/my_init_startup_files_completed", "w") as f:
-		f.write("1")
+	restore_environ()
+	create_run_envvars() # recreate env var without startup files
+
+	open("/container/run/state/startup-done", 'a').close()
 
 	runit_exited = False
 	exit_code = None
@@ -513,7 +519,7 @@ def main(args):
 			wait_for_runit_services()
 
 try:
-    os.remove("/etc/my_init_startup_files_completed")
+    os.remove("/container/run/state/startup-done")
 except OSError:
     pass
 
@@ -523,7 +529,7 @@ parser.add_argument('main_command', metavar = 'MAIN_COMMAND', type = str, nargs 
 	help = 'The main command to run. (default: runit)')
 parser.add_argument('--skip-startup-files', dest = 'skip_startup_files',
 	action = 'store_const', const = True, default = False,
-	help = 'Skip running /etc/my_init.d/* and /etc/rc.local')
+	help = 'Skip running /container/run/startup/* and /container/run/startup.sh')
 parser.add_argument('--skip-runit', dest = 'skip_runit',
 	action = 'store_const', const = True, default = False,
 	help = 'Do not run runit services')
