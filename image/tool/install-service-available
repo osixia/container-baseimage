@@ -19,9 +19,6 @@ do
     echo "move /container/service-available/$i to /container/service/.$i"
     mv /container/service-available/$i /container/service/.$i
 
-    echo "link /container/service/.$i to /container/service/$i"
-    ln -s /container/service/.$i /container/service/$i
-
   else
     echo "service-available: $i not found in /container/service-available/$i"
     exit 1
