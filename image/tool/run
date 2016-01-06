@@ -1,21 +1,23 @@
 #!/bin/bash -e
-
-nbDirectories=$(find /container/run/service -mindepth 1 -maxdepth 1 -type d | wc -l )
+echo "Searching process..."
+nbProcess=$(find /container/run/process -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l )
+echo "$nbProcess process found"
 
 # Multiple process image
-if [ "$nbDirectories" -gt 1 ]; then
+if [ "$nbProcess" -gt 1 ]; then
+
   echo "Execute /container/tool/my_init"
   exec /container/tool/my_init
 
 # Single process image
-elif [ "$nbDirectories" -eq 1 ]; then
+elif [ "$nbProcess" -eq 1 ]; then
 
-  SERVICE=$(find /container/run/service -mindepth 1 -maxdepth 1 -type d)
+  SERVICE=$(find /container/run/process -mindepth 1 -maxdepth 1 -type d)
 
-  echo "Execute /container/tool/my_init --skip-runit $SERVICE/run"
+  echo "Execute /container/tool/my_init --skip-runit $SERVICE/run $@"
   exec /container/tool/my_init --skip-runit $SERVICE/run $@
 
-# No process set
+# No process set: run bash
 else
   echo "Execute /container/tool/my_init --skip-runit bash"
   exec /container/tool/my_init --skip-runit bash

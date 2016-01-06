@@ -3,20 +3,11 @@
 ## Add bash tools to /sbin
 ln -s /container/tool/* /sbin/
 
-# Add needed directories & files
-mkdir -p /container/run/service
-mkdir -p /container/run/startup
-mkdir -p /container/run/state
-mkdir -p /container/run/environment
-
-mkdir -p /container/environment /container/environment/startup
-
-touch /container/run/environment.sh
-chmod 700 /container/environment/ /container/environment/startup /container/run/environment
+mkdir -p /container/service
+mkdir -p /container/environment /container/environment/setup
+chmod 700 /container/environment/ /container/environment/setup
 
 groupadd -g 8377 docker_env
-chown :docker_env /container/run/environment.sh
-chmod 640 /container/run/environment.sh
 
 # dpkg options
 cp /container/file/dpkg_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc

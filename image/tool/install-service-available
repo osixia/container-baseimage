@@ -10,20 +10,17 @@ do
   if  [ -d "/container/service-available/$i" ]; then
 
     if [ -f /container/service-available/$i/install.sh ]; then
-      echo "Processing file /container/service-available/$i/install.sh"
+      echo "run /container/service-available/$i/install.sh"
       /container/service-available/$i/install.sh
+      echo "remove /container/service-available/$i/install.sh"
+      rm -f /container/service-available/$i/install.sh
     fi
 
-    if [ -f /container/service-available/$i/daemon.sh ]; then
-      echo "link /container/service-available/$i/daemon.sh to /container/run/service/$i/run"
-      mkdir /container/run/service/$i
-      ln -sf /container/service-available/$i/daemon.sh /container/run/service/$i/run
-    fi
+    echo "move /container/service-available/$i to /container/service/.$i"
+    mv /container/service-available/$i /container/service/.$i
 
-    if [ -f /container/service-available/$i/container-start.sh ]; then
-      echo "link /container/service-available/$i/container-start.sh to /container/run/startup/$i"
-      ln -sf /container/service-available/$i/container-start.sh /container/run/startup/$i
-    fi
+    echo "link /container/service/.$i to /container/service/$i"
+    ln -s /container/service/.$i /container/service/$i
 
   else
     echo "service-available: $i not found in /container/service-available/$i"

@@ -1,4 +1,4 @@
 #!/bin/bash -e
 echo "Install the multiple process stack: runit syslog-ng-core logrotate cron"
 /container/tool/install-service-available runit syslog-ng-core logrotate cron
-touch /etc/multiple_process_stack_installed
+touch /container/multiple_process_stack_installed

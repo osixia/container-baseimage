@@ -23,9 +23,6 @@ chmod 700 /usr/sbin/cfssl
 curl -o /usr/sbin/cfssljson -SL https://pkg.cfssl.org/R1.1/cfssljson_linux-amd64
 chmod 700 /usr/sbin/cfssljson
 
-ln -s /container/service-available/cfssl/assets/tool/* /usr/sbin
-chmod 700 /container/service-available/cfssl/assets/tool/*
-
 if [ -n "$TO_INSTALL" ]; then
   apt-get remove -y --purge --auto-remove $TO_INSTALL
 fi

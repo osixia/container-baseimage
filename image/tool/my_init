@@ -1,5 +1,5 @@
 #!/usr/bin/python -u
-import os, os.path, sys, stat, signal, errno, argparse, time, re, yaml, json, ast, socket, shutil
+import os, os.path, sys, stat, signal, errno, argparse, time, re, yaml, json, ast, socket, shutil, pwd, grp
 
 KILL_PROCESS_TIMEOUT = 5
 KILL_ALL_PROCESSES_TIMEOUT = 5
@@ -11,14 +11,17 @@ LOG_LEVEL_DEBUG = 3
 
 SHENV_NAME_WHITELIST_REGEX = re.compile('[^\w\-_\.]')
 
-yamlExtensions = ('.yaml', '.yaml.startup')
-jsonExtensions = ('.json', '.json.startup')
-startupExtensions = ('.yaml.startup', '.json.startup')
+yamlExtensions = ('.yaml', '.yaml.setup')
+jsonExtensions = ('.json', '.json.setup')
+setupExtensions = ('.yaml.setup', '.json.setup')
 
 log_level = None
 debug_env = False
 
 environ_backup = dict(os.environ)
+
+move_service_to_run = False
+os.environ['SERVICE_DIR'] = '/container/service'
 
 terminated_child_processes = {}
 
@@ -160,6 +163,65 @@ def decode_envvars():
 	decode_json_envvars()
 	decode_python_envvars()
 
+def generic_import_envvars(path, override_existing_environment):
+	if not os.path.exists(path):
+		return
+	new_env = {}
+	for envfile in listdir(path):
+		filePath=path + "/" + envfile
+		if os.path.isfile(filePath) and "." not in envfile:
+			name = os.path.basename(envfile)
+			with open(filePath, "r") as f:
+				# Text files often end with a trailing newline, which we
+				# don't want to include in the env variable value. See
+				# https://github.com/phusion/baseimage-docker/pull/49
+				value = re.sub('\n\Z', '', f.read())
+			new_env[name] = value
+			debug_env_info("import " + name + " from " + filePath + " --- ")
+
+	for name, value in new_env.items():
+		if override_existing_environment or not name in os.environ:
+			os.environ[name] = value
+			debug_env_info("set : " + name + " = "+ os.environ[name])
+		else:
+			debug_env_info("ignore : " + name + " = " + xstr(value) + " (keep " + name + " = " + os.environ[name] + " )")
+
+def import_run_envvars():
+	clear_environ()
+	generic_import_envvars("/container/run/environment", True)
+
+def import_envvars():
+	generic_import_envvars("/container/environment", False)
+	generic_import_envvars("/container/environment/setup", False)
+
+def export_run_envvars(to_dir = True):
+	if not os.path.exists("/container/run/environment"):
+		return
+	shell_dump = ""
+	for name, value in os.environ.items():
+		if name in ['HOME', 'USER', 'GROUP', 'UID', 'GID', 'SHELL']:
+			continue
+		if to_dir:
+			with open("/container/run/environment/" + name, "w") as f:
+				f.write(value)
+			debug_env_info("export " + name + " to /container/run/environment/" + name + " --- ")
+		shell_dump += "export " + sanitize_shenvname(name) + "=" + shquote(value) + "\n"
+
+	with open("/container/run/environment.sh", "w") as f:
+		f.write(shell_dump)
+	debug_env_info("export /container/run/environment.sh --- ")
+
+def create_run_envvars():
+		import_envvars()
+		import_env_files()
+		decode_envvars()
+		export_run_envvars()
+
+def clear_run_envvars():
+	shutil.rmtree('/container/run/environment')
+	os.makedirs('/container/run/environment')
+	os.chmod('/container/run/environment', 700)
+
 def print_env_files_order(fileExtensions):
 
 	to_print = 'Caution: previously defined variables will not be overriden.\n'
@@ -177,21 +239,7 @@ def print_env_files_order(fileExtensions):
 		info('Environment files will be proccessed in this order :')
 		sys.stderr.write(to_print+'\n')
 		sys.stderr.write('To see how this files are processed and environment variables values,\n')
-		sys.stderr.write('run this image with --env DEBUG_ENV=true\n\n')
-
-def remove_startup_env_files():
-
-	shutil.rmtree('/container/environment/startup')
-
-	for subdir, dirs, files in sorted(os.walk("/container/environment")):
-		for file in files:
-			filepath = subdir + os.sep + file
-			if filepath.endswith(startupExtensions):
-				os.remove(filepath)
-
-def clear_run_envvars():
-	shutil.rmtree('/container/run/environment')
-	os.makedirs('/container/run/environment')
+		sys.stderr.write('run this image with --env LIGHT_BASEIMAGE_DEBUG_ENV=true\n\n')
 
 def import_env_files():
 
@@ -226,28 +274,16 @@ def import_env_files():
 					except:
 						info('failed to parse: ' + filepath)
 
-def generic_import_envvars(path, override_existing_environment):
-	if not os.path.exists(path):
-		return
-	new_env = {}
-	for envfile in listdir(path):
-		filePath=path + "/" + envfile
-		if os.path.isfile(filePath):
-			name = os.path.basename(envfile)
-			with open(filePath, "r") as f:
-				# Text files often end with a trailing newline, which we
-				# don't want to include in the env variable value. See
-				# https://github.com/phusion/baseimage-docker/pull/49
-				value = re.sub('\n\Z', '', f.read())
-			new_env[name] = value
-			debug_env_info("import " + name + " from " + filePath + " --- ")
+def remove_setup_env_files():
 
-	for name, value in new_env.items():
-		if override_existing_environment or not name in os.environ:
-			os.environ[name] = value
-			debug_env_info("set : " + name + " = "+ os.environ[name])
-		else:
-			debug_env_info("ignore : " + name + " = " + xstr(value) + " (keep " + name + " = " + os.environ[name] + " )")
+	shutil.rmtree('/container/environment/setup')
+
+	for subdir, dirs, files in sorted(os.walk("/container/environment")):
+		for file in files:
+			filepath = subdir + os.sep + file
+			if filepath.endswith(setupExtensions):
+				os.remove(filepath)
+
 
 def restore_environ():
 	clear_environ()
@@ -258,36 +294,73 @@ def clear_environ():
 	debug_env_info("--- Clear existing environment ---")
 	os.environ.clear()
 
-def import_run_envvars():
-	clear_environ()
-	generic_import_envvars("/container/run/environment", True)
+def set_startup_scripts_env():
+	info("Set environment for startup scripts")
+	clear_run_envvars() # clear previous environment
+	create_run_envvars() # create run envvars with all env files
 
-def import_envvars():
-	generic_import_envvars("/container/environment", False)
-	generic_import_envvars("/container/environment/startup", False)
+def set_process_env():
+	info("Set environment for container process")
+	remove_setup_env_files()
+	clear_run_envvars()
 
-def export_run_envvars(to_dir = True):
-	if not os.path.exists("/container/run/environment"):
-		return
-	shell_dump = ""
-	for name, value in os.environ.items():
-		if name in ['HOME', 'USER', 'GROUP', 'UID', 'GID', 'SHELL']:
-			continue
-		if to_dir:
-			with open("/container/run/environment/" + name, "w") as f:
-				f.write(value)
-			debug_env_info("export " + name + " to /container/run/environment/" + name + " --- ")
-		shell_dump += "export " + sanitize_shenvname(name) + "=" + shquote(value) + "\n"
+	restore_environ()
+	create_run_envvars() # recreate env var without setup files
 
-	with open("/container/run/environment.sh", "w") as f:
-		f.write(shell_dump)
-	debug_env_info("export /container/run/environment.sh --- ")
+def setup_run_directories():
 
-def create_run_envvars():
-		import_envvars()
-		import_env_files()
-		decode_envvars()
-		export_run_envvars()
+	directories = ('/container/run/process', '/container/run/startup', '/container/run/state', '/container/run/environment')
+	for directory in directories:
+		if not os.path.exists(directory):
+		    	os.makedirs(directory)
+
+			if directory == "/container/run/environment":
+				os.chmod(directory, 700)
+
+	if not os.path.exists('/container/run/environment.sh'):
+		open('/container/run/environment.sh', 'a').close()
+		os.chmod('/container/run/environment.sh', 640)
+		uid = pwd.getpwnam("root").pw_uid
+		gid = grp.getgrnam("docker_env").gr_gid
+		os.chown('/container/run/environment.sh', uid, gid)
+
+	if state_is_first_start():
+
+		base_path = os.environ['SERVICE_DIR']
+		for d in sorted(os.listdir(base_path)):
+
+			d_path = base_path + '/' + d
+			if os.path.isdir(d_path) and not os.path.islink(d_path):
+				if is_exe(d_path + '/container-start.sh'):
+					info('link ' + d_path + '/container-start.sh to /container/run/startup/' + d)
+					os.symlink(d_path + '/container-start.sh', '/container/run/startup/' + d)
+
+				if is_exe(d_path + '/process.sh'):
+					info('link ' + d_path + '/process.sh to /container/run/process/' + d + '/run')
+					os.makedirs('/container/run/process/' + d)
+					os.symlink(d_path + '/process.sh', '/container/run/process/' + d + '/run')
+
+def copy_service_to_run_dir():
+	info("Copy /container/service to /container/run/service")
+	shutil.copytree("/container/service", "/container/run/service")
+
+	os.environ['SERVICE_DIR'] = '/container/run/service'
+	debug_env_info("set : SERVICE_DIR = /container/run/service")
+
+def state_set_first_start_done():
+	open("/container/run/state/first-start-done", 'a').close()
+
+def state_is_first_start():
+	return os.path.exists('/container/run/state/first-start-done') == False
+
+def state_set_start_done():
+	open("/container/run/state/start-done", 'a').close()
+
+def state_reset_start_done():
+	try:
+	    os.remove("/container/run/state/start-done")
+	except OSError:
+	    pass
 
 _find_unsafe = re.compile(r'[^\w@%+=:,./-]').search
 
@@ -432,7 +505,7 @@ def start_runit():
 	info("Booting runit daemon...")
 	debug_env_dump()
 	pid = os.spawnl(os.P_NOWAIT, "/usr/bin/runsvdir", "/usr/bin/runsvdir",
-		"-P", "/container/run/service")
+		"-P", "/container/run/process")
 	info("Runit started as PID %d" % pid)
 	return pid
 
@@ -445,35 +518,34 @@ def wait_for_runit_or_interrupt(pid):
 
 def shutdown_runit_services():
 	debug("Begin shutting down runit services...")
-	os.system("/usr/bin/sv down /container/run/service/*")
+	os.system("/usr/bin/sv down /container/run/process/*")
 
 def wait_for_runit_services():
 	debug("Waiting for runit services to exit...")
 	done = False
 	while not done:
-		done = os.system("/usr/bin/sv status /container/run/service/* | grep -q '^run:'") != 0
+		done = os.system("/usr/bin/sv status /container/run/process/* | grep -q '^run:'") != 0
 		if not done:
 			time.sleep(0.1)
 
 def main(args):
 
-	info("Set environment for startup scripts")
-	clear_run_envvars() # clear previous environment
-	create_run_envvars() # create run envvars with all env files
+	setup_run_directories()
 
-	set_env_hostname_to_etc_hosts()
+	if copy_service_to_run:
+		copy_service_to_run_dir()
+
+	if state_is_first_start():
+		set_env_hostname_to_etc_hosts()
 
 	if not args.skip_startup_files:
+		set_startup_scripts_env()
 		run_startup_files()
 
-	info("Set environment for container process")
-	remove_startup_env_files()
-	clear_run_envvars()
+	set_process_env()
 
-	restore_environ()
-	create_run_envvars() # recreate env var without startup files
-
-	open("/container/run/state/startup-done", 'a').close()
+	state_set_start_done()
+	state_set_first_start_done()
 
 	runit_exited = False
 	exit_code = None
@@ -518,10 +590,7 @@ def main(args):
 				stop_child_process("runit daemon", runit_pid)
 			wait_for_runit_services()
 
-try:
-    os.remove("/container/run/state/startup-done")
-except OSError:
-    pass
+state_reset_start_done()
 
 # Parse options.
 parser = argparse.ArgumentParser(description = 'Initialize the system.')
@@ -543,7 +612,8 @@ parser.add_argument('--quiet', dest = 'log_level',
 args = parser.parse_args()
 log_level = args.log_level
 
-debug_env=("DEBUG_ENV" in os.environ and os.environ["DEBUG_ENV"] == "true")
+debug_env=("LB_DEBUG_ENV" in os.environ and os.environ["LB_DEBUG_ENV"] == "true")
+copy_service_to_run=("LB_COPY_SERVICE_TO_RUN" in os.environ and os.environ["LB_COPY_SERVICE_TO_RUN"] == "true")
 
 if args.skip_runit and len(args.main_command) == 0:
 	error("When --skip-runit is given, you must also pass a main command.")

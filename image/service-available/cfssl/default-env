@@ -1,10 +1,11 @@
+#!/bin/bash
 #
 # Default CA config
 #
-CFSSL_DEFAULT_CACERT="/container/service-available/cfssl/assets/default-ca/default-ca.pem"
-CFSSL_DEFAULT_CA_KEY="/container/service-available/cfssl/assets/default-ca/default-ca-key.pem"
-CFSSL_DEFAULT_CA_CONFIG="/container/service-available/cfssl/assets/default-ca/config/ca-config.json"
-CFSSL_DEFAULT_CSR="/container/service-available/cfssl/assets/default-ca/config/req-csr.json.tmpl"
+CFSSL_DEFAULT_CACERT="${SERVICE_DIR}/cfssl/assets/default-ca/default-ca.pem"
+CFSSL_DEFAULT_CA_KEY="${SERVICE_DIR}/cfssl/assets/default-ca/default-ca-key.pem"
+CFSSL_DEFAULT_CA_CONFIG="${SERVICE_DIR}/cfssl/assets/default-ca/config/ca-config.json"
+CFSSL_DEFAULT_CSR="${SERVICE_DIR}/cfssl/assets/default-ca/config/req-csr.json.tmpl"
 
 # default csr file params
 CFSSL_DEFAULT_CA_CSR_CN=${CFSSL_DEFAULT_CA_CSR_CN:-${HOSTNAME}}
