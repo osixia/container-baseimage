@@ -1,6 +1,8 @@
 NAME = osixia/light-baseimage
 VERSION = 0.2.1-dev
 
+ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+
 .PHONY: all build build-nocache test tag_latest release
 
 all: build

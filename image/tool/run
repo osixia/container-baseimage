@@ -553,8 +553,6 @@ def main(args):
 
 	setup_run_directories()
 
-
-
 	if state_is_first_start():
 		set_env_hostname_to_etc_hosts()
 

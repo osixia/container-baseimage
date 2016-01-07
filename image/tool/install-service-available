@@ -7,20 +7,20 @@ for i in $@
 do
 
   echo "install-service-available: $i"
-  if  [ -d "/container/service-available/$i" ]; then
+  if  [ -d "/container/service-available/.$i" ]; then
 
-    if [ -f /container/service-available/$i/install.sh ]; then
-      echo "run /container/service-available/$i/install.sh"
-      /container/service-available/$i/install.sh
-      echo "remove /container/service-available/$i/install.sh"
-      rm -f /container/service-available/$i/install.sh
+    if [ -f /container/service-available/.$i/install.sh ]; then
+      echo "run /container/service-available/.$i/install.sh"
+      /container/service-available/.$i/install.sh
+      echo "remove /container/service-available/.$i/install.sh"
+      rm -f /container/service-available/.$i/install.sh
     fi
 
-    echo "move /container/service-available/$i to /container/service/.$i"
-    mv /container/service-available/$i /container/service/.$i
+    echo "move /container/service-available/.$i to /container/service/.$i"
+    mv /container/service-available/.$i /container/service/.$i
 
   else
-    echo "service-available: $i not found in /container/service-available/$i"
+    echo "service-available: $i not found in /container/service-available/.$i"
     exit 1
   fi
 done

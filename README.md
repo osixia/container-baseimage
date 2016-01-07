@@ -6,3 +6,9 @@ Inspired by :
 > [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
 
 Add optional service-available install, tool to automate service/process addition, and single process container capability.
+
+
+## To build py_tool
+sudo apt-get install python-pip
+
+pip install pyinstaller
