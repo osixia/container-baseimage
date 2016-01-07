@@ -1,0 +1,63 @@
+#!/bin/bash -e
+
+# log helper base on environment variable LOG_LEVEL
+# LOG_LEVEL environment variable is set by run tool based on --log-level argument
+# or you can set it directly with docker --env argument
+
+# LOG_LEVEL = 0 -> None
+# LOG_LEVEL = 1 -> Error
+# LOG_LEVEL = 2 -> Warning
+# LOG_LEVEL = 3 -> Info
+# LOG_LEVEL = 4 -> Debug
+
+LOG_LEVEL=${LOG_LEVEL:-3}
+
+CALL=$1
+
+read $foo
+
+function error(){
+  if [ $LOG_LEVEL -ge 1 ]; then
+    echo "$@"
+  fi
+}
+
+function warning(){
+  if [ $LOG_LEVEL -ge 2 ]; then
+    echo "$@"
+  fi
+}
+
+function info(){
+  if [ $LOG_LEVEL -ge 3 ]; then
+    echo "$@"
+  fi
+}
+
+function debug(){
+  if [ $LOG_LEVEL -ge 4 ]; then
+    echo "$@"
+  fi
+}
+
+function is(){
+  local loglevel_str=$1
+  local loglevel_str=${loglevel_str^^} # uppercase
+
+  local LOG_LEVEL_NONE = 0
+  local LOG_LEVEL_ERROR = 1
+  local LOG_LEVEL_WARNING = 2
+  local LOG_LEVEL_INFO = 3
+  local LOG_LEVEL_DEBUG = 4
+
+  local loglevel=LOG_LEVEL_$loglevel_str
+
+  if [ ${!loglevel} -eq $LOG_LEVEL ]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+shift
+$CALL "$@"
