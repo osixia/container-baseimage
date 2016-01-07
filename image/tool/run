@@ -395,6 +395,9 @@ def get_single_process():
 	for p in listdir("/container/run/process/"):
 		return '/container/run/process/' + p + '/run'
 
+def is_runit_installed():
+	return os.path.exists('/sbin/runit')
+
 _find_unsafe = re.compile(r'[^\w@%+=:,./-]').search
 
 def shquote(s):
@@ -585,12 +588,13 @@ def main(args):
 	# if it's a single process image we run only the process (runit is not installed anyway...)
 	# if no process we run bash
 	if len(args.main_command) == 0 and not is_multiple_process_image():
-		args.skip_runit = True
-
 		if is_single_process_image():
 			args.main_command = [get_single_process()]
 		else:
 			args.main_command = ['bash']
+
+	if not is_runit_installed():
+		args.skip_runit = True
 
 	if not args.skip_runit:
 		runit_pid = start_runit()
