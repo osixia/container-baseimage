@@ -1,4 +1,6 @@
 #!/bin/sh
+log-helper level is eq trace && set -x
+
 set -e
 
 # If /dev/log is either a named pipe or it was placed there accidentally,

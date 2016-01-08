@@ -7,12 +7,12 @@
 # Usage example log-helper info "LOG_LEVEL is info or more"
 # the message will be printed only if log level is info or debug
 
-# LOG_LEVEL = 0 -> None
-# LOG_LEVEL = 1 -> Error
-# LOG_LEVEL = 2 -> Warning
-# LOG_LEVEL = 3 -> Info
-# LOG_LEVEL = 4 -> Debug
-# LOG_LEVEL = 5 -> Trace
+LOG_LEVEL_NONE=0
+LOG_LEVEL_ERROR=1
+LOG_LEVEL_WARNING=2
+LOG_LEVEL_INFO=3
+LOG_LEVEL_DEBUG=4
+LOG_LEVEL_TRACE=5
 
 # default log level: 3 -> info
 LOG_LEVEL=${LOG_LEVEL:-3}
@@ -104,13 +104,6 @@ function level() {
     echo "Allowed log level are: none, error, warning, info, debug, trace"
     return 2
   fi
-
-  local LOG_LEVEL_NONE=0
-  local LOG_LEVEL_ERROR=1
-  local LOG_LEVEL_WARNING=2
-  local LOG_LEVEL_INFO=3
-  local LOG_LEVEL_DEBUG=4
-  local LOG_LEVEL_TRACE=5
 
   local loglevel=LOG_LEVEL_$loglevel_str
 

@@ -1,22 +1,39 @@
 #!/bin/bash -e
+log-helper level is eq trace && set -x
 
 PREFIX=$1
 CERT_FILE=$2
 KEY_FILE=$3
 CA_FILE=$4
 
-echo "cfssl-helper is launched, everybody on the floor !"
+log-helper debug "cfssl-helper is launched, everybody on the floor !"
 
 if [ -z "$PREFIX" ] || [ -z "$CERT_FILE" ] || [ -z "$KEY_FILE" ] || [ -z "$CA_FILE" ]; then
-  echo "Usage: cfssl-helper prefix cert_file key_file ca_file"
+  log-helper error "Usage: cfssl-helper prefix cert_file key_file ca_file"
   exit 1
 fi
 
 if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
 
-  echo "No certificate file and certificate key provided, generate:"
-  echo "$CERT_FILE and $KEY_FILE"
-  echo ""
+  log-helper info "No certificate file and certificate key provided, generate:"
+  log-helper info "$CERT_FILE and $KEY_FILE"
+
+  LOG_LEVEL_PARAM=""
+
+  case $LOG_LEVEL in
+      0 )
+          LOG_LEVEL_PARAM="-loglevel 4";;
+      1 )
+          LOG_LEVEL_PARAM="-loglevel 3";;
+      2 )
+          LOG_LEVEL_PARAM="-loglevel 2";;
+      3 )
+          LOG_LEVEL_PARAM="-loglevel 1";;
+      4 )
+          LOG_LEVEL_PARAM="-loglevel 0";;
+      5 )
+          LOG_LEVEL_PARAM="-loglevel 0";;
+  esac
 
   # set env vars
   PREFIX=$1
@@ -54,10 +71,10 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
   # set csr file
   CSR_FILE="/tmp/csr-file"
   if [ -n "$CFSSL_CSR_JSON" ]; then
-      echo "use CFSSL_CSR_JSON value as csr file"
+      log-helper debug "use CFSSL_CSR_JSON value as csr file"
       echo $CFSSL_CSR_JSON > $CSR_FILE
   elif [ -n "$CFSSL_CSR" ]; then
-    echo "use $CFSSL_CSR as csr file"
+    log-helper debug "use $CFSSL_CSR as csr file"
     cp -f $CFSSL_CSR $CSR_FILE
 
     # it's the default csr
@@ -73,12 +90,10 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
       sed -i "s|{{ CFSSL_DEFAULT_CA_CSR_COUNTRY }}|${CFSSL_DEFAULT_CA_CSR_COUNTRY}|g" $CSR_FILE
     fi
   else
-    echo "error: no csr file provided"
-    echo "CFSSL_CSR_JSON and CFSSL_CSR are empty"
+    log-helper error "error: no csr file provided"
+    log-helper error "CFSSL_CSR_JSON and CFSSL_CSR are empty"
     exit 1
   fi
-
-  echo ""
 
   # generate cert
   CONFIG_FILE="/tmp/config-file"
@@ -101,7 +116,7 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
         [[ ! -d "/etc/ssl/certs/" ]] && mkdir -p /etc/ssl/certs/
         cat $CFSSL_REMOTE_HTTPS_CA_CERT >> /etc/ssl/certs/ca-certificates.crt
       else
-        echo "error: remote https ca cert file $CFSSL_REMOTE_HTTPS_CA_CERT not found"
+        log-helper error "error: remote https ca cert file $CFSSL_REMOTE_HTTPS_CA_CERT not found"
       fi
     fi
 
@@ -111,7 +126,7 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
   fi
 
   if [ -n "$CFSSL_CONFIG_JSON" ]; then
-    echo "use CFSSL_CONFIG_JSON value as config file"
+    log-helper debug "use CFSSL_CONFIG_JSON value as config file"
     echo $CFSSL_CONFIG_JSON > $CONFIG_FILE
     CONFIG_PARAM="-config $CONFIG_FILE"
 
@@ -125,15 +140,14 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
   [[ -n "$CFSSL_PROFILE" ]] && PROFILE_PARAM="-profile $CFSSL_PROFILE"
   [[ -n "$CFSSL_LABEL" ]] && LABEL_PARAM="-label $CFSSL_LABEL"
 
-  echo "cfssl gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME"
-  cfssl gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME
-  echo ""
+  log-helper debug "cfssl $LOG_LEVEL_PARAM gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME"
+  cfssl $LOG_LEVEL_PARAM gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME
 
   # move generated files
-  echo "move /tmp/$CERT_NAME.pem to $CERT_FILE"
+  log-helper debug "move /tmp/$CERT_NAME.pem to $CERT_FILE"
   mv /tmp/$CERT_NAME.pem $CERT_FILE
 
-  echo "move /tmp/$CERT_NAME-key.pem to $KEY_FILE"
+  log-helper debug "move /tmp/$CERT_NAME-key.pem to $KEY_FILE"
   mv /tmp/$CERT_NAME-key.pem $KEY_FILE
 
   # delete tmp files
@@ -143,20 +157,20 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
   if [ ! -e "$CA_FILE" ]; then
 
     if [ -n "$CFSSL_REMOTE" ]; then
-      echo "Get CA certificate from $CFSSL_REMOTE"
-      echo "cfssl info $REMOTE_PARAM $CONFIG_PARAM $PROFILE_PARAM $LABEL_PARAM"
-      cfssl info $REMOTE_PARAM $CONFIG_PARAM $PROFILE_PARAM $LABEL_PARAM | sed -e "s/.*certificate\":\"\(.*-----\)\".*/\1/g" | sed 's/\\n/\n/g' > $CA_FILE
-      echo "CA certificate returned save as $CA_FILE"
+      log-helper debug "Get CA certificate from $CFSSL_REMOTE"
+      log-helper debug "cfssl $LOG_LEVEL_PARAM info $REMOTE_PARAM $CONFIG_PARAM $PROFILE_PARAM $LABEL_PARAM"
+      cfssl $LOG_LEVEL_PARAM info $REMOTE_PARAM $CONFIG_PARAM $PROFILE_PARAM $LABEL_PARAM | sed -e "s/.*certificate\":\"\(.*-----\)\".*/\1/g" | sed 's/\\n/\n/g' > $CA_FILE
+      log-helper debug "CA certificate returned save as $CA_FILE"
 
     elif [ -n "$CFSSL_CA_CERT" ]; then
-      echo "Link $CFSSL_CA_CERT to $CA_FILE"
+      log-helper info "Link $CFSSL_CA_CERT to $CA_FILE"
       ln -s $CFSSL_CA_CERT $CA_FILE
     fi
 
   fi
-  echo "done"
+  log-helper debug "done :)"
 
 else
-  echo "Files $CERT_FILE or $KEY_FILE already exists,"
-  echo "do nothing."
+  log-helper info "Files $CERT_FILE or $KEY_FILE already exists,"
+  log-helper info "do nothing."
 fi

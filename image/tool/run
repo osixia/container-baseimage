@@ -4,8 +4,9 @@ import os, os.path, sys, stat, signal, errno, argparse, time, re, json, yaml, as
 KILL_PROCESS_TIMEOUT = 5
 KILL_ALL_PROCESSES_TIMEOUT = 5
 
+LOG_LEVEL_NONE = 0
 LOG_LEVEL_ERROR = 1
-LOG_LEVEL_WARN  = 2
+LOG_LEVEL_WARNING  = 2
 LOG_LEVEL_INFO  = 3
 LOG_LEVEL_DEBUG = 4
 LOG_LEVEL_TRACE = 5
@@ -30,8 +31,8 @@ def error(message):
 	if log_level >= LOG_LEVEL_ERROR:
 		sys.stderr.write("*** %s\n" % message)
 
-def warn(message):
-	if log_level >= LOG_LEVEL_WARN:
+def warning(message):
+	if log_level >= LOG_LEVEL_WARNING:
 		sys.stderr.write("*** %s\n" % message)
 
 def info(message):
@@ -194,7 +195,7 @@ def import_envvars():
 
 def export_run_envvars(to_dir = True):
 	if to_dir and not os.path.exists("/container/run/environment"):
-		warn("export_run_envvars /container/run/environment don't exists")
+		warning("export_run_envvars /container/run/environment don't exists")
 		return
 	shell_dump = ""
 	for name, value in os.environ.items():
@@ -224,12 +225,12 @@ def clear_run_envvars():
 		os.makedirs('/container/run/environment')
 		os.chmod('/container/run/environment', 700)
 	except:
-		warn("clear_run_envvars failed at some point...")
+		warning("clear_run_envvars failed at some point...")
 
 def print_env_files_order(fileExtensions):
 
 	if not os.path.exists("/container/environment"):
-		warn("print_env_files_order /container/environment don't exists")
+		warning("print_env_files_order /container/environment don't exists")
 		return
 
 	to_print = 'Caution: previously defined variables will not be overriden.\n'
@@ -252,7 +253,7 @@ def print_env_files_order(fileExtensions):
 def import_env_files():
 
 	if not os.path.exists("/container/environment"):
-		warn("import_env_files /container/environment don't exists")
+		warning("import_env_files /container/environment don't exists")
 		return
 
 	fileExtensions = yamlExtensions + jsonExtensions
@@ -292,7 +293,7 @@ def remove_setup_env_files():
 		shutil.rmtree('/container/environment/setup')
 
 	if not os.path.exists("/container/environment"):
-		warn("remove_setup_env_files /container/environment don't exists")
+		warning("remove_setup_env_files /container/environment don't exists")
 		return
 
 	for subdir, dirs, files in sorted(os.walk("/container/environment")):
@@ -373,7 +374,7 @@ def set_service_dir_env():
 	debug("set : SERVICE_DIR = " + os.environ['SERVICE_DIR'])
 
 def set_log_level_env():
-	os.environ['LOG_LEVEL'] = log_level
+	os.environ['LOG_LEVEL'] = xstr(log_level)
 	debug("set : LOG_LEVEL = " + os.environ['LOG_LEVEL'])
 
 def copy_service_to_run_dir():
@@ -472,7 +473,7 @@ def stop_child_process(name, pid, signo = signal.SIGTERM, time_limit = KILL_PROC
 		except OSError:
 			pass
 	except AlarmException:
-		warn("%s (PID %d) did not shut down in time. Forcing it to exit." % (name, pid))
+		warning("%s (PID %d) did not shut down in time. Forcing it to exit." % (name, pid))
 		try:
 			os.kill(pid, signal.SIGKILL)
 		except OSError:
@@ -492,7 +493,7 @@ def run_command_killable(*argv):
 	try:
 		status = waitpid_reap_other_children(pid)
 	except BaseException as s:
-		warn("An error occurred. Aborting.")
+		warning("An error occurred. Aborting.")
 		stop_child_process(filename, pid)
 		raise
 	if status != 0:
@@ -526,7 +527,7 @@ def kill_all_processes(time_limit):
 				else:
 					raise
 	except AlarmException:
-		warn("Not all processes have exited in time. Forcing them to exit.")
+		warning("Not all processes have exited in time. Forcing them to exit.")
 		try:
 			os.kill(-1, signal.SIGKILL)
 		except OSError:
@@ -576,6 +577,7 @@ def wait_for_runit_services():
 
 def main(args):
 
+	info("LOG_LEVEL = " + xstr(log_level) + " (" + log_level_switcher_inv.get(log_level) + ")")
 	setup_run_directories()
 
 	if state_is_first_start():
@@ -635,7 +637,7 @@ def main(args):
 				stop_child_process(args.main_command[0], pid)
 				raise
 			except BaseException as s:
-				warn("An error occurred. Aborting.")
+				warning("An error occurred. Aborting.")
 				stop_child_process(args.main_command[0], pid)
 				raise
 		sys.exit(exit_status)
@@ -669,7 +671,8 @@ parser.add_argument('--copy-service', dest = 'copy_service',
 
 args = parser.parse_args()
 
-log_level_switcher = {"none": 0,"error": 1,"warning": 2,"info": 3,"debug": 4, "trace": 5}
+log_level_switcher = {"none": LOG_LEVEL_NONE,"error": LOG_LEVEL_ERROR,"warning": LOG_LEVEL_WARNING,"info": LOG_LEVEL_INFO,"debug": LOG_LEVEL_DEBUG, "trace": LOG_LEVEL_TRACE}
+log_level_switcher_inv = {LOG_LEVEL_NONE: "none",LOG_LEVEL_ERROR:"error",LOG_LEVEL_WARNING:"warning",LOG_LEVEL_INFO:"info",LOG_LEVEL_DEBUG:"debug",LOG_LEVEL_TRACE:"trace"}
 log_level = log_level_switcher.get(args.log_level)
 
 copy_service = args.copy_service
@@ -686,7 +689,7 @@ signal.signal(signal.SIGALRM, lambda signum, frame: raise_alarm_exception())
 try:
 	main(args)
 except KeyboardInterrupt:
-	warn("Init system aborted.")
+	warning("Init system aborted.")
 	exit(2)
 finally:
 	if args.kill_all_on_exit:
