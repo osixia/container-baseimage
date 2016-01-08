@@ -212,6 +212,7 @@ def export_run_envvars(to_dir = True):
 
 def create_run_envvars():
 		set_service_dir_env()
+		set_log_level_env()
 		import_envvars()
 		import_env_files()
 		decode_envvars()
@@ -370,6 +371,10 @@ def set_service_dir_env():
 	else:
 		os.environ['SERVICE_DIR'] = '/container/service'
 	debug("set : SERVICE_DIR = " + os.environ['SERVICE_DIR'])
+
+def set_log_level_env():
+	os.environ['LOG_LEVEL'] = log_level
+	debug("set : LOG_LEVEL = " + os.environ['LOG_LEVEL'])
 
 def copy_service_to_run_dir():
 	info("Copy /container/service to /container/run/service")
