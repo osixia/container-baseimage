@@ -4,8 +4,8 @@
 # LOG_LEVEL environment variable is set by run tool based on --log-level argument
 # or you can set it directly with docker --env argument
 
-# Usage example log-helper info "LOG_LEVEL is info or more"
-# the message will be printed only if log level is info or debug
+# Usage example: log-helper info LOG_LEVEL is info or more
+# the message "LOG_LEVEL is info or more" will be printed only if log level is info, debug or trace
 
 LOG_LEVEL_NONE=0
 LOG_LEVEL_ERROR=1
@@ -15,9 +15,17 @@ LOG_LEVEL_DEBUG=4
 LOG_LEVEL_TRACE=5
 
 # default log level: 3 -> info
-LOG_LEVEL=${LOG_LEVEL:-3}
+LOG_LEVEL=${LOG_LEVEL:-${LOG_LEVEL_INFO}}
 
-CALL=$1 # function to call (error, warning, info, debug, trace)
+CALL=$1 # function to call (error, warning, info, debug, trace, level)
+if [[ ! "$CALL" =~ ^(error|warning|info|debug|trace|level)$ ]]; then
+  echo "Error: Function $CALL not found"
+  echo "Allowed functions are: error, warning, info, debug, trace, level"
+  echo "usage example: log-helper info hello !"
+  exit 1
+fi
+
+
 MSG="" # message to print if required log level is set
 ECHO_PARAM="" # echo command parameters
 
@@ -88,21 +96,21 @@ function level() {
   if [  "$action" != "is" ]; then
     echo "Error: Only \"is\" action is supported"
     echo "usage example: log-helper level is eq info"
-    return 2
+    exit 1
   fi
 
   if [[ ! "$operator" =~ ^(eq|ne|gt|ge|lt|le)$ ]]; then
     echo "Error: Operator $operator not allowed"
     echo "Allowed operators are: eq, ne, gt, ge, lt, le"
     echo "Help: http://www.tldp.org/LDP/abs/html/comparison-ops.html"
-    return 2
+    exit 1
   fi
 
   if [ -z "$loglevel_str" ]; then
     echo "Error: No log level provided"
-    echo "usage example: log-helper level is eq info"
     echo "Allowed log level are: none, error, warning, info, debug, trace"
-    return 2
+    echo "usage example: log-helper level is eq info"
+    exit 1
   fi
 
   local loglevel=LOG_LEVEL_$loglevel_str
@@ -116,3 +124,5 @@ function level() {
 
 shift
 $CALL "$@"
+
+exit 0
