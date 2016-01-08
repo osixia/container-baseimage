@@ -4,55 +4,98 @@
 # LOG_LEVEL environment variable is set by run tool based on --log-level argument
 # or you can set it directly with docker --env argument
 
+# Usage example log-helper info "LOG_LEVEL is info or more"
+# the message will be printed only if log level is info or debug
+
 # LOG_LEVEL = 0 -> None
 # LOG_LEVEL = 1 -> Error
 # LOG_LEVEL = 2 -> Warning
 # LOG_LEVEL = 3 -> Info
 # LOG_LEVEL = 4 -> Debug
 
+# default log level: 3 -> info
 LOG_LEVEL=${LOG_LEVEL:-3}
 
-CALL=$1
+CALL=$1 # function to call (error, warning info, debug, level)
+MSG="" # message to print if required log level is set
 
-read $foo
+function error() {
+  MSG="$@"
 
-function error(){
   if [ $LOG_LEVEL -ge 1 ]; then
-    echo "$@"
+    [[ -z "$MSG" ]] && getMsgFromStdin
+    echo "$MSG"
   fi
 }
 
-function warning(){
+function warning() {
+  MSG="$@"
+
   if [ $LOG_LEVEL -ge 2 ]; then
-    echo "$@"
+    [[ -z "$MSG" ]] && getMsgFromStdin
+    echo "$MSG"
   fi
 }
 
-function info(){
+function info() {
+  MSG="$@"
+
   if [ $LOG_LEVEL -ge 3 ]; then
-    echo "$@"
+    [[ -z "$MSG" ]] && getMsgFromStdin
+    echo "$MSG"
   fi
 }
 
-function debug(){
+function debug() {
+  MSG="$@"
+
   if [ $LOG_LEVEL -ge 4 ]; then
-    echo "$@"
+    [[ -z "$MSG" ]] && getMsgFromStdin
+    echo "$MSG"
   fi
 }
 
-function is(){
-  local loglevel_str=$1
+function getMsgFromStdin() {
+  if [ -z "$2" ]; then
+    read MSG
+  fi
+}
+
+function level() {
+  local action=$1
+  local operator=$2
+  local loglevel_str=$3
   local loglevel_str=${loglevel_str^^} # uppercase
 
-  local LOG_LEVEL_NONE = 0
-  local LOG_LEVEL_ERROR = 1
-  local LOG_LEVEL_WARNING = 2
-  local LOG_LEVEL_INFO = 3
-  local LOG_LEVEL_DEBUG = 4
+  if [  "$action" != "is" ]; then
+    echo "Error: Only \"is\" action is supported"
+    echo "usage example: log-helper level is eq info"
+    return 2
+  fi
+
+  if [[ ! "$operator" =~ ^(eq|ne|gt|ge|lt|le)$ ]]; then
+    echo "Error: Operator $operator not allowed"
+    echo "Allowed operators are: eq, ne, gt, ge, lt, le"
+    echo "Help: http://www.tldp.org/LDP/abs/html/comparison-ops.html"
+    return 2
+  fi
+
+  if [ -z "$loglevel_str" ]; then
+    echo "Error: No log level provided"
+    echo "usage example: log-helper level is eq info"
+    echo "Allowed log level are: none, error, warning, info, debug"
+    return 2
+  fi
+
+  local LOG_LEVEL_NONE=0
+  local LOG_LEVEL_ERROR=1
+  local LOG_LEVEL_WARNING=2
+  local LOG_LEVEL_INFO=3
+  local LOG_LEVEL_DEBUG=4
 
   local loglevel=LOG_LEVEL_$loglevel_str
 
-  if [ ${!loglevel} -eq $LOG_LEVEL ]; then
+  if [ ${!loglevel} -$operator $LOG_LEVEL ]; then
     return 0
   else
     return 1
