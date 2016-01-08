@@ -12,11 +12,12 @@
 # LOG_LEVEL = 2 -> Warning
 # LOG_LEVEL = 3 -> Info
 # LOG_LEVEL = 4 -> Debug
+# LOG_LEVEL = 5 -> Trace
 
 # default log level: 3 -> info
 LOG_LEVEL=${LOG_LEVEL:-3}
 
-CALL=$1 # function to call (error, warning info, debug, level)
+CALL=$1 # function to call (error, warning, info, debug, trace)
 MSG="" # message to print if required log level is set
 ECHO_PARAM="" # echo command parameters
 
@@ -51,6 +52,15 @@ function debug() {
   MSG="$@"
 
   if [ $LOG_LEVEL -ge 4 ]; then
+    [[ -z "$MSG" ]] && getMsgFromStdin || getEchoParam $1
+    echo $ECHO_PARAM "$MSG"
+  fi
+}
+
+function trace() {
+  MSG="$@"
+
+  if [ $LOG_LEVEL -ge 5 ]; then
     [[ -z "$MSG" ]] && getMsgFromStdin || getEchoParam $1
     echo $ECHO_PARAM "$MSG"
   fi
@@ -91,7 +101,7 @@ function level() {
   if [ -z "$loglevel_str" ]; then
     echo "Error: No log level provided"
     echo "usage example: log-helper level is eq info"
-    echo "Allowed log level are: none, error, warning, info, debug"
+    echo "Allowed log level are: none, error, warning, info, debug, trace"
     return 2
   fi
 
@@ -100,6 +110,7 @@ function level() {
   local LOG_LEVEL_WARNING=2
   local LOG_LEVEL_INFO=3
   local LOG_LEVEL_DEBUG=4
+  local LOG_LEVEL_TRACE=5
 
   local loglevel=LOG_LEVEL_$loglevel_str
 
