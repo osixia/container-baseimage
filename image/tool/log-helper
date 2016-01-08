@@ -18,13 +18,14 @@ LOG_LEVEL=${LOG_LEVEL:-3}
 
 CALL=$1 # function to call (error, warning info, debug, level)
 MSG="" # message to print if required log level is set
+ECHO_PARAM="" # echo command parameters
 
 function error() {
   MSG="$@"
 
   if [ $LOG_LEVEL -ge 1 ]; then
-    [[ -z "$MSG" ]] && getMsgFromStdin
-    echo "$MSG"
+    [[ -z "$MSG" ]] && getMsgFromStdin || getEchoParam $1
+    echo $ECHO_PARAM  "$MSG"
   fi
 }
 
@@ -32,8 +33,8 @@ function warning() {
   MSG="$@"
 
   if [ $LOG_LEVEL -ge 2 ]; then
-    [[ -z "$MSG" ]] && getMsgFromStdin
-    echo "$MSG"
+    [[ -z "$MSG" ]] && getMsgFromStdin || getEchoParam $1
+    echo $ECHO_PARAM  "$MSG"
   fi
 }
 
@@ -41,8 +42,8 @@ function info() {
   MSG="$@"
 
   if [ $LOG_LEVEL -ge 3 ]; then
-    [[ -z "$MSG" ]] && getMsgFromStdin
-    echo "$MSG"
+    [[ -z "$MSG" ]] && getMsgFromStdin || getEchoParam $1
+    echo $ECHO_PARAM "$MSG"
   fi
 }
 
@@ -50,14 +51,21 @@ function debug() {
   MSG="$@"
 
   if [ $LOG_LEVEL -ge 4 ]; then
-    [[ -z "$MSG" ]] && getMsgFromStdin
-    echo "$MSG"
+    [[ -z "$MSG" ]] && getMsgFromStdin || getEchoParam $1
+    echo $ECHO_PARAM "$MSG"
   fi
 }
 
 function getMsgFromStdin() {
   if [ -z "$2" ]; then
     read MSG
+  fi
+}
+
+function getEchoParam() {
+  if [[ "$1" =~ ^(-e|-n|-E)$ ]]; then
+    ECHO_PARAM=$1
+    MSG=${MSG#$1 }
   fi
 }
 
