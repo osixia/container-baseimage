@@ -1,5 +1,5 @@
 #!/bin/bash -e
-log-helper level is eq trace && set -x
+log-helper level eq trace && set -x
 
 FIRST_START_SETUP_DONE="/container/run/state/logrotate-first-start-setup-done"
 

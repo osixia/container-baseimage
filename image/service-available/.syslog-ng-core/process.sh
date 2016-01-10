@@ -1,5 +1,5 @@
 #!/bin/sh
-log-helper level is eq trace && set -x
+log-helper level eq trace && set -x
 
 set -e
 

@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # log helper base on environment variable LOG_LEVEL
-# LOG_LEVEL environment variable is set by run tool based on --log-level argument
+# LOG_LEVEL environment variable is set by run tool based on --log-level argument (info by default)
 # or you can set it directly with docker --env argument
 
 # Usage example: log-helper info LOG_LEVEL is info or more
@@ -14,7 +14,7 @@ LOG_LEVEL_INFO=3
 LOG_LEVEL_DEBUG=4
 LOG_LEVEL_TRACE=5
 
-# default log level: 3 -> info
+# default log level if LOG_LEVEL is not set -> info
 LOG_LEVEL=${LOG_LEVEL:-${LOG_LEVEL_INFO}}
 
 CALL=$1 # function to call (error, warning, info, debug, trace, level)
@@ -26,78 +26,75 @@ if [[ ! "$CALL" =~ ^(error|warning|info|debug|trace|level)$ ]]; then
 fi
 
 
-MSG="" # message to print if required log level is set
+ECHO_MSG="" # message to print if required log level is set
 ECHO_PARAM="" # echo command parameters
 
 function error() {
-  MSG="$@"
+  getEchoParams $@
 
   if [ $LOG_LEVEL -ge 1 ]; then
-    [[ -z "$MSG" ]] && getMsgFromStdin || getEchoParam $1
-    echo $ECHO_PARAM  "$MSG"
+    [[ -z "$ECHO_MSG" ]] && getMsgFromStdin
+    echo $ECHO_PARAM  "$ECHO_MSG"
   fi
 }
 
 function warning() {
-  MSG="$@"
+  getEchoParams $@
 
   if [ $LOG_LEVEL -ge 2 ]; then
-    [[ -z "$MSG" ]] && getMsgFromStdin || getEchoParam $1
-    echo $ECHO_PARAM  "$MSG"
+    [[ -z "$ECHO_MSG" ]] && getMsgFromStdin
+    echo $ECHO_PARAM  "$ECHO_MSG"
   fi
 }
 
 function info() {
-  MSG="$@"
+  getEchoParams $@
 
   if [ $LOG_LEVEL -ge 3 ]; then
-    [[ -z "$MSG" ]] && getMsgFromStdin || getEchoParam $1
-    echo $ECHO_PARAM "$MSG"
+    [[ -z "$ECHO_MSG" ]] && getMsgFromStdin
+    echo $ECHO_PARAM "$ECHO_MSG"
   fi
 }
 
 function debug() {
-  MSG="$@"
+  getEchoParams $@
 
   if [ $LOG_LEVEL -ge 4 ]; then
-    [[ -z "$MSG" ]] && getMsgFromStdin || getEchoParam $1
-    echo $ECHO_PARAM "$MSG"
+    [[ -z "$ECHO_MSG" ]] && getMsgFromStdin
+    echo $ECHO_PARAM "$ECHO_MSG"
   fi
 }
 
 function trace() {
-  MSG="$@"
+  getEchoParams $@
 
   if [ $LOG_LEVEL -ge 5 ]; then
-    [[ -z "$MSG" ]] && getMsgFromStdin || getEchoParam $1
-    echo $ECHO_PARAM "$MSG"
+    [[ -z "$ECHO_MSG" ]] && getMsgFromStdin
+    echo $ECHO_PARAM "$ECHO_MSG"
   fi
 }
 
 function getMsgFromStdin() {
   if [ -z "$2" ]; then
-    read MSG
+    read -r ECHO_MSG
   fi
 }
 
-function getEchoParam() {
+function getEchoParams() {
+
+  ECHO_MSG="$@"
+
   if [[ "$1" =~ ^(-e|-n|-E)$ ]]; then
     ECHO_PARAM=$1
-    MSG=${MSG#$1 }
+    ECHO_MSG=${ECHO_MSG#$1 }
   fi
 }
 
 function level() {
-  local action=$1
-  local operator=$2
-  local loglevel_str=$3
-  local loglevel_str=${loglevel_str^^} # uppercase
 
-  if [  "$action" != "is" ]; then
-    echo "Error: Only \"is\" action is supported"
-    echo "usage example: log-helper level is eq info"
-    exit 1
-  fi
+  local operator=$1
+  local loglevel_str=$2
+  local loglevel_str=${loglevel_str^^} # uppercase
 
   if [[ ! "$operator" =~ ^(eq|ne|gt|ge|lt|le)$ ]]; then
     echo "Error: Operator $operator not allowed"

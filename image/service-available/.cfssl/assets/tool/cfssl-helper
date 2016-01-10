@@ -1,5 +1,5 @@
 #!/bin/bash -e
-log-helper level is eq trace && set -x
+log-helper level eq trace && set -x
 
 PREFIX=$1
 CERT_FILE=$2

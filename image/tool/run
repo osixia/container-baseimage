@@ -48,10 +48,10 @@ def trace(message):
 		sys.stderr.write("*** %s\n" % message)
 
 def debug_env_dump():
-		debug("--- Environment dump ---")
-		for name, value in os.environ.items():
-			debug(name + " = " +  value)
-		debug("------------------------")
+	debug("------------ Environment dump ------------")
+	for name, value in os.environ.items():
+		debug(name + " = " +  value)
+	debug("------------------------------------------")
 
 def ignore_signals_and_raise_keyboard_interrupt(signame):
 	signal.signal(signal.SIGTERM, signal.SIG_IGN)
@@ -94,48 +94,48 @@ def set_env_hostname_to_etc_hosts():
 				with open("/etc/hosts", "a") as myfile:
 					myfile.write(ip_address+" "+os.environ["HOSTNAME"]+"\n")
 	except:
-		debug("set_env_hostname_to_etc_hosts failed at some point...")
+		trace("set_env_hostname_to_etc_hosts: failed at some point...")
 
 def python_dict_to_bash_envvar(name, python_dict):
 
-		for value in python_dict:
-			python_to_bash_envvar(name+"_KEY", value)
-			python_to_bash_envvar(name+"_VALUE", python_dict.get(value))
+	for value in python_dict:
+		python_to_bash_envvar(name+"_KEY", value)
+		python_to_bash_envvar(name+"_VALUE", python_dict.get(value))
 
-		values = "#COMPLEX_BASH_ENV:ROW: "+name+"_KEY "+name+"_VALUE"
-		os.environ[name] = xstr(values)
-		debug("python2bash : set : " + name + " = "+ os.environ[name])
+	values = "#COMPLEX_BASH_ENV:ROW: "+name+"_KEY "+name+"_VALUE"
+	os.environ[name] = xstr(values)
+	trace("python2bash : set : " + name + " = "+ os.environ[name])
 
 def python_list_to_bash_envvar(name, python_list):
 
-		values="#COMPLEX_BASH_ENV:TABLE:"
+	values="#COMPLEX_BASH_ENV:TABLE:"
 
-		i=1
-		for value in python_list:
-			child_name = name + "_ROW_" + str(i)
-			values += " " + child_name
-			python_to_bash_envvar(child_name, value)
-			i = i +1
+	i=1
+	for value in python_list:
+		child_name = name + "_ROW_" + str(i)
+		values += " " + child_name
+		python_to_bash_envvar(child_name, value)
+		i = i +1
 
-		os.environ[name] = xstr(values)
-		debug("python2bash : set : " + name + " = "+ os.environ[name])
+	os.environ[name] = xstr(values)
+	trace("python2bash : set : " + name + " = "+ os.environ[name])
 
 def python_to_bash_envvar(name, value):
 
-		try:
-				value = ast.literal_eval(value)
-		except:
-				pass
+	try:
+		value = ast.literal_eval(value)
+	except:
+		pass
 
-		if isinstance(value, list):
-				python_list_to_bash_envvar(name,value)
+	if isinstance(value, list):
+		python_list_to_bash_envvar(name,value)
 
-		elif isinstance(value, dict):
-				python_dict_to_bash_envvar(name,value)
+	elif isinstance(value, dict):
+		python_dict_to_bash_envvar(name,value)
 
-		else:
-				os.environ[name] = xstr(value)
-				debug("python2bash : set : " + name + " = "+ os.environ[name])
+	else:
+		os.environ[name] = xstr(value)
+		trace("python2bash : set : " + name + " = "+ os.environ[name])
 
 def decode_python_envvars():
 	_environ = dict(os.environ)
@@ -154,8 +154,8 @@ def decode_json_envvars():
 				python_to_bash_envvar(name,value)
 			except:
 				os.environ[name] = xstr(value)
-				debug("failed to parse : " + xstr(value))
-				debug("set : " + name + " = "+ os.environ[name])
+				warning("failed to parse : " + xstr(value))
+				trace("set : " + name + " = "+ os.environ[name])
 
 def decode_envvars():
 	decode_json_envvars()
@@ -163,7 +163,7 @@ def decode_envvars():
 
 def generic_import_envvars(path, override_existing_environment):
 	if not os.path.exists(path):
-		debug("generic_import_envvars "+ path+ " don't exists")
+		trace("generic_import_envvars "+ path+ " don't exists")
 		return
 	new_env = {}
 	for envfile in listdir(path):
@@ -176,12 +176,12 @@ def generic_import_envvars(path, override_existing_environment):
 				# https://github.com/phusion/baseimage-docker/pull/49
 				value = re.sub('\n\Z', '', f.read())
 			new_env[name] = value
-			debug("import " + name + " from " + filePath + " --- ")
+			trace("import " + name + " from " + filePath + " --- ")
 
 	for name, value in new_env.items():
 		if override_existing_environment or not name in os.environ:
 			os.environ[name] = value
-			debug("set : " + name + " = "+ os.environ[name])
+			trace("set : " + name + " = "+ os.environ[name])
 		else:
 			debug("ignore : " + name + " = " + xstr(value) + " (keep " + name + " = " + os.environ[name] + " )")
 
@@ -195,7 +195,7 @@ def import_envvars():
 
 def export_run_envvars(to_dir = True):
 	if to_dir and not os.path.exists("/container/run/environment"):
-		warning("export_run_envvars /container/run/environment don't exists")
+		warning("export_run_envvars: /container/run/environment don't exists")
 		return
 	shell_dump = ""
 	for name, value in os.environ.items():
@@ -204,12 +204,12 @@ def export_run_envvars(to_dir = True):
 		if to_dir:
 			with open("/container/run/environment/" + name, "w") as f:
 				f.write(value)
-			debug("export " + name + " to /container/run/environment/" + name + " --- ")
+			trace("export " + name + " to /container/run/environment/" + name + " --- ")
 		shell_dump += "export " + sanitize_shenvname(name) + "=" + shquote(value) + "\n"
 
 	with open("/container/run/environment.sh", "w") as f:
 		f.write(shell_dump)
-	debug("export /container/run/environment.sh --- ")
+	trace("export /container/run/environment.sh --- ")
 
 def create_run_envvars():
 		set_service_dir_env()
@@ -225,7 +225,7 @@ def clear_run_envvars():
 		os.makedirs('/container/run/environment')
 		os.chmod('/container/run/environment', 700)
 	except:
-		warning("clear_run_envvars failed at some point...")
+		warning("clear_run_envvars: failed at some point...")
 
 def print_env_files_order(fileExtensions):
 
@@ -253,7 +253,7 @@ def print_env_files_order(fileExtensions):
 def import_env_files():
 
 	if not os.path.exists("/container/environment"):
-		warning("import_env_files /container/environment don't exists")
+		warning("import_env_files: /container/environment don't exists")
 		return
 
 	fileExtensions = yamlExtensions + jsonExtensions
@@ -281,35 +281,40 @@ def import_env_files():
 									os.environ[name] = '#PYTHON2BASH:' + xstr(value)
 								else:
 									os.environ[name] = xstr(value)
-								debug("set : " + name + " = "+ os.environ[name])
+								trace("set : " + name + " = "+ os.environ[name])
 							else:
 								debug("ignore : " + name + " = " + xstr(value) + " (keep " + name + " = " + os.environ[name] + " )")
 				except:
-					info('failed to parse: ' + filepath)
+					warning('failed to parse: ' + filepath)
 
 def remove_setup_env_files():
 
 	if os.path.isdir('/container/environment/setup'):
-		shutil.rmtree('/container/environment/setup')
+		try:
+			shutil.rmtree('/container/environment/setup')
+		except:
+			warning("remove_setup_env_files: failed to remove /container/environment/setup")
 
 	if not os.path.exists("/container/environment"):
-		warning("remove_setup_env_files /container/environment don't exists")
+		warning("remove_setup_env_files: /container/environment don't exists")
 		return
 
 	for subdir, dirs, files in sorted(os.walk("/container/environment")):
 		for file in files:
 			filepath = subdir + os.sep + file
 			if filepath.endswith(setupExtensions):
-				os.remove(filepath)
-
+				try:
+					os.remove(filepath)
+				except:
+					warning("remove_setup_env_files: failed to remove "+filepath)
 
 def restore_environ():
 	clear_environ()
-	debug("--- Restore initial environment ---")
+	trace("--- Restore initial environment ---")
 	os.environ.update(environ_backup)
 
 def clear_environ():
-	debug("--- Clear existing environment ---")
+	trace("--- Clear existing environment ---")
 	os.environ.clear()
 
 def set_startup_scripts_env():
@@ -371,11 +376,11 @@ def set_service_dir_env():
 		os.environ['SERVICE_DIR'] = '/container/run/service'
 	else:
 		os.environ['SERVICE_DIR'] = '/container/service'
-	debug("set : SERVICE_DIR = " + os.environ['SERVICE_DIR'])
+	trace("set : SERVICE_DIR = " + os.environ['SERVICE_DIR'])
 
 def set_log_level_env():
 	os.environ['LOG_LEVEL'] = xstr(log_level)
-	debug("set : LOG_LEVEL = " + os.environ['LOG_LEVEL'])
+	trace("set : LOG_LEVEL = " + os.environ['LOG_LEVEL'])
 
 def copy_service_to_run_dir():
 	info("Copy /container/service to /container/run/service")
