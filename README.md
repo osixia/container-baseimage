@@ -1,6 +1,7 @@
-# osixia/light-baseimage
+# osixia/light-baseimage:0.2.1
 
-[![](https://badge.imagelayers.io/osixia/light-baseimage:latest.svg)](https://imagelayers.io/?images=osixia/light-baseimage:latest 'Get your own badge on imagelayers.io') | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
+[![](https://badge.imagelayers.io/osixia/light-baseimage:latest.svg)](https://imagelayers.io/?images=osixia/light-baseimage:latest 'Get your own badge on imagelayers.io') | Latest release: 0.2.1 -  [Changelog](CHANGELOG.md)
+ | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
 
 A Debian based docker image to help you build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image.
 
@@ -16,7 +17,7 @@ If you find this image useful here's how you can help:
 
 ## Overview
 
-This image takes all the advantages of [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker) but makes programs optionals to allow more lightweight images and single process images.
+This image takes all the advantages of [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker) but makes programs optionals to allow more lightweight images and single process images. It also define simple directory structure and files to defined quickly how a program (here called service) is installed, setup and run.
 
 So major features are:
  - simple way to install services and multiple process image stacks
@@ -27,19 +28,49 @@ So major features are:
 
 ### Image directories structure
 
+This image use four directories:
 
-### Single process image
+- **/container/environment**: To add your environment files.
+- **/container/service**: To store services to install, setup and run.
+- **/container/service-available**: To store service that may be on demand installed, setup and run.
+- **/container/tool**: Contains image tools.
+
+By the way at run time an other directoy is create:
+- **/container/run**: To store container run environment, state, startup files and process to run based on files in  /container/environment and /container/service directories.
+
+But we will see that in details right after this quick start.
+
+### Service directory structure
+
+This section define a service directory that can be added in /container/service or /container/service-available.
+
+- **my-service**: root directory
+- **my-service/install.sh**: Install script (not mandatory).
+- **my-service/startup.sh**: startup script to setup the service when the container start (not mandatory).
+- **my-service/process.sh**: process to run (not mandatory).
+- **my-service/...** add whatever you want!
+
+Ok that's pretty all to know to start building our first images!
+
+### Create a single process image
 
 
-### Multiple process image
+### Create a multiple process image
 
 
 ## Advanced User Guide
 
+### Mastering image tools
 
-### Run options
+#### run
 
-## Image Assets Details
+#### log-helper
+
+#### complex-bash-env
+
+### Add your own service available
+
+## Image Assets
 
 ### /container/tool
 
@@ -90,11 +121,11 @@ Rotates and compresses logs on a regular basis.
 This service is part of the multiple-process-stack
 
 #### cfssl
-CFSSL is CloudFlare's PKI/TLS swiss army knife. It is both a command line tool for signing, verifying, and bundling TLS certificates.
+CFSSL is CloudFlare's PKI/TLS swiss army knife. It's a command line tool for signing, verifying, and bundling TLS certificates.
 
 Comes with cfssl-helper tool that make it docker friendly by taking command line parameters from environment variables.
 
-### Tests
+## Tests
 
 We use **Bats** (Bash Automated Testing System) to test this image:
 
