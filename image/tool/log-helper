@@ -1,11 +1,11 @@
 #!/bin/bash -e
 
-# log helper base on environment variable LOG_LEVEL
-# LOG_LEVEL environment variable is set by run tool based on --log-level argument (info by default)
+# log helper base on environment variable CONTAINER_LOG_LEVEL
+# CONTAINER_LOG_LEVEL environment variable is set by run tool based on --log-level argument (info by default)
 # or you can set it directly with docker --env argument
 
-# Usage example: log-helper info LOG_LEVEL is info or more
-# the message "LOG_LEVEL is info or more" will be printed only if log level is info, debug or trace
+# Usage example: log-helper info CONTAINER_LOG_LEVEL is info or more
+# the message "CONTAINER_LOG_LEVEL is info or more" will be printed only if log level is info, debug or trace
 
 LOG_LEVEL_NONE=0
 LOG_LEVEL_ERROR=1
@@ -14,8 +14,8 @@ LOG_LEVEL_INFO=3
 LOG_LEVEL_DEBUG=4
 LOG_LEVEL_TRACE=5
 
-# default log level if LOG_LEVEL is not set -> info
-LOG_LEVEL=${LOG_LEVEL:-${LOG_LEVEL_INFO}}
+# default log level if CONTAINER_LOG_LEVEL is not set -> info
+LOG_LEVEL=${CONTAINER_LOG_LEVEL:-${LOG_LEVEL_INFO}}
 
 CALL=$1 # function to call (error, warning, info, debug, trace, level)
 if [[ ! "$CALL" =~ ^(error|warning|info|debug|trace|level)$ ]]; then

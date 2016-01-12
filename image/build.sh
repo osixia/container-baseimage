@@ -4,8 +4,8 @@
 ln -s /container/tool/* /sbin/
 
 mkdir -p /container/service
-mkdir -p /container/environment /container/environment/setup
-chmod 700 /container/environment/ /container/environment/setup
+mkdir -p /container/environment /container/environment/startup
+chmod 700 /container/environment/ /container/environment/startup
 
 groupadd -g 8377 docker_env
 
