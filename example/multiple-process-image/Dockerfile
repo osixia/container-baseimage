@@ -1,20 +1,18 @@
-# Use single process image example
-FROM example/single-process
+# Use osixia/light-baseimage
+# https://github.com/osixia/docker-light-baseimage
+FROM osixia/light-baseimage:0.2.1-dev
 MAINTAINER Your Name <your@name.com>
 
-# Install multiple process stack and download php5-fpm
-# sources: https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service-available
-#          https://github.com/osixia/docker-light-baseimage/blob/stable/image/service-available/.cfssl/install.sh
+# add non free repository to apt-get install multiple process stack, nginx and php5-fpm
+# https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-multiple-process-stack
 RUN echo "deb http://http.debian.net/debian/ jessie main contrib non-free" >> /etc/apt/sources.list \
     && apt-get -y update \
     && /container/tool/install-multiple-process-stack \
     && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+       nginx \
        php5-fpm
 
 # Add service directory to /container/service
-# Content :
-# /container/service/nginx (from example/single-process)
-# /container/service/php5-fpm
 ADD service /container/service
 
 # Use baseimage install-service script and clean all
@@ -22,3 +20,12 @@ ADD service /container/service
 RUN /container/tool/install-service \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Add default env directory
+ADD environment /container/environment/99-default
+
+# Set /var/www/ in a data volume
+VOLUME /var/www/
+
+# Expose default http and https ports
+EXPOSE 80 443

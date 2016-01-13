@@ -1,11 +1,9 @@
 # Use osixia/light-baseimage
-# sources: https://github.com/osixia/docker-light-baseimage
+# https://github.com/osixia/docker-light-baseimage
 FROM osixia/light-baseimage:0.2.1-dev
 MAINTAINER Your Name <your@name.com>
 
-# Download nginx and install cfssl from baseimage
-# sources: https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service-available
-#          https://github.com/osixia/docker-light-baseimage/blob/stable/image/service-available/.cfssl/install.sh
+# Install nginx
 RUN apt-get -y update \
     && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
        nginx
