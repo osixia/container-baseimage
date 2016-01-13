@@ -325,7 +325,7 @@ def remove_setup_env_files():
 			if filepath.endswith(ENV_FILES_STARTUP_EXTENSIONS):
 				try:
 					os.remove(filepath)
-					info("remove file "+filepath)
+					info("Remove file "+filepath)
 				except:
 					warning("remove_setup_env_files: failed to remove "+filepath)
 
