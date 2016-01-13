@@ -704,8 +704,7 @@ def run_single_process_container(args):
 
 def run_no_process_container(args):
 	if len(args.main_command) == 0:
-		error("Error: This container has no process you must pass a main command.")
-		sys.exit(1)
+		args.main_command=['bash'] # run bash by default
 
 	exit_status = run_foreground_process(args.main_command)
 	sys.exit(exit_status)
