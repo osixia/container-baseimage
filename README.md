@@ -11,6 +11,36 @@ Other base distribution are available:
  - [Debian Experimental](https://github.com/osixia/docker-light-baseimage/tree/experimental-light-baseimage) | [Docker Hub](https://hub.docker.com/r/osixia/experimental-light-baseimage/)
  - [Ubuntu 14:04](https://github.com/osixia/docker-light-baseimage/tree/ubuntu-light-baseimage) | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/)
 
+Table of Contents
+- [Contributing](#)
+- [Overview](#)
+- [Quick Start](#)
+	- [Image directories structure](#)
+	- [Service directory structure](#)
+	- [Create a single process image](#)
+		- [Overview](#)
+		- [Dockerfile](#)
+		- [Service files](#)
+		- [Environment files](#)
+		- [Build and test](#)
+	- [Create a multiple process image](#)
+		- [Overview](#)
+		- [Dockerfile](#)
+		- [Service files](#)
+		- [Build and test](#)
+	- [Real world image example](#)
+- [Image Assets](#)
+	- [Tools](#)
+	- [Services available](#)
+- [Advanced User Guide](#)
+	- [Service available](#)
+	- [Mastering image tools](#)
+		- [run](#)
+		- [log-helper](#)
+		- [complex-bash-env](#)
+	- [Tests](#)
+- [Changelog](#)
+
 ## Contributing
 
 If you find this image useful here's how you can help:
@@ -240,9 +270,7 @@ Inspect the output and you should see that the secret is present in startup scri
 > The secret is: The bdd password is Baw0unga!
 
 And the secret is not defined in the process:
-> *** Remove file /container/environment/99-default/default.yaml.startup
-
->...
+> \*\*\* Remove file /container/environment/99-default/default.yaml.startup [...]
 
 > \*\*\* Running /container/run/process/nginx/run...
 
@@ -493,9 +521,9 @@ All container tools are available in `/container/tool` directory and are linked 
 
 A service-available is basically a normal service expect that it is in the `service-available` directory and have a `download.sh` file.
 
-To add a service-available to the current image use the `add-service-available` tool. It will process the download.sh file of scripts given in argument and move them to the regular service directory (/container/service).
+To add a service-available to the current image use the `add-service-available` tool. It will process the download.sh file of services given in argument and move them to the regular service directory (/container/service).
 
-After that service-available scripts will be process like regular services.
+After that the service-available will be process like regular services.
 
 Here simple Dockerfile example how to add a service-available to an image :
 
@@ -518,16 +546,171 @@ Note: Most of predefined service available start with a `.` to make sure they ar
 
 To create a service-available just create a regular service, add a download.sh file to set how the needed content is download  and add it to /container/service-available directory. The download.sh script is not mandatory if nothing need to be downloaded.
 
-For example a simple image example that add service-available to this baseimage: [osixia/web-baseimage](https://github.com/osixia/docker-web-baseimage)
+For example a simple image example that add service-available to this baseimage: [osixia/web-baseimage](https://github.com/osixia/docker-web-baseimage
+
+### Complex environment variables
+With light-baseimage you can set bash environment variable from .yaml and .json files.
+But bash environment variables can't store complex objects such as table that can be set in yaml or json file, that's why they are converted to complex bash environment variables (see [complex-bash-env](#complex-bash-env)  tool).
+
+This complex environment variable in yaml:
+
+    FRUITS:
+      - orange
+      - apple
+
+Can also be set by command line converted in python or json definitions:
+
+    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:0.2.1 printenv
+    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:0.2.1 printenv
+
 
 ### Mastering image tools
 
 #### run
 
+The run tool is defined as the image ENTRYPOINT (see [Dockerfile](image/Dockerfile)). It's the core tool of this image.
+
+What it does:
+- Setup the run directory
+- Set the startup files environment
+- Run startup files
+- Set process environment
+- Run process
+
+The run tool takes several options, to list them simply run:
+
+    docker run osixia/light-baseimage:0.2.1 --help
+
+##### Run directory setup
+The tool will create if they not exists the following directories:
+  - /container/run/state
+  - /container/run/environment
+  - /container/run/startup
+  - /container/run/process
+  - /container/run/service
+
+At the container first start it will search in /container/service or /container/run/service (if --copy-service option is used) all image's services.
+
+In a service directory (e.g /container/service/my-service):
+  - If a startup.sh file is found, the tool link it to /container/run/startup/my-service
+  - If a process.sh file is found, the tool link it to /container/run/process/my-service/run
+
+##### Startup files environment setup
+The tool takes all file in /container/environment/* and import the variables values to the container environment.
+The container environment is then exported to /container/run/environment and in /container/run/environment.sh
+
+##### Startup files execution
+The tool iterate trough /container/run/startup/ directory in alphabetical order and run script.
+At the end of the script execution the environment is restored to the version exported in /container/run/environment
+
+Finally it try to run /container/run/startup.sh if exists.
+
+##### Process environment setup
+The tool delete all .yaml.startup and .json.startup in /container/environment/*
+Then it takes all remaining file in /container/environment/* and import the variables values to the container environment.
+The container environment is then exported to /container/run/environment and in /container/run/environment.sh
+
+##### Process execution
+
+###### Single process image
+
+The tool run the unique /container/run/process/service-name/run file.
+
+If a main command is set for example:
+
+    docker run -it osixia/openldap:1.1.0 bash
+
+The tool will run the single process and the main command. If the main command exits the container exits. This is useful to debug or image development purpose.
+
+###### Multiple process image
+
+In a multiple process image the tool run runit, and runit supervise the /container/run/process directory and start all services automatically. Runit will also relaunched them if they failed.
+
+If a main command is set for example:
+
+    docker run -it osixia/phpldapadmin:0.6.7 bash
+
+The tool will run the runit and the main command. If the main command exits the container exits. This is useful to debug or image development purpose.
+
+###### No process image
+If a main command is set the tool launch it otherwise bash is launched.
+Example :
+
+    docker run -it osixia/light-baseimage:0.2.1
+
+
+##### Extra environment variables
+
+the tool add 3 variables to the container environment:
+- **CONTAINER_STATE_DIR**: /container/run/state
+- **CONTAINER_SERVICE_DIR**: the container service directory. By default: /container/service but if the container is started with --copy-service option: /container/run/service
+- **CONTAINER_LOG_LEVEL**: log level set by --loglevel option defaults to: 3 (info)
+
+This variables are usually helpful in startup and process files.
+
+
 #### log-helper
+This tool is a simple utility based on the CONTAINER_LOG_LEVEL variable to print leveled log messages.
+For example if the log level is info:
+
+    log-helper info hello
+
+will echo:
+> hello
+
+    log-helper debug i'm bob
+
+will not echo anything.
+
+Note: log-helper support piped input
+
+    echo "Heyyyyy" | log-helper info
+
+> Heyyyyy
+
+Available log message functions:
+  - error
+  - warning
+  - info
+  - debug
+  - trace
+
+Usage: log-helper error|warning|info|debug|trace message
+
+You can also test the log level with the level function:
+
+    log-helper level eq trace && set -x
+
+for example this will set -x if log level is trace.
+
+Usage: log-helper level [eq|ne|gt|ge|lt|le](http://www.tldp.org/LDP/abs/html/comparison-ops.html) error|warning|info|debug|trace
 
 #### complex-bash-env
+With light-baseimage you can set bash environment variable from .yaml and .json files.
+But bash environment variables can't store complex objects such as table that can be defined in json or yaml, that's why we need complex-bash-env tool.
 
+For example the following yaml file:
+
+      FRUITS:
+        - orange
+        - apple
+
+will produce this bash environment variables:
+
+      FRUITS=#COMPLEX_BASH_ENV:TABLE: FRUITS_ROW_1 FRUITS_ROW_2
+      FRUITS_ROW_1=orange
+      FRUITS_ROW_2=apple
+
+(this is done by run tool)
+
+complex-bash-env make it easy to iterate trough this variables:
+
+      for fruit in $(complex-bash-env iterate "${FRUITS}")
+      do
+        echo $fruit
+      done
+
+More complete example can be found [osixia/phpLDAPadmin](https://github.com/osixia/docker-phpLDAPadmin) image.
 
 ### Tests
 
