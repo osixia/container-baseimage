@@ -4,45 +4,28 @@ echo "install-service"
 
 # Auto run global install script if available
 if [ -f "/container/service/install.sh" ]; then
-  echo "Processing file /container/service/install.sh"
+  echo "run /container/service/install.sh"
   ./container/service/install.sh
+  echo "remove /container/service/install.sh"
   rm -f /container/service/install.sh
 fi
 
-# Process install of services in /container/service
-for d in $(find /container/service -mindepth 1 -maxdepth 1 -type d | sort); do
-  echo "Processing directory ${d}"
-  service=$(basename $d)
-
-  # Service install script
-  if [ -f "${d}/install.sh" ]; then
-    echo "run ${d}/install.sh"
-    ${d}/install.sh
-    rm -f ${d}/install.sh
-  fi
-
-  # Service container start script
-  if [ -f "${d}/container-start.sh" ]; then
-    echo "link ${d}/container-start.sh to /etc/my_init.d/$service"
-    ln -fs ${d}/container-start.sh /etc/my_init.d/$service
-  fi
-
-  # Service process
-  if [ -f "${d}/daemon.sh" ]; then
-    echo "link ${d}/daemon.sh to /etc/service/$service/run"
-    mkdir -p /etc/service/$service
-    ln -fs ${d}/daemon.sh /etc/service/$service/run
-  fi
-
+# Process install script of services in /container/service
+for i in $(find /container/service -mindepth 2 -maxdepth 2 -type f -name "install.sh" | sort); do
+  echo "run $i"
+  $i
+  echo "remove $i"
+  rm -f $i
 done
 
 echo "Searching process..."
-nbDirectories=$(find /etc/service -mindepth 1 -maxdepth 1 -type d | wc -l )
-echo "$nbDirectories process found"
+nbProcess=$(find /container/service -mindepth 2 -maxdepth 2 -type f -name "process.sh" | wc -l )
+echo "$nbProcess process found"
 
-if [ "$nbDirectories" -gt 1 ] && [ ! -e "/etc/multiple_process_stack_installed" ]; then
+# Multiple process image
+if [ "$nbProcess" -gt 1 ] && [ ! -e "/container/multiple_process_stack_added" ]; then
   echo "This image has multiple process."
-  /container/tool/install-multiple-process-stack
+  /container/tool/add-multiple-process-stack
   echo "For better image build process consider adding :"
-  echo "\"/container/tool/install-multiple-process-stack\" after an apt-get update in your dockerfile."
+  echo "\"/container/tool/add-multiple-process-stack\" after an apt-get update in your Dockerfile."
 fi
