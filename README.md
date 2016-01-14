@@ -58,8 +58,6 @@ So major features are:
  - Getting environment variables from **.yaml** and **.json** files.
  - Special environment files **.yaml.startup** and **.json.startup** deleted after image startup files first execution to keep the image setup secret.
  - Greats build tools to minimize the image number of layers.
- - Like in [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker) in a multiple process container services are supervised by runit and relaunched if they stops.
-
 
 ## Quick Start
 
@@ -69,7 +67,7 @@ This image use four directories:
 
 - **/container/environment**: for environment files.
 - **/container/service**: for services to install, setup and run.
-- **/container/service-available**: for service that may be on demand installed, setup and run.
+- **/container/service-available**: for service that may be on demand downloaded, installed, setup and run.
 - **/container/tool**: for image tools.
 
 By the way at run time an other directory is create:
@@ -326,6 +324,7 @@ Let's now create the nginx and php5-fpm directories:
 #### Dockerfile
 
 In the Dockerfile we are going to:
+  - Add the multple process stack
   - Download nginx and php5-fpm from apt-get.
   - Add the service directory to the image.
   - Install service and clean up.
@@ -407,7 +406,7 @@ This file define the command to run:
 
 Make sure process.sh can be executed (chmod +x process.sh).
 
-*Caution: The command executed must start a foreground process otherwise the container will immediately stops.*
+*Caution: The command executed must start a foreground process otherwise runit (use to supervise mutlple process images) will  keep restarting php5-fpm.*
 
 That why we run php5-fpm with `--nodaemonize"`
 
@@ -454,11 +453,11 @@ Start a new container:
 
     docker run -p 8080:80 example/multiple-process
 
-Go to http://localhost:8080/phpinfo.php
+Go to [http://localhost:8080/phpinfo.php](http://localhost:8080/phpinfo.php)
 
 > phpinfo should be printed
 
-So we have a container with two process supervised by runit running in our container.
+So we have a container with two process supervised by runit running in our container !
 
 
 ### Real world image example
@@ -498,21 +497,21 @@ All container tools are available in `/container/tool` directory and are linked 
 | ---------------- | ------------------- |
 | run | The run tool is defined as the image ENTRYPOINT (see [Dockerfile](image/Dockerfile)). It set environment and run  startup scripts and images process. More information in the [Advanced User Guide / run](#run) section. |
 | setuser | A tool for running a command as another user. Easier to use than su, has a smaller attack vector than sudo, and unlike chpst this tool sets $HOME correctly.|
-| log-helper | A simple bash tool to print message base on the log level set by the run tool. |
-|  add-service-available | A tool to install services in the service-available directory. |
-| add-multiple-process-stack | A tool to install the multiple process stack: runit, cron syslog-ng-core and logrotate. |
+| log-helper | A simple bash tool to print message base on the log level. |
+|  add-service-available | A tool to download and add services in service-available directory to the regular service directory. |
+| add-multiple-process-stack | A tool to add the multiple process stack: runit, cron syslog-ng-core and logrotate. |
 | install-service | A tool that execute /container/service/install.sh and /container/service/\*/install.sh if file exists. |
-|  complex-bash-env | A tool to iterate trough complex bash environment variables created by the run tool when a table or a list was set in environment files. |
+|  complex-bash-env | A tool to iterate trough complex bash environment variables created by the run tool when a table or a list was set in environment files or in environment command line argument. |
 
 ### Services available
 
 | Name        | Description |
 | ---------------- | ------------------- |
-| runit | Replaces Debian's Upstart. Used for service supervision and management. Much easier to use than SysV init and supports restarting daemons when they crash. Much easier to use and more lightweight than Upstart. <br><br>*This service is part of the multiple-process-stack.*|
-| cron | Cron daemon. <br><br>*This service is part of the multiple-process-stack.*|
-| syslog-ng-core | Syslog daemon so that many services - including the kernel itself - can correctly log to /var/log/syslog. If no syslog daemon is running, a lot of important messages are silently swallowed. <br><br>Only listens locally. All syslog messages are forwarded to "docker logs".<br><br>*This service is part of the multiple-process-stack.* |
-| logrotate | Rotates and compresses logs on a regular basis. <br><br>*This service is part of the multiple-process-stack.*|
-| cfssl | CFSSL is CloudFlare's PKI/TLS swiss army knife. It's a command line tool for signing, verifying, and bundling TLS certificates. <br><br>Comes with cfssl-helper tool that make it docker friendly by taking command line parameters from environment variables. |
+| .runit | Replaces Debian's Upstart. Used for service supervision and management. Much easier to use than SysV init and supports restarting daemons when they crash. Much easier to use and more lightweight than Upstart. <br><br>*This service is part of the multiple-process-stack.*|
+| .cron | Cron daemon. <br><br>*This service is part of the multiple-process-stack.*|
+| .syslog-ng-core | Syslog daemon so that many services - including the kernel itself - can correctly log to /var/log/syslog. If no syslog daemon is running, a lot of important messages are silently swallowed. <br><br>Only listens locally. All syslog messages are forwarded to "docker logs".<br><br>*This service is part of the multiple-process-stack.* |
+| .logrotate | Rotates and compresses logs on a regular basis. <br><br>*This service is part of the multiple-process-stack.*|
+| .cfssl | CFSSL is CloudFlare's PKI/TLS swiss army knife. It's a command line tool for signing, verifying, and bundling TLS certificates. <br><br>Comes with cfssl-helper tool that make it docker friendly by taking command line parameters from environment variables. |
 
 
 ## Advanced User Guide
@@ -546,11 +545,11 @@ Note: Most of predefined service available start with a `.` to make sure they ar
 
 To create a service-available just create a regular service, add a download.sh file to set how the needed content is download  and add it to /container/service-available directory. The download.sh script is not mandatory if nothing need to be downloaded.
 
-For example a simple image example that add service-available to this baseimage: [osixia/web-baseimage](https://github.com/osixia/docker-web-baseimage
+For example a simple image example that add service-available to this baseimage: [osixia/web-baseimage](https://github.com/osixia/docker-web-baseimage)
 
 ### Complex environment variables
 With light-baseimage you can set bash environment variable from .yaml and .json files.
-But bash environment variables can't store complex objects such as table that can be set in yaml or json file, that's why they are converted to complex bash environment variables (see [complex-bash-env](#complex-bash-env)  tool).
+But bash environment variables can't store complex objects such as table that can be defined in yaml or json file, that's why they are converted to complex bash environment variables (see [complex-bash-env](#complex-bash-env)  tool).
 
 This complex environment variable in yaml:
 
@@ -558,7 +557,7 @@ This complex environment variable in yaml:
       - orange
       - apple
 
-Can also be set by command line converted in python or json definitions:
+Can also be set by command line converted in python or json:
 
     docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:0.2.1 printenv
     docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:0.2.1 printenv
@@ -568,7 +567,7 @@ Can also be set by command line converted in python or json definitions:
 
 #### run
 
-The run tool is defined as the image ENTRYPOINT (see [Dockerfile](image/Dockerfile)). It's the core tool of this image.
+The *Run tool* is defined as the image ENTRYPOINT (see [Dockerfile](image/Dockerfile)). It's the core tool of this image.
 
 What it does:
 - Setup the run directory
@@ -577,12 +576,12 @@ What it does:
 - Set process environment
 - Run process
 
-The run tool takes several options, to list them simply run:
+*Run tool* takes several options, to list them:
 
     docker run osixia/light-baseimage:0.2.1 --help
 
 ##### Run directory setup
-The tool will create if they not exists the following directories:
+*Run tool* will create if they not exists the following directories:
   - /container/run/state
   - /container/run/environment
   - /container/run/startup
@@ -592,21 +591,21 @@ The tool will create if they not exists the following directories:
 At the container first start it will search in /container/service or /container/run/service (if --copy-service option is used) all image's services.
 
 In a service directory (e.g /container/service/my-service):
-  - If a startup.sh file is found, the tool link it to /container/run/startup/my-service
-  - If a process.sh file is found, the tool link it to /container/run/process/my-service/run
+  - If a startup.sh file is found, the file is linked to /container/run/startup/my-service
+  - If a process.sh file is found, the file is linked to /container/run/process/my-service/run
 
 ##### Startup files environment setup
-The tool takes all file in /container/environment/* and import the variables values to the container environment.
+*Run tool* takes all file in /container/environment/* and import the variables values to the container environment.
 The container environment is then exported to /container/run/environment and in /container/run/environment.sh
 
 ##### Startup files execution
-The tool iterate trough /container/run/startup/ directory in alphabetical order and run script.
+*Run tool* iterate trough /container/run/startup/ directory in alphabetical order and run the script.
 At the end of the script execution the environment is restored to the version exported in /container/run/environment
 
 Finally it try to run /container/run/startup.sh if exists.
 
 ##### Process environment setup
-The tool delete all .yaml.startup and .json.startup in /container/environment/*
+*Run tool* delete all .yaml.startup and .json.startup in /container/environment/* and clear the previous environment (/container/run/environment is removed)
 Then it takes all remaining file in /container/environment/* and import the variables values to the container environment.
 The container environment is then exported to /container/run/environment and in /container/run/environment.sh
 
@@ -614,26 +613,26 @@ The container environment is then exported to /container/run/environment and in 
 
 ###### Single process image
 
-The tool run the unique /container/run/process/service-name/run file.
+*Run tool* execute the unique /container/run/process/service-name/run file.
 
 If a main command is set for example:
 
     docker run -it osixia/openldap:1.1.0 bash
 
-The tool will run the single process and the main command. If the main command exits the container exits. This is useful to debug or image development purpose.
+*Run tool* will execute the single process and the main command. If the main command exits the container exits. This is useful to debug or image development purpose.
 
 ###### Multiple process image
 
-In a multiple process image the tool run runit, and runit supervise the /container/run/process directory and start all services automatically. Runit will also relaunched them if they failed.
+In a multiple process image the *run tool* execute runit witch supervise /container/run/process directory and start all services automatically. Runit will also relaunched them if they failed.
 
 If a main command is set for example:
 
     docker run -it osixia/phpldapadmin:0.6.7 bash
 
-The tool will run the runit and the main command. If the main command exits the container exits. This is useful to debug or image development purpose.
+*run tool* will execute runit and the main command. If the main command exits the container exits. This is still useful to debug or image development purpose.
 
 ###### No process image
-If a main command is set the tool launch it otherwise bash is launched.
+If a main command is set *run tool* launch it otherwise bash is launched.
 Example :
 
     docker run -it osixia/light-baseimage:0.2.1
@@ -641,13 +640,10 @@ Example :
 
 ##### Extra environment variables
 
-the tool add 3 variables to the container environment:
+*run tool* add 3 variables to the container environment:
 - **CONTAINER_STATE_DIR**: /container/run/state
 - **CONTAINER_SERVICE_DIR**: the container service directory. By default: /container/service but if the container is started with --copy-service option: /container/run/service
 - **CONTAINER_LOG_LEVEL**: log level set by --loglevel option defaults to: 3 (info)
-
-This variables are usually helpful in startup and process files.
-
 
 #### log-helper
 This tool is a simple utility based on the CONTAINER_LOG_LEVEL variable to print leveled log messages.
@@ -668,20 +664,15 @@ Note: log-helper support piped input
 
 > Heyyyyy
 
-Available log message functions:
-  - error
-  - warning
-  - info
-  - debug
-  - trace
+Available log message functions: error, warning, info, debug and trace.
 
 Usage: log-helper error|warning|info|debug|trace message
 
 You can also test the log level with the level function:
 
-    log-helper level eq trace && set -x
+    log-helper level eq info && echo "log level is infos"
 
-for example this will set -x if log level is trace.
+for example this will echo log level is trace if log level is trace.
 
 Usage: log-helper level [eq|ne|gt|ge|lt|le](http://www.tldp.org/LDP/abs/html/comparison-ops.html) error|warning|info|debug|trace
 
@@ -703,7 +694,7 @@ will produce this bash environment variables:
 
 (this is done by run tool)
 
-complex-bash-env make it easy to iterate trough this variables:
+complex-bash-env make it easy to iterate trough this variable:
 
       for fruit in $(complex-bash-env iterate "${FRUITS}")
       do
