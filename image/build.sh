@@ -3,16 +3,11 @@
 ## Add bash tools to /sbin
 ln -s /container/tool/* /sbin/
 
-# Add needed directories & files
-mkdir -p /etc/service
-mkdir -p /etc/my_init.d
-mkdir -p /etc/container_environment
-touch /etc/container_environment.sh
-chmod 700 /etc/container_environment
+mkdir -p /container/service
+mkdir -p /container/environment /container/environment/startup
+chmod 700 /container/environment/ /container/environment/startup
 
 groupadd -g 8377 docker_env
-chown :docker_env /etc/container_environment.sh
-chmod 640 /etc/container_environment.sh
 
 # dpkg options
 cp /container/file/dpkg_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
@@ -32,8 +27,7 @@ fi
 ## https://journal.paul.querna.org/articles/2013/10/15/docker-ubuntu-on-rackspace/
 ## http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=594189
 export INITRD=no
-mkdir -p /etc/container_environment
-echo -n no > /etc/container_environment/INITRD
+echo -n no > /container/environment/INITRD
 
 ## Enable Ubuntu Universe and Multiverse.
 sed -i 's/^#\s*\(deb.*universe\)$/\1/g' /etc/apt/sources.list
@@ -61,12 +55,14 @@ $minimal_apt_get_install software-properties-common
 ## Upgrade all packages.
 apt-get dist-upgrade -y --no-install-recommends
 
-## Fix locale.
+# fix locale
 $minimal_apt_get_install language-pack-en
 locale-gen en_US
 update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
-echo -n en_US.UTF-8 > /etc/container_environment/LANG
-echo -n en_US.UTF-8 > /etc/container_environment/LC_CTYPE
+
+echo -n C.UTF-8 > /container/environment/LANG
+echo -n C.UTF-8 > /container/environment/LANGUAGE
+echo -n C.UTF-8 > /container/environment/LC_CTYPE
 
 # install PyYAML
 tar -C /container/file/ -xvf /container/file/PyYAML-3.11.tar.gz
