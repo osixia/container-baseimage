@@ -30,7 +30,7 @@ Table of Contents
 		- [Dockerfile](#dockerfile-1)
 		- [Service files](#service-files-1)
 		- [Build and test](#build-and-test-1)
-	- [Real world image example](#real-world-image-example)
+- [Images based on light-baseimage](#images-based-on-light-baseimage)
 - [Image Assets](#image-assets)
 	- [Tools](#image-assets)
 	- [Services available](#services-available)
@@ -380,7 +380,7 @@ The Dockerfile contains directives to download nginx and php5-fpm from apt-get b
 
 Maybe you already read that in the previous example ? Sorry.
 
-#### Service
+#### Service files
 
 Please refer to [single process image](#create-a-single-process-image) for the nginx service files description.
 Here just php5-fpm files are described.
@@ -472,7 +472,7 @@ Go to [http://localhost:8080/phpinfo.php](http://localhost:8080/phpinfo.php)
 So we have a container with two process supervised by runit running in our container !
 
 
-### Real world image example
+## Images based on light-baseimage
 
 Single process images:
 - [osixia/openldap](https://github.com/osixia/docker-openldap)
