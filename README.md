@@ -7,6 +7,10 @@ A Debian based docker image to help you build reliable image quickly. This image
 
 The aims of this image is to be used as a base for your own Docker images. It's base on the awesome work of: [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
 
+Other base distribution are available:
+ - [Debian Experimental](https://github.com/osixia/docker-light-baseimage/tree/experimental-light-baseimage) | [Docker Hub](https://hub.docker.com/r/osixia/experimental-light-baseimage/)
+ - [Ubuntu 14:04](https://github.com/osixia/docker-light-baseimage/tree/ubuntu-light-baseimage) | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/)
+
 ## Contributing
 
 If you find this image useful here's how you can help:
@@ -17,14 +21,15 @@ If you find this image useful here's how you can help:
 
 ## Overview
 
-This image takes all the advantages of [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker) but makes programs optionals to allow more lightweight images and single process images. It also define simple directory structure and files to defined quickly how a program (here called service) is installed, setup and run.
+This image takes all the advantages of [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker) but makes programs optionals to allow more lightweight images and single process images. It also define simple directory structure and files to set quickly how a program (here called service) is installed, setup and run.
 
 So major features are:
- - simple way to install services and multiple process image stacks (runit, cron, syslog-ng-core and logrotate)
- - getting environment variables from **.yaml** and **.json** files
- - special environment files **.yaml.startup** and **.json.startup** deleted after image startup files first execution to keep the image setup secret.
+ - Simple way to install services and multiple process image stacks (runit, cron, syslog-ng-core and logrotate) if needed.
+ - Getting environment variables from **.yaml** and **.json** files.
+ - Special environment files **.yaml.startup** and **.json.startup** deleted after image startup files first execution to keep the image setup secret.
+ - Greats build tools to minimize the image number of layers.
+ - Like in [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker) in a multiple process container services are supervised by runit and relaunched if they stops.
 
-Like in [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker) in a mutliple process container services are supervised by runit and relaunched if they stops.
 
 ## Quick Start
 
@@ -32,12 +37,12 @@ Like in [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker) 
 
 This image use four directories:
 
-- **/container/environment**: environment files.
-- **/container/service**: services to install, setup and run.
-- **/container/service-available**: service that may be on demand installed, setup and run.
-- **/container/tool**: image tools.
+- **/container/environment**: for environment files.
+- **/container/service**: for services to install, setup and run.
+- **/container/service-available**: for service that may be on demand installed, setup and run.
+- **/container/tool**: for image tools.
 
-By the way at run time an other directoy is create:
+By the way at run time an other directory is create:
 - **/container/run**: To store container run environment, state, startup files and process to run based on files in  /container/environment and /container/service directories.
 
 But we will see that in details right after this quick start.
@@ -68,7 +73,7 @@ First we create the directory structure of the image:
  - **single-process-image/environment**: environment files directory.
  - **single-process-image/Dockerfile**: the Dockerfile to build this image.
 
-**service** and **environment** directories name are arbitrary and can be changed but make sure to adapt their name in the Dockerfile.
+**service** and **environment** directories name are arbitrary and can be changed but make sure to adapt their name in the everywhere and especially in the Dockerfile.
 
 Let's now create the nginx service directory:
 
@@ -81,7 +86,7 @@ Let's now create the nginx service directory:
 #### Dockerfile
 
 In the Dockerfile we are going to:
-  - Install nginx from apt-get.
+  - Download nginx from apt-get.
   - Add the service directory to the image.
   - Install service and clean up.
   - Add the environment directory to the image.
@@ -92,7 +97,7 @@ In the Dockerfile we are going to:
         FROM osixia/light-baseimage:0.2.1-dev
         MAINTAINER Your Name <your@name.com>
 
-        # Install nginx
+        # Download nginx from apt-get
         RUN apt-get -y update \
             && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
                nginx
@@ -181,13 +186,12 @@ Let's create two files:
  - single-process-image/environment/default.yaml.startup
 
 ##### default.yaml
-In this file we will defined variables that can be used at anytime in the container environment:
+default.yaml file define variables that can be used at anytime in the container environment:
 
     WHO_AM_I: We are Anonymous. We are Legion. We do not forgive. We do not forget. Expect us.
 
 ##### default.yaml.startup
-
-In this file we will defnie variables that are only available during the container **first start** in **startup files**.
+default.yaml.startup define variables that are only available during the container **first start** in **startup files**.
 \*.yaml.startup are deleted right after startup files are processed for the first time,
 then all variables they contains will not be available in the container environment.
 
@@ -197,7 +201,7 @@ But for this tutorial we will add a variable to this file:
 
     FIRST_START_SETUP_ONLY_SECRET: The bdd password is Baw0unga!
 
-Change **startup.sh** to:
+An try to get it's value in **startup.sh** script:
 
     #!/bin/bash -e
     FIRST_START_DONE="${CONTAINER_STATE_DIR}/nginx-first-start-done"
@@ -212,7 +216,7 @@ Change **startup.sh** to:
 
     exit 0
 
-And **process.sh** to:
+And in **process.sh** script:
 
     #!/bin/bash -e
     echo "The secret is: $FIRST_START_SETUP_ONLY_SECRET"
@@ -291,12 +295,10 @@ Let's now create the nginx and php5-fpm directories:
  - **multiple-process-image/service/php5-fpm/process.sh**: process to run.
  - **multiple-process-image/service/php5-fpm/config/default**: default nginx server config with
 
-Please refer to [single process image](#create-a-single-process-image) for the nginx service files.
-
 #### Dockerfile
 
 In the Dockerfile we are going to:
-  - Install nginx and php5-fpm from apt-get.
+  - Download nginx and php5-fpm from apt-get.
   - Add the service directory to the image.
   - Install service and clean up.
   - Add the environment directory to the image.
@@ -307,7 +309,7 @@ In the Dockerfile we are going to:
         FROM osixia/light-baseimage:0.2.1-dev
         MAINTAINER Your Name <your@name.com>
 
-        # add non free repository to apt-get install multiple process stack, nginx and php5-fpm
+        # Add non free repository to apt-get (needed to download php5-fpm), install multiple process stack, nginx and php5-fpm
         # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-multiple-process-stack
         RUN echo "deb http://http.debian.net/debian/ jessie main contrib non-free" >> /etc/apt/sources.list \
             && apt-get -y update \
@@ -335,18 +337,20 @@ In the Dockerfile we are going to:
         EXPOSE 80 443
 
 
-The Dockerfile contains directives to download nginx and php5-fpm from apt-get but all the initial setup will take place in install.sh file (called by /container/tool/install-service tool) for a better build experience. The time consumer download task is decoupled from the initial setup to make great use of docker build cache. If an install.sh file is changed the builder will not have to download again php5-fpm add will just run install scripts.
+The Dockerfile contains directives to download nginx and php5-fpm from apt-get but all the initial setup will take place in install.sh file (called by /container/tool/install-service tool) for a better build experience. The time consumer download task is decoupled from the initial setup to make great use of docker build cache. If an install.sh file is changed the builder will not have to download again nginx and php5-fpm add will just run install scripts.
+
+Maybe you already read that in the previous example ? Sorry.
 
 #### Service
 
-Please refer to [single process image](#create-a-single-process-image) for the nginx service files.
+Please refer to [single process image](#create-a-single-process-image) for the nginx service files description.
 Here just php5-fpm files are described.
 
 ##### install.sh
 
 This file must only contains directives for the service initial setup. If there is files to download, apt-get command to run we will it takes place in the Dockerfile for a better image building experience (see [Dockerfile](#Dockerfile) ).
 
-In this example, for the initial setup set some php5-fpm default configuration, replace the default nginx server config and add phpinfo.php file
+In this example, for the initial setup we set some php5-fpm default configuration, replace the default nginx server config and add phpinfo.php file:
 
     #!/bin/bash -e
     # this script is run during the image build

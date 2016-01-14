@@ -3,7 +3,7 @@
 FROM osixia/light-baseimage:0.2.1-dev
 MAINTAINER Your Name <your@name.com>
 
-# Install nginx
+# Download nginx from apt-get
 RUN apt-get -y update \
     && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
        nginx
