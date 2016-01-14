@@ -356,7 +356,7 @@ def setup_run_directories(args):
 	directories = (RUN_PROCESS_DIR, RUN_STARTUP_DIR, RUN_STATE_DIR, RUN_ENVIRONMENT_DIR)
 	for directory in directories:
 		if not os.path.exists(directory):
-		    	os.makedirs(directory)
+			os.makedirs(directory)
 
 			if directory == RUN_ENVIRONMENT_DIR:
 				os.chmod(directory, 700)
