@@ -1,0 +1,24 @@
+#!/bin/bash -e
+
+# Usage :
+# RUN /container/tool/add-service-available [service1] [service2] ...
+
+for i in $@
+do
+
+  echo "add-service-available: $i"
+  if  [ -d "/container/service-available/$i" ]; then
+
+    if [ -f /container/service-available/$i/download.sh ]; then
+      echo "run /container/service-available/$i/download.sh"
+      /container/service-available/$i/download.sh
+    fi
+
+    echo "move /container/service-available/$i to /container/service/$i"
+    mv /container/service-available/$i /container/service/$i
+
+  else
+    echo "service-available: $i not found in /container/service-available/$i"
+    exit 1
+  fi
+done

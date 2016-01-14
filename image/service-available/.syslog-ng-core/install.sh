@@ -1,8 +1,5 @@
 #!/bin/bash -e
 
-# install apache
-LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends syslog-ng-core
-
 mkdir -p /var/lib/syslog-ng
 rm -f /etc/default/syslog-ng
 

@@ -23,9 +23,9 @@ nbProcess=$(find /container/service -mindepth 2 -maxdepth 2 -type f -name "proce
 echo "$nbProcess process found"
 
 # Multiple process image
-if [ "$nbProcess" -gt 1 ] && [ ! -e "/container/multiple_process_stack_installed" ]; then
+if [ "$nbProcess" -gt 1 ] && [ ! -e "/container/multiple_process_stack_added" ]; then
   echo "This image has multiple process."
-  /container/tool/install-multiple-process-stack
+  /container/tool/add-multiple-process-stack
   echo "For better image build process consider adding :"
-  echo "\"/container/tool/install-multiple-process-stack\" after an apt-get update in your dockerfile."
+  echo "\"/container/tool/add-multiple-process-stack\" after an apt-get update in your Dockerfile."
 fi
