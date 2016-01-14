@@ -1,8 +1,6 @@
 # Changelog
 
-<<<<<<< HEAD
-=======
-## 0.2.1
+## 0.1.4
   - Add cfssl as available service to generate ssl certs
     Warning: ssl-helper ssl-helper-openssl and ssl-helper-gnutls
              have been removed
@@ -25,18 +23,6 @@
   - Rename install-multiple-process-stack to add-multiple-process-stack
   - Rename install-service-available to add-service-available
 
-## 0.2.0
-  - Allow more easy image inheritance
-  - Fix cron NUMBER OF HARD LINKS > 1
-  - Makefile with build no cache
-
-## 0.1.5
-  - Fix bug with host network
-
-## 0.1.4
-  - Add run cmd arguments when it's a single process image
-  - Remove bash from command when it's a single process image
-
 ## 0.1.3
   - Add hostname env variable to /etc/hosts
     to make the image more friendly with kubernetes again :)
@@ -45,7 +31,6 @@
   - Load env.yaml file from /container/environment directory
     to make the image more friendly with kubernetes secrets :)
 
->>>>>>> hotfix-0.2.1
 ## 0.1.1
   - Fix bug with host network
 

@@ -1,6 +1,6 @@
-# Use osixia/light-baseimage
+# Use osixia/ubuntu-light-baseimage
 # https://github.com/osixia/docker-light-baseimage
-FROM osixia/light-baseimage:0.2.1-dev
+FROM osixia/ubuntu-light-baseimage:0.1.4-dev
 MAINTAINER Your Name <your@name.com>
 
 # Download nginx from apt-get
