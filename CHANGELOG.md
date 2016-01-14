@@ -20,6 +20,8 @@
   - Container startup script directory /etc/my_init.d/ moved to /container/run/startup
   - Container final startup script /etc/rc.local moved to /container/run/startup.sh
   - Add bash log-helper
+  - Rename install-multiple-process-stack to add-multiple-process-stack
+  - Rename install-service-available to add-service-available
 
 ## 0.2.0
   - Allow more easy image inheritance
