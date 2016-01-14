@@ -12,6 +12,8 @@ do
     if [ -f /container/service-available/$i/download.sh ]; then
       echo "run /container/service-available/$i/download.sh"
       /container/service-available/$i/download.sh
+      echo "remove /container/service-available/$i/download.sh"
+      rm -f /container/service-available/$i/download.sh
     fi
 
     echo "move /container/service-available/$i to /container/service/$i"
