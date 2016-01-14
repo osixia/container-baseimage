@@ -356,10 +356,10 @@ In this example, for the initial setup we set some php5-fpm default configuratio
     # this script is run during the image build
 
     # config
-    sed -i --follow-symlinks -e "s/expose_php = On/expose_php = Off/g" /etc/php5/fpm/php.ini
-    sed -i --follow-symlinks -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini
-    sed -i --follow-symlinks -e "s/;listen.owner = www-data/listen.owner = www-data/g" /etc/php5/fpm/pool.d/www.conf
-    sed -i --follow-symlinks -e "s/;listen.group = www-data/listen.group = www-data/g" /etc/php5/fpm/pool.d/www.conf
+    sed -i -e "s/expose_php = On/expose_php = Off/g" /etc/php5/fpm/php.ini
+    sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini
+    sed -i -e "s/;listen.owner = www-data/listen.owner = www-data/g" /etc/php5/fpm/pool.d/www.conf
+    sed -i -e "s/;listen.group = www-data/listen.group = www-data/g" /etc/php5/fpm/pool.d/www.conf
 
     # replace default website with php5-fpm default website
     cp -f /container/service/php5-fpm/config/default /etc/nginx/sites-available/default
@@ -384,6 +384,7 @@ Make sure process.sh can be executed (chmod +x process.sh).
 That why we run php5-fpm with `--nodaemonize"`
 
 ##### config/default
+nginx server configuration:
 
       server {
       	listen 80 default_server;
@@ -419,7 +420,7 @@ That's it we have a multiple process image that run nginx and php5-fpm !
 
 Build the image:
 
-  docker build -t example/multiple-process --rm .
+    docker build -t example/multiple-process --rm .
 
 Start a new container:
 
@@ -429,20 +430,95 @@ Go to http://localhost:8080/phpinfo.php
 
 > phpinfo should be printed
 
-So we have a container with two process supervised by runit runing in our container.
-
-### Using service available
-
-
+So we have a container with two process supervised by runit running in our container.
 
 
 ### Real world image example
 
+Single process images:
+- [osixia/openldap](https://github.com/osixia/docker-openldap)
+- [osixia/openldap-backup](https://github.com/osixia/docker-openldap-backup)
+- [osixia/keepalived](https://github.com/osixia/docker-keepalived)
+- [osixia/tinc](https://github.com/osixia/docker-tinc)
+- [osixia/registry-ldap-auth](https://github.com/osixia/docker-registry-ldap-auth)
+- [osixia/cfssl-multirootca](https://github.com/osixia/docker-cfssl-multirootca)
+- [osixia/backup-manager](https://github.com/osixia/docker-backup-manager)
+- [osixia/mmc-agent](https://github.com/osixia/docker-mmc-agent)
+
+Multiple process images:
+- [osixia/mariadb](https://github.com/osixia/docker-mariadb)
+- [osixia/wordpress](https://github.com/osixia/docker-wordpress)
+- [osixia/roundcube](https://github.com/osixia/docker-roundcube)
+- [osixia/phpMyAdmin](https://github.com/osixia/docker-phpMyAdmin)
+- [osixia/phpLDAPadmin](https://github.com/osixia/docker-phpLDAPadmin)
+- [osixia/kubernetes-reverseproxy](https://github.com/osixia/kubernetes-reverseproxy)
+- [osixia/keepalived-confd](https://github.com/osixia/docker-keepalived-confd)
+- [osixia/tinc-etcd](https://github.com/osixia/docker-tinc-etcd)
+- [osixia/mmc-mail](https://github.com/osixia/docker-mmc-mail)
+- [osixia/mmc-web](https://github.com/osixia/docker-mmc-web)
 
 Send me a message to add your image based on light-baseimage in this list.
 
+## Image Assets
+
+### Tools
+
+All container tools are available in `/container/tool` directory and are linked in `/sbin/` so they belong to the container PATH.
+
+
+| Filename        | Description |
+| ---------------- | ------------------- |
+| run | The run tool is defined as the image ENTRYPOINT (see [Dockerfile](image/Dockerfile)). It set environment and run  startup scripts and images process. More information in the [Advanced User Guide / run](#run) section. |
+| setuser | A tool for running a command as another user. Easier to use than su, has a smaller attack vector than sudo, and unlike chpst this tool sets $HOME correctly.|
+| log-helper | A simple bash tool to print message base on the log level set by the run tool. |
+|  add-service-available | A tool to install services in the service-available directory. |
+| add-multiple-process-stack | A tool to install the multiple process stack: runit, cron syslog-ng-core and logrotate. |
+| install-service | A tool that execute /container/service/install.sh and /container/service/\*/install.sh if file exists. |
+|  complex-bash-env | A tool to iterate trough complex bash environment variables created by the run tool when a table or a list was set in environment files. |
+
+### Services available
+
+| Name        | Description |
+| ---------------- | ------------------- |
+| runit | Replaces Debian's Upstart. Used for service supervision and management. Much easier to use than SysV init and supports restarting daemons when they crash. Much easier to use and more lightweight than Upstart. <br><br>*This service is part of the multiple-process-stack.*|
+| cron | Cron daemon. <br><br>*This service is part of the multiple-process-stack.*|
+| syslog-ng-core | Syslog daemon so that many services - including the kernel itself - can correctly log to /var/log/syslog. If no syslog daemon is running, a lot of important messages are silently swallowed. <br><br>Only listens locally. All syslog messages are forwarded to "docker logs".<br><br>*This service is part of the multiple-process-stack.* |
+| logrotate | Rotates and compresses logs on a regular basis. <br><br>*This service is part of the multiple-process-stack.*|
+| cfssl | CFSSL is CloudFlare's PKI/TLS swiss army knife. It's a command line tool for signing, verifying, and bundling TLS certificates. <br><br>Comes with cfssl-helper tool that make it docker friendly by taking command line parameters from environment variables. |
+
+
 ## Advanced User Guide
 
+### Service available
+
+A service-available is basically a normal service expect that it is in the `service-available` directory and have a `download.sh` file.
+
+To add a service-available to the current image use the `add-service-available` tool. It will process the download.sh file of scripts given in argument and move them to the regular service directory (/container/service).
+
+After that service-available scripts will be process like regular services.
+
+Here simple Dockerfile example how to add a service-available to an image :
+
+        # Use osixia/light-baseimage
+        # https://github.com/osixia/docker-light-baseimage
+        FROM osixia/light-baseimage:0.2.1-dev
+        MAINTAINER Your Name <your@name.com>
+
+        # Add cfssl tool, nginx and php5-fpm
+        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
+        RUN apt-get -y update \
+            && /container/tool/add-service-available .cfssl \
+            && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+               nginx \
+               php5-fpm
+        ...
+
+
+Note: Most of predefined service available start with a `.` to make sure they are install before regular services (so they can be used by regular services). The install-service tool process services in /container/service in alphabetical order.
+
+To create a service-available just create a regular service, add a download.sh file to set how the needed content is download  and add it to /container/service-available directory. The download.sh script is not mandatory if nothing need to be downloaded.
+
+For example a simple image example that add service-available to this baseimage: [osixia/web-baseimage](https://github.com/osixia/docker-web-baseimage)
 
 ### Mastering image tools
 
@@ -452,66 +528,8 @@ Send me a message to add your image based on light-baseimage in this list.
 
 #### complex-bash-env
 
-### Create your own service available
 
-## Image Assets
-
-### /container/tool
-
-All container tools are available in `/container/tool` directory and are linked in `/sbin/` so they belong to the container PATH.
-
-#### run
-
-The run tool is defined as the image ENTRYPOINT (see [Dockerfile](image/Dockerfile)). It set environment and run  startup scripts and images process. More information in the [Advanced User Guide / run](#run) section.
-
-#### setuser
-A tool for running a command as another user. Easier to use than su, has a smaller attack vector than sudo, and unlike chpst this tool sets $HOME correctly.
-
-#### log-helper
-A simple bash tool to print message base on the log level set by the run tool.
-
-#### add-multiple-process-stack
-A tool to install the multiple process stack: runit, cron syslog-ng-core and logrotate.
-
-#### install-service
-A tool that execute /container/service/install.sh and /container/service/\*/install.sh if file exists.
-
-#### add-service-available
-A tool to install services in the service-available directory.
-
-#### complex-bash-env
-A tool to iterate trough complex bash environment variables created by the run tool when a table or a list was set in environment files.
-
-### /container/service-available
-
-#### runit
-Replaces Debian's Upstart. Used for service supervision and management. Much easier to use than SysV init and supports restarting daemons when they crash. Much easier to use and more lightweight than Upstart.
-
-This service is part of the multiple-process-stack.
-
-#### cron
-Cron daemon.
-
-This service is part of the multiple-process-stack.
-
-#### syslog-ng-core
-Syslog daemon so that many services - including the kernel itself - can correctly log to /var/log/syslog. If no syslog daemon is running, a lot of important messages are silently swallowed.
-
-Only listens locally. All syslog messages are forwarded to "docker logs".
-
-This service is part of the multiple-process-stack.
-
-#### logrotate
-Rotates and compresses logs on a regular basis.
-
-This service is part of the multiple-process-stack.
-
-#### cfssl
-CFSSL is CloudFlare's PKI/TLS swiss army knife. It's a command line tool for signing, verifying, and bundling TLS certificates.
-
-Comes with cfssl-helper tool that make it docker friendly by taking command line parameters from environment variables.
-
-## Tests
+### Tests
 
 We use **Bats** (Bash Automated Testing System) to test this image:
 
