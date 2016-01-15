@@ -8,7 +8,7 @@ A Debian based docker image to help you build reliable image quickly. This image
 The aims of this image is to be used as a base for your own Docker images. It's base on the awesome work of: [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
 
 Other base distribution are available:
-- [Debian](https://github.com/osixia/docker-light-baseimage) | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/)
+- [Debian](https://github.com/osixia/docker-light-baseimage) | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/)
 - [Debian Experimental](https://github.com/osixia/docker-light-baseimage/tree/experimental) | [Docker Hub](https://hub.docker.com/r/osixia/experimental-light-baseimage)
 
 Table of Contents
