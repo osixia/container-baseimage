@@ -727,7 +727,8 @@ You can also test the log level with the level function:
 
 for example this will echo "log level is trace" if log level is trace.
 
-Level `function usage: log-helper level [eq|ne|gt|ge|lt|le](http://www.tldp.org/LDP/abs/html/comparison-ops.html) none|error|warning|info|debug|trace`
+Level `function usage: log-helper level eq|ne|gt|ge|lt|le none|error|warning|info|debug|trace`
+Help: [http://www.tldp.org/LDP/abs/html/comparison-ops.html](http://www.tldp.org/LDP/abs/html/comparison-ops.html)
 
 #### complex-bash-env
 With light-baseimage you can set bash environment variable from .yaml and .json files.
