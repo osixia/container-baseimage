@@ -1,16 +1,15 @@
 # osixia/ubuntu-light-baseimage:0.1.4
 
-[![](https://badge.imagelayers.io/osixia/light-baseimage:latest.svg)](https://imagelayers.io/?images=osixia/light-baseimage:latest 'Get your own badge on imagelayers.io') | Latest release: 0.2.1 -  [Changelog](CHANGELOG.md)
- | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
+[![](https://badge.imagelayers.io/osixia/ubuntu-light-baseimage:latest.svg)](https://imagelayers.io/?images=osixia/ubuntu-light-baseimage:latest 'Get your own badge on imagelayers.io') | Latest release: 0.2.1 -  [Changelog](CHANGELOG.md)
+| [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/)
 
-A Ubuntu trusty based docker image to help you build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image.
+A Debian based docker image to help you build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimised build.
 
 The aims of this image is to be used as a base for your own Docker images. It's base on the awesome work of: [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
 
 Other base distribution are available:
- - [Debian](https://github.com/osixia/docker-light-baseimage) | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/)
- - [Debian Experimental](https://github.com/osixia/docker-light-baseimage/tree/experimental) | [Docker Hub](https://hub.docker.com/r/osixia/experimental-light-baseimage)
-
+- [Debian](https://github.com/osixia/docker-light-baseimage) | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/)
+- [Debian Experimental](https://github.com/osixia/docker-light-baseimage/tree/experimental) | [Docker Hub](https://hub.docker.com/r/osixia/experimental-light-baseimage)
 
 Table of Contents
 - [Contributing](#contributing)
@@ -23,27 +22,25 @@ Table of Contents
 		- [Dockerfile](#dockerfile)
 		- [Service files](#service-files)
 		- [Environment files](#environment-files)
-			- [default.yaml](#defaultyaml)
-			- [default.yaml.startup](#defaultyamlstartup)
 		- [Build and test](#build-and-test)
 	- [Create a multiple process image](#create-a-multiple-process-image)
 		- [Overview](#create-a-multiple-process-image)
 		- [Dockerfile](#dockerfile-1)
 		- [Service files](#service-files-1)
 		- [Build and test](#build-and-test-1)
-- [Images based on light-baseimage](#images-based-on-light-baseimage)
+- [Images Based On Light-Baseimage](#images-based-on-light-baseimage)
 - [Image Assets](#image-assets)
 	- [Tools](#image-assets)
 	- [Services available](#services-available)
 - [Advanced User Guide](#advanced-user-guide)
 	- [Service available](#service-available)
-	- [Complex environment variables](#complex-environment-variables)
 	- [Mastering image tools](#mastering-image-tools)
 		- [run](#run)
+           - [Run command line options](#run-command-line-options)
 			- [Run directory setup](#run-directory-setup)
 			- [Startup files environment setup](#startup-files-environment-setup)
 			- [Startup files execution](#startup-files-execution)
-			- [ Process environment setup](#process-environment-setup)
+			- [ Process environment setup](#process-environment-setup)
 			- [Process execution](#process-execution)
 				- [Single process image](#single-process-image)
 				- [Multiple process image](#multiple-process-image)
@@ -67,10 +64,11 @@ If you find this image useful here's how you can help:
 This image takes all the advantages of [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker) but makes programs optionals to allow more lightweight images and single process images. It also define simple directory structure and files to set quickly how a program (here called service) is installed, setup and run.
 
 So major features are:
- - Simple way to install services and multiple process image stacks (runit, cron, syslog-ng-core and logrotate) if needed.
- - Getting environment variables from **.yaml** and **.json** files.
- - Special environment files **.yaml.startup** and **.json.startup** deleted after image startup files first execution to keep the image setup secret.
- - Greats build tools to minimize the image number of layers.
+- Greats build tools to minimize the image number of layers and optimise image build.
+- Simple way to install services and multiple process image stacks (runit, cron, syslog-ng-core and logrotate) if needed.
+- Getting environment variables from **.yaml** and **.json** files.
+- Special environment files **.yaml.startup** and **.json.startup** deleted after image startup files first execution to keep the image setup secret.
+
 
 ## Quick Start
 
@@ -109,74 +107,75 @@ See complete example in: [example/single-process-image](example/single-process-i
 
 First we create the directory structure of the image:
 
- - **single-process-image**: root directory
- - **single-process-image/service**: directory to store the nginx service.
- - **single-process-image/environment**: environment files directory.
- - **single-process-image/Dockerfile**: the Dockerfile to build this image.
+- **single-process-image**: root directory
+- **single-process-image/service**: directory to store the nginx service.
+- **single-process-image/environment**: environment files directory.
+- **single-process-image/Dockerfile**: the Dockerfile to build this image.
 
-**service** and **environment** directories name are arbitrary and can be changed but make sure to adapt their name in the everywhere and especially in the Dockerfile.
+**service** and **environment** directories name are arbitrary and can be changed but make sure to adapt their name everywhere and especially in the Dockerfile.
 
 Let's now create the nginx service directory:
 
- - **single-process-image/service/nginx**: service root directory
- - **single-process-image/service/nginx/install.sh**: service installation script.
- - **single-process-image/service/nginx/startup.sh**:  startup script to setup the service when the container start.
- - **single-process-image/service/nginx/process.sh**: process to run.
+- **single-process-image/service/nginx**: service root directory
+- **single-process-image/service/nginx/install.sh**: service installation script.
+- **single-process-image/service/nginx/startup.sh**:  startup script to setup the service when the container start.
+- **single-process-image/service/nginx/process.sh**: process to run.
 
 
 #### Dockerfile
 
 In the Dockerfile we are going to:
-  - Download nginx from apt-get.
-  - Add the service directory to the image.
-  - Install service and clean up.
-  - Add the environment directory to the image.
-  - Define ports exposed and volumes if needed.
+ - Download nginx from apt-get.
+ - Add the service directory to the image.
+ - Install service and clean up.
+ - Add the environment directory to the image.
+ - Define ports exposed and volumes if needed.
 
-        # Use osixia/light-baseimage
-        # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/ubuntu-light-baseimage:0.1.4
-        MAINTAINER Your Name <your@name.com>
 
-        # Download nginx from apt-get
-        RUN apt-get -y update \
-            && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-               nginx
+       # Use osixia/ubuntu-light-baseimage
+       # https://github.com/osixia/docker-light-baseimage
+       FROM osixia/ubuntu-light-baseimage:0.1.4
+       MAINTAINER Your Name <your@name.com>
 
-        # Add service directory to /container/service
-        ADD service /container/service
+       # Download nginx from apt-get
+       RUN apt-get -y update \
+           && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+              nginx
 
-        # Use baseimage install-service script and clean all
-        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
-        RUN /container/tool/install-service \
-            && apt-get clean \
-            && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+       # Add service directory to /container/service
+       ADD service /container/service
 
-        # Add default env directory
-        ADD environment /container/environment/99-default
+       # Use baseimage install-service script and clean all
+       # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
+       RUN /container/tool/install-service \
+           && apt-get clean \
+           && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-        # Set /var/www/ in a data volume
-        VOLUME /var/www/
+       # Add default env directory
+       ADD environment /container/environment/99-default
 
-        # Expose default http and https ports
-        EXPOSE 80 443
+       # Set /var/www/ in a data volume
+       VOLUME /var/www/
+
+       # Expose default http and https ports
+       EXPOSE 80 443
 
 
 The Dockerfile contains directives to download nginx from apt-get but all the initial setup will take place in install.sh file (called by /container/tool/install-service tool) for a better build experience. The time consumer download task is decoupled from the initial setup to make great use of docker build cache. If install.sh file is changed the builder won't have to download again nginx add will just run install scripts.
 
 #### Service files
 
-##### install.sh
+##### install.sh
 
-This file must only contains directives for the service initial setup. If there is files to download, apt-get command to run we will it takes place in the Dockerfile for a better image building experience (see [Dockerfile](#Dockerfile)).
+This file must only contains directives for the service initial setup. If there is files to download, apt-get command to run we will it takes place in the Dockerfile for a better image building experience (see [Dockerfile](#dockerfile)).
 
 In this example, for the initial setup we just delete the default nginx debian index file and create a custom index.html:
 
-    #!/bin/bash -e
-    # this script is run during the image build
+   #!/bin/bash -e
+   # this script is run during the image build
 
-    rm -rf /var/www/html/index.nginx-debian.html
-    echo "Hi!" > /var/www/html/index.html
+   rm -rf /var/www/html/index.nginx-debian.html
+   echo "Hi!" > /var/www/html/index.html
 
 Make sure install.sh can be executed (chmod +x install.sh).
 
@@ -189,27 +188,27 @@ This file is used to make process.sh ready to be run and customize the service s
 
 For example at run time we would like to introduce ourself so we will use an environment variable WHO_AM_I set by command line with --env. So we add WHO_AM_I value to index.html file but we want to do that only on the first container start because on restart the index.html file will already contains our name:
 
-    #!/bin/bash -e
-    FIRST_START_DONE="${CONTAINER_STATE_DIR}/nginx-first-start-done"
+   #!/bin/bash -e
+   FIRST_START_DONE="${CONTAINER_STATE_DIR}/nginx-first-start-done"
 
-    # container first start
-    if [ ! -e "$FIRST_START_DONE" ]; then
-      echo "I'm ${WHO_AM_I}."  >> /var/www/html/index.html
-      touch $FIRST_START_DONE
-    fi
+   # container first start
+   if [ ! -e "$FIRST_START_DONE" ]; then
+     echo "I'm ${WHO_AM_I}."  >> /var/www/html/index.html
+     touch $FIRST_START_DONE
+   fi
 
-    exit 0
+   exit 0
 
 Make sure startup.sh can be executed (chmod +x startup.sh).
 
-As you can see we use CONTAINER_STATE_DIR variable, it contains the directory where container state is saved, this variable is automatically set by run tool. Refer to the Advanced User Guide for more information.
+As you can see we use CONTAINER_STATE_DIR variable, it contains the directory where container state is saved, this variable is automatically set by run tool. Refer to the [Advanced User Guide](#extra-environment-variables) for more information.
 
 ##### process.sh
 
 This file define the command to run:
 
-    #!/bin/bash -e
-    exec /usr/sbin/nginx -g "daemon off;"
+   #!/bin/bash -e
+   exec /usr/sbin/nginx -g "daemon off;"
 
 Make sure process.sh can be executed (chmod +x process.sh).
 
@@ -223,45 +222,47 @@ We could already build and test this image but 2 more minutes to take advantage 
 #### Environment files
 
 Let's create two files:
- - single-process-image/environment/default.yaml
- - single-process-image/environment/default.yaml.startup
+- single-process-image/environment/default.yaml
+- single-process-image/environment/default.yaml.startup
+
+File name *default*.yaml and *default*.yaml.startup can be changed as you want. Also in this example we are going to use yaml files but json files works too.
 
 ##### default.yaml
 default.yaml file define variables that can be used at anytime in the container environment:
 
-    WHO_AM_I: We are Anonymous. We are Legion. We do not forgive. We do not forget. Expect us.
+   WHO_AM_I: We are Anonymous. We are Legion. We do not forgive. We do not forget. Expect us.
 
 ##### default.yaml.startup
 default.yaml.startup define variables that are only available during the container **first start** in **startup files**.
-\*.yaml.startup are deleted right after startup files are processed for the first time,
+*\*.yaml.startup* are deleted right after startup files are processed for the first time,
 then all variables they contains will not be available in the container environment.
 
 This helps to keep the container configuration secret. If you don't care all environment variables can be defined in **default.yaml** and everything will work fine.
 
 But for this tutorial we will add a variable to this file:
 
-    FIRST_START_SETUP_ONLY_SECRET: The bdd password is Baw0unga!
+   FIRST_START_SETUP_ONLY_SECRET: The bdd password is KawaaahBounga
 
 An try to get it's value in **startup.sh** script:
 
-    #!/bin/bash -e
-    FIRST_START_DONE="${CONTAINER_STATE_DIR}/nginx-first-start-done"
+   #!/bin/bash -e
+   FIRST_START_DONE="${CONTAINER_STATE_DIR}/nginx-first-start-done"
 
-    # container first start
-    if [ ! -e "$FIRST_START_DONE" ]; then
-      echo ${WHO_AM_I}  >> /var/www/html/index.html
-      touch $FIRST_START_DONE
-    fi
+   # container first start
+   if [ ! -e "$FIRST_START_DONE" ]; then
+     echo ${WHO_AM_I}  >> /var/www/html/index.html
+     touch $FIRST_START_DONE
+   fi
 
-    echo "The secret is: $FIRST_START_SETUP_ONLY_SECRET"
+   echo "The secret is: $FIRST_START_SETUP_ONLY_SECRET"
 
-    exit 0
+   exit 0
 
 And in **process.sh** script:
 
-    #!/bin/bash -e
-    echo "The secret is: $FIRST_START_SETUP_ONLY_SECRET"
-    exec /usr/sbin/nginx -g "daemon off;"
+   #!/bin/bash -e
+   echo "The secret is: $FIRST_START_SETUP_ONLY_SECRET"
+   exec /usr/sbin/nginx -g "daemon off;"
 
 Ok it's time for the show !
 
@@ -273,7 +274,7 @@ Build the image:
 
 Start a new container:
 
-    docker run -p 8080:80 example/single-process
+   docker run -p 8080:80 example/single-process
 
 Inspect the output and you should see that the secret is present in startup script:
 > \*\*\* Running /container/run/startup/nginx...
@@ -295,13 +296,42 @@ Ok let's check our name now, go to [http://localhost:8080/](http://localhost:808
 You should see:
 > Hi! We are Anonymous. We are Legion. We do not forgive. We do not forget. Expect us.
 
-And finally, let's say who we really are, stop the previous container (ctrl+c) and start a new one:
+And finally, let's say who we really are, stop the previous container (ctrl+c or ctrl+d) and start a new one:
 
-    docker run --env WHO_AM_I="I'm Jon Snow, yes i'm not dead." \
-    -p 8080:80 example/single-process
+   docker run --env WHO_AM_I="I'm Jon Snow, what?! i'm dead?" \
+   -p 8080:80 example/single-process
 
 Refresh [http://localhost:8080/](http://localhost:8080/) and you should see:
-> Hi! I'm Jon Snow, yes i'm not dead.
+> Hi! I'm Jon Snow, what?! i'm dead?
+
+
+##### Overriding default environment files at run time:
+let's create two new environment files:
+ - single-process-image/test-custom-env/env.yaml
+ - single-process-image/test-custom-env/env.yaml.startup
+
+env.yaml:
+
+   WHO_AM_I: I'm bobby.
+
+env.yaml.startup:
+
+   FIRST_START_SETUP_ONLY_SECRET: The bdd password is KawaaahB0unga!!!
+
+And we mount them at run time:
+
+   docker run --volume $PWD/test-custom-env:/container/environment/01-custom \
+   -p 8080:80 example/single-process
+
+Take care to link your environment files folder to `/container/environment/XX-somedir` (with XX < 99 so they will be processed before default environment files) and not  directly to `/container/environment` because this directory contains predefined baseimage environment files to fix container environment (INITRD, LANG, LANGUAGE and LC_CTYPE).
+
+In the output:
+> \*\*\* Running /container/run/startup/nginx...
+
+> The secret is: The bdd password is KawaaahB0unga!!!
+
+Refresh [http://localhost:8080/](http://localhost:8080/) and you should see:
+> Hi! I'm bobby.
 
 ### Create a multiple process image
 
@@ -311,70 +341,71 @@ This example takes back the single process image example and add php5-fpm to run
 
 See complete example in: [example/multiple-process-image](example/multiple-process-image)
 
-Note: it would have been  ♪ faster, better, stronger ♪ to extends the previous image but to make things easier we just copied files.
+Note: it would have been  ♪ ~~harder~~, faster, better, stronger ♪ to extends the previous image but to make things easier we just copied files.
 
 So here the image directory structure:
 
- - **multiple-process-image**: root directory
- - **multiple-process-image/service**: directory to store the nginx and php5-fpm service.
- - **multiple-process-image/environment**: environment files directory.
- - **multiple-process-image/Dockerfile**: the Dockerfile to build this image.
+- **multiple-process-image**: root directory
+- **multiple-process-image/service**: directory to store the nginx and php5-fpm service.
+- **multiple-process-image/environment**: environment files directory.
+- **multiple-process-image/Dockerfile**: the Dockerfile to build this image.
 
 **service** and **environment** directories name are arbitrary and can be changed but make sure to adapt their name in the Dockerfile.
 
 Let's now create the nginx and php5-fpm directories:
 
- - **multiple-process-image/service/nginx**: nginx root directory
- - **multiple-process-image/service/nginx/install.sh**: service installation script.
- - **multiple-process-image/service/nginx/startup.sh**:  startup script to setup the service when the container start.
- - **multiple-process-image/service/nginx/process.sh**: process to run.
+- **multiple-process-image/service/nginx**: nginx root directory
+- **multiple-process-image/service/nginx/install.sh**: service installation script.
+- **multiple-process-image/service/nginx/startup.sh**:  startup script to setup the service when the container start.
+- **multiple-process-image/service/nginx/process.sh**: process to run.
 
- - **multiple-process-image/service/php5-fpm**: php5-fpm root directory
- - **multiple-process-image/service/php5-fpm/install.sh**: service installation script.
- - **multiple-process-image/service/php5-fpm/process.sh**: process to run.
- - **multiple-process-image/service/php5-fpm/config/default**: default nginx server config with
+- **multiple-process-image/service/php5-fpm**: php5-fpm root directory
+- **multiple-process-image/service/php5-fpm/install.sh**: service installation script.
+- **multiple-process-image/service/php5-fpm/process.sh**: process to run.
+- **multiple-process-image/service/php5-fpm/config/default**: default nginx server config with
 
 #### Dockerfile
 
 In the Dockerfile we are going to:
-  - Add the multple process stack
-  - Download nginx and php5-fpm from apt-get.
-  - Add the service directory to the image.
-  - Install service and clean up.
-  - Add the environment directory to the image.
-  - Define ports exposed and volumes if needed.
+ - Add the multple process stack
+ - Download nginx and php5-fpm from apt-get.
+ - Add the service directory to the image.
+ - Install service and clean up.
+ - Add the environment directory to the image.
+ - Define ports exposed and volumes if needed.
 
-        # Use osixia/light-baseimage
-        # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/ubuntu-light-baseimage:0.1.4
-        MAINTAINER Your Name <your@name.com>
 
-        # Add non free repository to apt-get (needed to download php5-fpm), install multiple process stack, nginx and php5-fpm
-        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
-        RUN echo "deb http://http.debian.net/debian/ jessie main contrib non-free" >> /etc/apt/sources.list \
-            && apt-get -y update \
-            && /container/tool/add-multiple-process-stack \
-            && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-               nginx \
-               php5-fpm
+       # Use osixia/ubuntu-light-baseimage
+       # https://github.com/osixia/docker-light-baseimage
+       FROM osixia/ubuntu-light-baseimage:0.1.4
+       MAINTAINER Your Name <your@name.com>
 
-        # Add service directory to /container/service
-        ADD service /container/service
+       # Add non free repository to apt-get (needed to download php5-fpm), install multiple process stack, nginx and php5-fpm
+       # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
+       RUN echo "deb http://http.debian.net/debian/ jessie main contrib non-free" >> /etc/apt/sources.list \
+           && apt-get -y update \
+           && /container/tool/add-multiple-process-stack \
+           && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+              nginx \
+              php5-fpm
 
-        # Use baseimage install-service script and clean all
-        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
-        RUN /container/tool/install-service \
-            && apt-get clean \
-            && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+       # Add service directory to /container/service
+       ADD service /container/service
 
-        # Add default env directory
-        ADD environment /container/environment/99-default
+       # Use baseimage install-service script and clean all
+       # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
+       RUN /container/tool/install-service \
+           && apt-get clean \
+           && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-        # Set /var/www/ in a data volume
-        VOLUME /var/www/
+       # Add default env directory
+       ADD environment /container/environment/99-default
 
-        # Expose default http and https ports
-        EXPOSE 80 443
+       # Set /var/www/ in a data volume
+       VOLUME /var/www/
+
+       # Expose default http and https ports
+       EXPOSE 80 443
 
 
 The Dockerfile contains directives to download nginx and php5-fpm from apt-get but all the initial setup will take place in install.sh file (called by /container/tool/install-service tool) for a better build experience. The time consumer download task is decoupled from the initial setup to make great use of docker build cache. If an install.sh file is changed the builder will not have to download again nginx and php5-fpm add will just run install scripts.
@@ -383,29 +414,28 @@ Maybe you already read that in the previous example ? Sorry.
 
 #### Service files
 
-Please refer to [single process image](#create-a-single-process-image) for the nginx service files description.
-Here just php5-fpm files are described.
+Please refer to [single process image](#create-a-single-process-image) for the nginx service files description. Here just php5-fpm files are described.
 
 ##### install.sh
 
-This file must only contains directives for the service initial setup. If there is files to download, apt-get command to run we will it takes place in the Dockerfile for a better image building experience (see [Dockerfile](#Dockerfile) ).
+This file must only contains directives for the service initial setup. If there is files to download, apt-get command to run we will it takes place in the Dockerfile for a better image building experience (see [Dockerfile](#dockerfile-1) ).
 
 In this example, for the initial setup we set some php5-fpm default configuration, replace the default nginx server config and add phpinfo.php file:
 
-    #!/bin/bash -e
-    # this script is run during the image build
+   #!/bin/bash -e
+   # this script is run during the image build
 
-    # config
-    sed -i -e "s/expose_php = On/expose_php = Off/g" /etc/php5/fpm/php.ini
-    sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini
-    sed -i -e "s/;listen.owner = www-data/listen.owner = www-data/g" /etc/php5/fpm/pool.d/www.conf
-    sed -i -e "s/;listen.group = www-data/listen.group = www-data/g" /etc/php5/fpm/pool.d/www.conf
+   # config
+   sed -i -e "s/expose_php = On/expose_php = Off/g" /etc/php5/fpm/php.ini
+   sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini
+   sed -i -e "s/;listen.owner = www-data/listen.owner = www-data/g" /etc/php5/fpm/pool.d/www.conf
+   sed -i -e "s/;listen.group = www-data/listen.group = www-data/g" /etc/php5/fpm/pool.d/www.conf
 
-    # replace default website with php5-fpm default website
-    cp -f /container/service/php5-fpm/config/default /etc/nginx/sites-available/default
+   # replace default website with php5-fpm default website
+   cp -f /container/service/php5-fpm/config/default /etc/nginx/sites-available/default
 
-    # create phpinfo.php
-    echo "<?php phpinfo(); " > /var/www/html/phpinfo.php
+   # create phpinfo.php
+   echo "<?php phpinfo(); " > /var/www/html/phpinfo.php
 
 
 Make sure install.sh can be executed (chmod +x install.sh).
@@ -414,8 +444,8 @@ Make sure install.sh can be executed (chmod +x install.sh).
 
 This file define the command to run:
 
-    #!/bin/bash -e
-    exec /usr/sbin/php5-fpm --nodaemonize
+   #!/bin/bash -e
+   exec /usr/sbin/php5-fpm --nodaemonize
 
 Make sure process.sh can be executed (chmod +x process.sh).
 
@@ -423,35 +453,35 @@ Make sure process.sh can be executed (chmod +x process.sh).
 
 That why we run php5-fpm with `--nodaemonize"`
 
-##### config/default
+##### config/default
 nginx server configuration:
 
-      server {
-      	listen 80 default_server;
-      	listen [::]:80 default_server;
+     server {
+     	listen 80 default_server;
+     	listen [::]:80 default_server;
 
-      	root /var/www/html;
+     	root /var/www/html;
 
-      	# Add index.php to the list if you are using PHP
-      	index index.html index.htm index.nginx-debian.html;
+     	# Add index.php to the list if you are using PHP
+     	index index.html index.htm index.nginx-debian.html;
 
-      	server_name _;
+     	server_name _;
 
-      	location / {
-      		# First attempt to serve request as file, then
-      		# as directory, then fall back to displaying a 404.
-      		try_files $uri $uri/ =404;
-      	}
+     	location / {
+     		# First attempt to serve request as file, then
+     		# as directory, then fall back to displaying a 404.
+     		try_files $uri $uri/ =404;
+     	}
 
-      	location ~ \.php$ {
-      		fastcgi_split_path_info ^(.+\.php)(/.+)$;
-      		# With php5-fpm:
-      		fastcgi_pass unix:/var/run/php5-fpm.sock;
-      		fastcgi_index index.php;
-      		include fastcgi_params;
-      		include fastcgi.conf;
-      	}
-      }
+     	location ~ \.php$ {
+     		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+     		# With php5-fpm:
+     		fastcgi_pass unix:/var/run/php5-fpm.sock;
+     		fastcgi_index index.php;
+     		include fastcgi_params;
+     		include fastcgi.conf;
+     	}
+     }
 
 That's it we have a multiple process image that run nginx and php5-fpm !
 
@@ -460,11 +490,11 @@ That's it we have a multiple process image that run nginx and php5-fpm !
 
 Build the image:
 
-    docker build -t example/multiple-process --rm .
+   docker build -t example/multiple-process --rm .
 
 Start a new container:
 
-    docker run -p 8080:80 example/multiple-process
+   docker run -p 8080:80 example/multiple-process
 
 Go to [http://localhost:8080/phpinfo.php](http://localhost:8080/phpinfo.php)
 
@@ -473,7 +503,7 @@ Go to [http://localhost:8080/phpinfo.php](http://localhost:8080/phpinfo.php)
 So we have a container with two process supervised by runit running in our container !
 
 
-## Images based on light-baseimage
+## Images Based On Light-Baseimage
 
 Single process images:
 - [osixia/openldap](https://github.com/osixia/docker-openldap)
@@ -497,7 +527,7 @@ Multiple process images:
 - [osixia/mmc-mail](https://github.com/osixia/docker-mmc-mail)
 - [osixia/mmc-web](https://github.com/osixia/docker-mmc-web)
 
-Send me a message to add your image based on light-baseimage in this list.
+Send me a message to add your image in this list.
 
 ## Image Assets
 
@@ -508,23 +538,23 @@ All container tools are available in `/container/tool` directory and are linked 
 
 | Filename        | Description |
 | ---------------- | ------------------- |
-| run | The run tool is defined as the image ENTRYPOINT (see [Dockerfile](image/Dockerfile)). It set environment and run  startup scripts and images process. More information in the [Advanced User Guide / run](#run) section. |
+| run | The run tool is defined as the image ENTRYPOINT (see [Dockerfile](image/Dockerfile)). It set environment and run  startup scripts and images process. More information in the [Advanced User Guide](#run). |
 | setuser | A tool for running a command as another user. Easier to use than su, has a smaller attack vector than sudo, and unlike chpst this tool sets $HOME correctly.|
-| log-helper | A simple bash tool to print message base on the log level. |
-|  add-service-available | A tool to download and add services in service-available directory to the regular service directory. |
-| add-multiple-process-stack | A tool to add the multiple process stack: runit, cron syslog-ng-core and logrotate. |
-| install-service | A tool that execute /container/service/install.sh and /container/service/\*/install.sh if file exists. |
-|  complex-bash-env | A tool to iterate trough complex bash environment variables created by the run tool when a table or a list was set in environment files or in environment command line argument. |
+| log-helper | A simple bash tool to print message base on the log level. |
+|  add-service-available | A tool to download and add services in service-available directory to the regular service directory. |
+| add-multiple-process-stack | A tool to add the multiple process stack: runit, cron syslog-ng-core and logrotate. |
+| install-service | A tool that execute /container/service/install.sh and /container/service/\*/install.sh scripts. |
+|  complex-bash-env | A tool to iterate trough complex bash environment variables created by the run tool when a table or a list was set in environment files or in environment command line argument. |
 
 ### Services available
 
 | Name        | Description |
 | ---------------- | ------------------- |
-| .runit | Replaces Debian's Upstart. Used for service supervision and management. Much easier to use than SysV init and supports restarting daemons when they crash. Much easier to use and more lightweight than Upstart. <br><br>*This service is part of the multiple-process-stack.*|
-| .cron | Cron daemon. <br><br>*This service is part of the multiple-process-stack.*|
-| .syslog-ng-core | Syslog daemon so that many services - including the kernel itself - can correctly log to /var/log/syslog. If no syslog daemon is running, a lot of important messages are silently swallowed. <br><br>Only listens locally. All syslog messages are forwarded to "docker logs".<br><br>*This service is part of the multiple-process-stack.* |
-| .logrotate | Rotates and compresses logs on a regular basis. <br><br>*This service is part of the multiple-process-stack.*|
-| .cfssl | CFSSL is CloudFlare's PKI/TLS swiss army knife. It's a command line tool for signing, verifying, and bundling TLS certificates. <br><br>Comes with cfssl-helper tool that make it docker friendly by taking command line parameters from environment variables. |
+| .runit | Replaces Debian's Upstart. Used for service supervision and management. Much easier to use than SysV init and supports restarting daemons when they crash. Much easier to use and more lightweight than Upstart. <br><br>*This service is part of the multiple-process-stack.*|
+| .cron | Cron daemon. <br><br>*This service is part of the multiple-process-stack.*|
+| .syslog-ng-core | Syslog daemon so that many services - including the kernel itself - can correctly log to /var/log/syslog. If no syslog daemon is running, a lot of important messages are silently swallowed. <br><br>Only listens locally. All syslog messages are forwarded to "docker logs".<br><br>*This service is part of the multiple-process-stack.* |
+| .logrotate | Rotates and compresses logs on a regular basis. <br><br>*This service is part of the multiple-process-stack.*|
+| .cfssl | CFSSL is CloudFlare's PKI/TLS swiss army knife. It's a command line tool for signing, verifying, and bundling TLS certificates. <br><br>Comes with cfssl-helper tool that make it docker friendly by taking command line parameters from environment variables. |
 
 
 ## Advanced User Guide
@@ -539,48 +569,32 @@ After that the service-available will be process like regular services.
 
 Here simple Dockerfile example how to add a service-available to an image :
 
-        # Use osixia/light-baseimage
-        # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/ubuntu-light-baseimage:0.1.4
-        MAINTAINER Your Name <your@name.com>
+       # Use osixia/ubuntu-light-baseimage
+       # https://github.com/osixia/docker-light-baseimage
+       FROM osixia/ubuntu-light-baseimage:0.1.4
+       MAINTAINER Your Name <your@name.com>
 
-        # Add cfssl tool, nginx and php5-fpm
-        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
-        RUN apt-get -y update \
-            && /container/tool/add-service-available .cfssl \
-            && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-               nginx \
-               php5-fpm
-        ...
+       # Add cfssl and cron service-available and get nginx and php5-fpm.
+       # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
+       RUN apt-get -y update \
+           && /container/tool/add-service-available .cfssl .cron \
+           && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+              nginx \
+              php5-fpm
+       ...
 
 
 Note: Most of predefined service available start with a `.` to make sure they are install before regular services (so they can be used by regular services). The install-service tool process services in /container/service in alphabetical order.
 
-To create a service-available just create a regular service, add a download.sh file to set how the needed content is download  and add it to /container/service-available directory. The download.sh script is not mandatory if nothing need to be downloaded.
+To create a service-available just create a regular service, add a download.sh file to set how the needed content is downloaded and add it to /container/service-available directory. The download.sh script is not mandatory if nothing need to be downloaded.
 
 For example a simple image example that add service-available to this baseimage: [osixia/web-baseimage](https://github.com/osixia/docker-web-baseimage)
-
-### Complex environment variables
-With light-baseimage you can set bash environment variable from .yaml and .json files.
-But bash environment variables can't store complex objects such as table that can be defined in yaml or json file, that's why they are converted to complex bash environment variables (see [complex-bash-env](#complex-bash-env)  tool).
-
-This complex environment variable in yaml:
-
-    FRUITS:
-      - orange
-      - apple
-
-Can also be set by command line converted in python or json:
-
-    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/ubuntu-light-baseimage:0.1.4 printenv
-    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/ubuntu-light-baseimage:0.1.4 printenv
-
 
 ### Mastering image tools
 
 #### run
 
-The *Run tool* is defined as the image ENTRYPOINT (see [Dockerfile](image/Dockerfile)). It's the core tool of this image.
+The *run tool* is defined as the image ENTRYPOINT (see [Dockerfile](image/Dockerfile)). It's the core tool of this image.
 
 What it does:
 - Setup the run directory
@@ -589,36 +603,63 @@ What it does:
 - Set process environment
 - Run process
 
+##### Run command line options
+
 *Run tool* takes several options, to list them:
 
-    docker run osixia/ubuntu-light-baseimage:0.1.4 --help
+   docker run osixia/ubuntu-light-baseimage:0.1.4 --help
+   usage: run [-h] [-e] [-s] [-p] [-k] [-c]
+              [-l {none,error,warning,info,debug,trace}]
+              [MAIN_COMMAND [MAIN_COMMAND ...]]
+
+   Initialize the system.
+
+   positional arguments:
+     MAIN_COMMAND          The main command to run, leave empty to only run
+                           container process.
+
+   optional arguments:
+     -h, --help            show this help message and exit
+     -e, --skip-env-files  Skip getting environment values from environment
+                           file(s)
+     -s, --skip-startup-files
+                           Skip running /container/run/startup/* and
+                           /container/run/startup.sh file(s)
+     -p, --skip-process-files
+                           Skip running container process file(s)
+     -k, --no-kill-all-on-exit
+                           Don't kill all processes on the system upon exiting
+     -c, --copy-service    Copy /container/service to /container/run/service
+     -l {none,error,warning,info,debug,trace}, --loglevel {none,error,warning,info,debug,trace}
+                           Log level (default: info)
+
 
 ##### Run directory setup
 *Run tool* will create if they not exists the following directories:
-  - /container/run/state
-  - /container/run/environment
-  - /container/run/startup
-  - /container/run/process
-  - /container/run/service
+ - /container/run/state
+ - /container/run/environment
+ - /container/run/startup
+ - /container/run/process
+ - /container/run/service
 
 At the container first start it will search in /container/service or /container/run/service (if --copy-service option is used) all image's services.
 
-In a service directory (e.g /container/service/my-service):
-  - If a startup.sh file is found, the file is linked to /container/run/startup/my-service
-  - If a process.sh file is found, the file is linked to /container/run/process/my-service/run
+In a service directory for example /container/service/my-service:
+ - If a startup.sh file is found, the file is linked to /container/run/startup/my-service
+ - If a process.sh file is found, the file is linked to /container/run/process/my-service/run
 
 ##### Startup files environment setup
 *Run tool* takes all file in /container/environment/* and import the variables values to the container environment.
 The container environment is then exported to /container/run/environment and in /container/run/environment.sh
 
 ##### Startup files execution
-*Run tool* iterate trough /container/run/startup/ directory in alphabetical order and run the script.
-At the end of the script execution the environment is restored to the version exported in /container/run/environment
+*Run tool* iterate trough /container/run/startup/* directory in alphabetical order and run scripts.
+After each time *run tool* runs a startup script, it resets its own environment variables to the state in /container/run/environment, and re-dumps the new environment variables to /container/run/environment.sh
 
-Finally it try to run /container/run/startup.sh if exists.
+After all startup script *run tool* run /container/run/startup.sh if exists.
 
-##### Process environment setup
-*Run tool* delete all .yaml.startup and .json.startup in /container/environment/* and clear the previous environment (/container/run/environment is removed)
+##### Process environment setup
+*Run tool* delete all .yaml.startup and .json.startup in /container/environment/* and clear the previous run environment (/container/run/environment is removed)
 Then it takes all remaining file in /container/environment/* and import the variables values to the container environment.
 The container environment is then exported to /container/run/environment and in /container/run/environment.sh
 
@@ -630,17 +671,17 @@ The container environment is then exported to /container/run/environment and in 
 
 If a main command is set for example:
 
-    docker run -it osixia/openldap:1.1.0 bash
+   docker run -it osixia/openldap:1.1.0 bash
 
 *Run tool* will execute the single process and the main command. If the main command exits the container exits. This is useful to debug or image development purpose.
 
 ###### Multiple process image
 
-In a multiple process image the *run tool* execute runit witch supervise /container/run/process directory and start all services automatically. Runit will also relaunched them if they failed.
+In a multiple process image *run tool* execute runit witch supervise /container/run/process directory and start all services automatically. Runit will also relaunched them if they failed.
 
 If a main command is set for example:
 
-    docker run -it osixia/phpldapadmin:0.6.7 bash
+   docker run -it osixia/phpldapadmin:0.6.7 bash
 
 *run tool* will execute runit and the main command. If the main command exits the container exits. This is still useful to debug or image development purpose.
 
@@ -648,7 +689,7 @@ If a main command is set for example:
 If a main command is set *run tool* launch it otherwise bash is launched.
 Example :
 
-    docker run -it osixia/ubuntu-light-baseimage:0.1.4
+   docker run -it osixia/ubuntu-light-baseimage:0.1.4
 
 
 ##### Extra environment variables
@@ -660,61 +701,72 @@ Example :
 
 #### log-helper
 This tool is a simple utility based on the CONTAINER_LOG_LEVEL variable to print leveled log messages.
+
 For example if the log level is info:
 
-    log-helper info hello
+   log-helper info hello
 
 will echo:
 > hello
 
-    log-helper debug i'm bob
+   log-helper debug i'm bob
 
 will not echo anything.
 
-Note: log-helper support piped input
+log-helper support piped input:
 
-    echo "Heyyyyy" | log-helper info
+   echo "Heyyyyy" | log-helper info
 
 > Heyyyyy
 
-Available log message functions: error, warning, info, debug and trace.
-
-Usage: log-helper error|warning|info|debug|trace message
+Log message functions usage: `log-helper error|warning|info|debug|trace message`
 
 You can also test the log level with the level function:
 
-    log-helper level eq info && echo "log level is infos"
+   log-helper level eq info && echo "log level is infos"
 
-for example this will echo log level is trace if log level is trace.
+for example this will echo "log level is trace" if log level is trace.
 
-Usage: log-helper level [eq|ne|gt|ge|lt|le](http://www.tldp.org/LDP/abs/html/comparison-ops.html) error|warning|info|debug|trace
+Level `function usage: log-helper level eq|ne|gt|ge|lt|le none|error|warning|info|debug|trace`
+Help: [http://www.tldp.org/LDP/abs/html/comparison-ops.html](http://www.tldp.org/LDP/abs/html/comparison-ops.html)
 
 #### complex-bash-env
 With light-baseimage you can set bash environment variable from .yaml and .json files.
-But bash environment variables can't store complex objects such as table that can be defined in json or yaml, that's why we need complex-bash-env tool.
+But bash environment variables can't store complex objects such as table that can be defined in yaml or json files, that's why they are converted to "complex bash environment variables" and complex-bash-env tool help getting those variables values easily.
 
 For example the following yaml file:
 
-      FRUITS:
-        - orange
-        - apple
+     FRUITS:
+       - orange
+       - apple
 
 will produce this bash environment variables:
 
-      FRUITS=#COMPLEX_BASH_ENV:TABLE: FRUITS_ROW_1 FRUITS_ROW_2
-      FRUITS_ROW_1=orange
-      FRUITS_ROW_2=apple
+     FRUITS=#COMPLEX_BASH_ENV:TABLE: FRUITS_ROW_1 FRUITS_ROW_2
+     FRUITS_ROW_1=orange
+     FRUITS_ROW_2=apple
 
 (this is done by run tool)
 
 complex-bash-env make it easy to iterate trough this variable:
 
-      for fruit in $(complex-bash-env iterate "${FRUITS}")
-      do
-        echo $fruit
-      done
+     for fruit in $(complex-bash-env iterate "${FRUITS}")
+     do
+       echo $fruit
+     done
 
 More complete example can be found [osixia/phpLDAPadmin](https://github.com/osixia/docker-phpLDAPadmin) image.
+
+Note this yaml definition:
+
+   FRUITS:
+     - orange
+     - apple
+
+Can also be set by command line converted in python or json:
+
+   docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/ubuntu-light-baseimage:0.1.4 printenv
+   docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/ubuntu-light-baseimage:0.1.4 printenv
 
 ### Tests
 

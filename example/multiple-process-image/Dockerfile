@@ -1,4 +1,4 @@
-# Use osixia/light-baseimage
+# Use osixia/ubuntu-light-baseimage
 # https://github.com/osixia/docker-light-baseimage
 FROM osixia/ubuntu-light-baseimage:0.1.4
 MAINTAINER Your Name <your@name.com>
