@@ -36,7 +36,7 @@ Table of Contents
 	- [Service available](#service-available)
 	- [Mastering image tools](#mastering-image-tools)
 		- [run](#run)
-      - [Run command line options](#run-command-line-options)
+            - [Run command line options](#run-command-line-options)
 			- [Run directory setup](#run-directory-setup)
 			- [Startup files environment setup](#startup-files-environment-setup)
 			- [Startup files execution](#startup-files-execution)
