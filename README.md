@@ -22,15 +22,13 @@ Table of Contents
 		- [Dockerfile](#dockerfile)
 		- [Service files](#service-files)
 		- [Environment files](#environment-files)
-			- [default.yaml](#defaultyaml)
-			- [default.yaml.startup](#defaultyamlstartup)
 		- [Build and test](#build-and-test)
 	- [Create a multiple process image](#create-a-multiple-process-image)
 		- [Overview](#create-a-multiple-process-image)
 		- [Dockerfile](#dockerfile-1)
 		- [Service files](#service-files-1)
 		- [Build and test](#build-and-test-1)
-- [Images based on light-baseimage](#images-based-on-light-baseimage)
+- [Images Based On Light-Baseimage](#images-based-on-light-baseimage)
 - [Image Assets](#image-assets)
 	- [Tools](#image-assets)
 	- [Services available](#services-available)
@@ -38,6 +36,7 @@ Table of Contents
 	- [Service available](#service-available)
 	- [Mastering image tools](#mastering-image-tools)
 		- [run](#run)
+      - [Run command line options](#run-command-line-options)
 			- [Run directory setup](#run-directory-setup)
 			- [Startup files environment setup](#startup-files-environment-setup)
 			- [Startup files execution](#startup-files-execution)
@@ -65,10 +64,11 @@ If you find this image useful here's how you can help:
 This image takes all the advantages of [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker) but makes programs optionals to allow more lightweight images and single process images. It also define simple directory structure and files to set quickly how a program (here called service) is installed, setup and run.
 
 So major features are:
+ - Greats build tools to minimize the image number of layers and optimise image build.
  - Simple way to install services and multiple process image stacks (runit, cron, syslog-ng-core and logrotate) if needed.
  - Getting environment variables from **.yaml** and **.json** files.
  - Special environment files **.yaml.startup** and **.json.startup** deleted after image startup files first execution to keep the image setup secret.
- - Greats build tools to minimize the image number of layers and optimise image build.
+
 
 ## Quick Start
 
@@ -131,6 +131,7 @@ In the Dockerfile we are going to:
   - Add the environment directory to the image.
   - Define ports exposed and volumes if needed.
 
+
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
         FROM osixia/light-baseimage:0.2.1-dev
@@ -166,7 +167,7 @@ The Dockerfile contains directives to download nginx from apt-get but all the in
 
 ##### install.sh
 
-This file must only contains directives for the service initial setup. If there is files to download, apt-get command to run we will it takes place in the Dockerfile for a better image building experience (see [Dockerfile](#Dockerfile)).
+This file must only contains directives for the service initial setup. If there is files to download, apt-get command to run we will it takes place in the Dockerfile for a better image building experience (see [Dockerfile](#dockerfile)).
 
 In this example, for the initial setup we just delete the default nginx debian index file and create a custom index.html:
 
@@ -304,7 +305,7 @@ Refresh [http://localhost:8080/](http://localhost:8080/) and you should see:
 > Hi! I'm Jon Snow, what?! i'm dead?
 
 
-##### Overriding default environment files at run time
+##### Overriding default environment files at run time:
 let's create two new environment files:
   - single-process-image/test-custom-env/env.yaml
   - single-process-image/test-custom-env/env.yaml.startup
@@ -373,6 +374,7 @@ In the Dockerfile we are going to:
   - Add the environment directory to the image.
   - Define ports exposed and volumes if needed.
 
+
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
         FROM osixia/light-baseimage:0.2.1-dev
@@ -416,7 +418,7 @@ Please refer to [single process image](#create-a-single-process-image) for the n
 
 ##### install.sh
 
-This file must only contains directives for the service initial setup. If there is files to download, apt-get command to run we will it takes place in the Dockerfile for a better image building experience (see [Dockerfile](#Dockerfile) ).
+This file must only contains directives for the service initial setup. If there is files to download, apt-get command to run we will it takes place in the Dockerfile for a better image building experience (see [Dockerfile](#dockerfile-1) ).
 
 In this example, for the initial setup we set some php5-fpm default configuration, replace the default nginx server config and add phpinfo.php file:
 
@@ -501,7 +503,7 @@ Go to [http://localhost:8080/phpinfo.php](http://localhost:8080/phpinfo.php)
 So we have a container with two process supervised by runit running in our container !
 
 
-## Images based on light-baseimage
+## Images Based On Light-Baseimage
 
 Single process images:
 - [osixia/openldap](https://github.com/osixia/docker-openldap)
@@ -601,9 +603,36 @@ What it does:
 - Set process environment
 - Run process
 
+##### Run command line options
+
 *Run tool* takes several options, to list them:
 
     docker run osixia/light-baseimage:0.2.1 --help
+    usage: run [-h] [-e] [-s] [-p] [-k] [-c]
+               [-l {none,error,warning,info,debug,trace}]
+               [MAIN_COMMAND [MAIN_COMMAND ...]]
+
+    Initialize the system.
+
+    positional arguments:
+      MAIN_COMMAND          The main command to run, leave empty to only run
+                            container process.
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -e, --skip-env-files  Skip getting environment values from environment
+                            file(s)
+      -s, --skip-startup-files
+                            Skip running /container/run/startup/* and
+                            /container/run/startup.sh file(s)
+      -p, --skip-process-files
+                            Skip running container process file(s)
+      -k, --no-kill-all-on-exit
+                            Don't kill all processes on the system upon exiting
+      -c, --copy-service    Copy /container/service to /container/run/service
+      -l {none,error,warning,info,debug,trace}, --loglevel {none,error,warning,info,debug,trace}
+                            Log level (default: info)
+
 
 ##### Run directory setup
 *Run tool* will create if they not exists the following directories:
@@ -690,7 +719,7 @@ log-helper support piped input:
 
 > Heyyyyy
 
-Log message functions usage: log-helper error|warning|info|debug|trace message
+Log message functions usage: `log-helper error|warning|info|debug|trace message`
 
 You can also test the log level with the level function:
 
@@ -698,9 +727,9 @@ You can also test the log level with the level function:
 
 for example this will echo "log level is trace" if log level is trace.
 
-Level function usage: log-helper level [eq|ne|gt|ge|lt|le](http://www.tldp.org/LDP/abs/html/comparison-ops.html) none|error|warning|info|debug|trace
+Level `function usage: log-helper level [eq|ne|gt|ge|lt|le](http://www.tldp.org/LDP/abs/html/comparison-ops.html) none|error|warning|info|debug|trace`
 
-#### complex-bash-env / complex bash environment variables
+#### complex-bash-env
 With light-baseimage you can set bash environment variable from .yaml and .json files.
 But bash environment variables can't store complex objects such as table that can be defined in yaml or json files, that's why they are converted to "complex bash environment variables" and complex-bash-env tool help getting those variables values easily.
 
@@ -725,6 +754,8 @@ complex-bash-env make it easy to iterate trough this variable:
         echo $fruit
       done
 
+More complete example can be found [osixia/phpLDAPadmin](https://github.com/osixia/docker-phpLDAPadmin) image.
+
 Note this yaml definition:
 
     FRUITS:
@@ -735,9 +766,6 @@ Can also be set by command line converted in python or json:
 
     docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:0.2.1 printenv
     docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:0.2.1 printenv
-
-
-More complete example can be found [osixia/phpLDAPadmin](https://github.com/osixia/docker-phpLDAPadmin) image.
 
 ### Tests
 
