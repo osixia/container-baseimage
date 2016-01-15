@@ -389,7 +389,7 @@ def setup_run_directories(args):
 
 					if is_exe(d_path + os.sep + IMPORT_PROCESS_FILENAME):
 						info('link ' + d_path + os.sep + IMPORT_PROCESS_FILENAME + ' to ' + RUN_PROCESS_DIR + os.sep + "service-" + d + os.sep + 'run')
-						os.makedirs(RUN_PROCESS_DIR + os.sep + d)
+						os.makedirs(RUN_PROCESS_DIR + os.sep + "service-" + d)
 						os.symlink(d_path + os.sep + IMPORT_PROCESS_FILENAME, RUN_PROCESS_DIR + os.sep + "service-" + d + os.sep + 'run')
 
 def set_dir_env():
