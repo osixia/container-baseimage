@@ -380,10 +380,9 @@ In the Dockerfile we are going to:
         FROM osixia/light-baseimage:0.2.1
         MAINTAINER Your Name <your@name.com>
 
-        # Add non free repository to apt-get (needed to download php5-fpm), install multiple process stack, nginx and php5-fpm
+        # Install multiple process stack, nginx and php5-fpm
         # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
-        RUN echo "deb http://http.debian.net/debian/ jessie main contrib non-free" >> /etc/apt/sources.list \
-            && apt-get -y update \
+        RUN apt-get -y update \
             && /container/tool/add-multiple-process-stack \
             && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
                nginx \
