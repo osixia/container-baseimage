@@ -384,13 +384,13 @@ def setup_run_directories(args):
 				d_path = base_path + os.sep + d
 				if os.path.isdir(d_path):
 					if is_exe(d_path + os.sep + IMPORT_STARTUP_FILENAME):
-						info('link ' + d_path + os.sep + IMPORT_STARTUP_FILENAME + ' to ' + RUN_STARTUP_DIR + os.sep + d)
-						os.symlink(d_path + os.sep + IMPORT_STARTUP_FILENAME, RUN_STARTUP_DIR + os.sep + d)
+						info('link ' + d_path + os.sep + IMPORT_STARTUP_FILENAME + ' to ' + RUN_STARTUP_DIR + os.sep + "service-" + d)
+						os.symlink(d_path + os.sep + IMPORT_STARTUP_FILENAME, RUN_STARTUP_DIR + os.sep + "service-" + d)
 
 					if is_exe(d_path + os.sep + IMPORT_PROCESS_FILENAME):
-						info('link ' + d_path + os.sep + IMPORT_PROCESS_FILENAME + ' to ' + RUN_PROCESS_DIR + os.sep + d + os.sep + 'run')
+						info('link ' + d_path + os.sep + IMPORT_PROCESS_FILENAME + ' to ' + RUN_PROCESS_DIR + os.sep + "service-" + d + os.sep + 'run')
 						os.makedirs(RUN_PROCESS_DIR + os.sep + d)
-						os.symlink(d_path + os.sep + IMPORT_PROCESS_FILENAME, RUN_PROCESS_DIR + os.sep + d + os.sep + 'run')
+						os.symlink(d_path + os.sep + IMPORT_PROCESS_FILENAME, RUN_PROCESS_DIR + os.sep + "service-" + d + os.sep + 'run')
 
 def set_dir_env():
 	if state_is_service_copied_to_run_dir():
