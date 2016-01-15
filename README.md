@@ -134,7 +134,7 @@ In the Dockerfile we are going to:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.1-dev
+        FROM osixia/light-baseimage:0.2.1
         MAINTAINER Your Name <your@name.com>
 
         # Download nginx from apt-get
@@ -377,7 +377,7 @@ In the Dockerfile we are going to:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.1-dev
+        FROM osixia/light-baseimage:0.2.1
         MAINTAINER Your Name <your@name.com>
 
         # Add non free repository to apt-get (needed to download php5-fpm), install multiple process stack, nginx and php5-fpm
@@ -571,7 +571,7 @@ Here simple Dockerfile example how to add a service-available to an image :
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.1-dev
+        FROM osixia/light-baseimage:0.2.1
         MAINTAINER Your Name <your@name.com>
 
         # Add cfssl and cron service-available and get nginx and php5-fpm.
