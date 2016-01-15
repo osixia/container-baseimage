@@ -1,6 +1,6 @@
 # Use osixia/light-baseimage
 # https://github.com/osixia/docker-light-baseimage
-FROM osixia/ubuntu-light-baseimage:0.1.4-dev
+FROM osixia/ubuntu-light-baseimage:0.1.4
 MAINTAINER Your Name <your@name.com>
 
 # Add non free repository to apt-get (needed to download php5-fpm), install multiple process stack, nginx and php5-fpm

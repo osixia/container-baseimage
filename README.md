@@ -1,4 +1,4 @@
-# osixia/light-baseimage:0.2.1
+# osixia/ubuntu-light-baseimage:0.1.4
 
 [![](https://badge.imagelayers.io/osixia/light-baseimage:latest.svg)](https://imagelayers.io/?images=osixia/light-baseimage:latest 'Get your own badge on imagelayers.io') | Latest release: 0.2.1 -  [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
@@ -9,7 +9,7 @@ The aims of this image is to be used as a base for your own Docker images. It's 
 
 Other base distribution are available:
  - [Debian](https://github.com/osixia/docker-light-baseimage) | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/)
- - [Debian Experimental](https://github.com/osixia/docker-light-baseimage/tree/experimental-light-baseimage) | [Docker Hub](https://hub.docker.com/r/osixia/experimental)
+ - [Debian Experimental](https://github.com/osixia/docker-light-baseimage/tree/experimental) | [Docker Hub](https://hub.docker.com/r/osixia/experimental-light-baseimage)
 
 
 Table of Contents
@@ -135,7 +135,7 @@ In the Dockerfile we are going to:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.1-dev
+        FROM osixia/ubuntu-light-baseimage:0.1.4
         MAINTAINER Your Name <your@name.com>
 
         # Download nginx from apt-get
@@ -346,7 +346,7 @@ In the Dockerfile we are going to:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.1-dev
+        FROM osixia/ubuntu-light-baseimage:0.1.4
         MAINTAINER Your Name <your@name.com>
 
         # Add non free repository to apt-get (needed to download php5-fpm), install multiple process stack, nginx and php5-fpm
@@ -541,7 +541,7 @@ Here simple Dockerfile example how to add a service-available to an image :
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.1-dev
+        FROM osixia/ubuntu-light-baseimage:0.1.4
         MAINTAINER Your Name <your@name.com>
 
         # Add cfssl tool, nginx and php5-fpm
@@ -572,8 +572,8 @@ This complex environment variable in yaml:
 
 Can also be set by command line converted in python or json:
 
-    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:0.2.1 printenv
-    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:0.2.1 printenv
+    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/ubuntu-light-baseimage:0.1.4 printenv
+    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/ubuntu-light-baseimage:0.1.4 printenv
 
 
 ### Mastering image tools
@@ -591,7 +591,7 @@ What it does:
 
 *Run tool* takes several options, to list them:
 
-    docker run osixia/light-baseimage:0.2.1 --help
+    docker run osixia/ubuntu-light-baseimage:0.1.4 --help
 
 ##### Run directory setup
 *Run tool* will create if they not exists the following directories:
@@ -648,7 +648,7 @@ If a main command is set for example:
 If a main command is set *run tool* launch it otherwise bash is launched.
 Example :
 
-    docker run -it osixia/light-baseimage:0.2.1
+    docker run -it osixia/ubuntu-light-baseimage:0.1.4
 
 
 ##### Extra environment variables
