@@ -18,10 +18,10 @@ fi
 # download libltdl-dev from apt-get
 LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libltdl-dev
 
-curl -o /usr/sbin/cfssl -SL https://pkg:cfssl.org/R1.1/cfssl_linux-amd64
+curl -o /usr/sbin/cfssl -SL https://pkg.cfssl.org/R1.1/cfssl_linux-amd64
 chmod 700 /usr/sbin/cfssl
 
-curl -o /usr/sbin/cfssljson -SL https://pkg:cfssl.org/R1.1/cfssljson_linux-amd64
+curl -o /usr/sbin/cfssljson -SL https://pkg.cfssl.org/R1.1/cfssljson_linux-amd64
 chmod 700 /usr/sbin/cfssljson
 
 # remove tools installed to download cfssl
