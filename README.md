@@ -549,11 +549,11 @@ All container tools are available in `/container/tool` directory and are linked 
 
 | Name        | Description |
 | ---------------- | ------------------- |
-| .runit | Replaces Debian's Upstart. Used for service supervision and management. Much easier to use than SysV init and supports restarting daemons when they crash. Much easier to use and more lightweight than Upstart. <br><br>*This service is part of the multiple-process-stack.*|
-| .cron | Cron daemon. <br><br>*This service is part of the multiple-process-stack.*|
-| .syslog-ng-core | Syslog daemon so that many services - including the kernel itself - can correctly log to /var/log/syslog. If no syslog daemon is running, a lot of important messages are silently swallowed. <br><br>Only listens locally. All syslog messages are forwarded to "docker logs".<br><br>*This service is part of the multiple-process-stack.* |
-| .logrotate | Rotates and compresses logs on a regular basis. <br><br>*This service is part of the multiple-process-stack.*|
-| .cfssl | CFSSL is CloudFlare's PKI/TLS swiss army knife. It's a command line tool for signing, verifying, and bundling TLS certificates. <br><br>Comes with cfssl-helper tool that make it docker friendly by taking command line parameters from environment variables. |
+| :runit | Replaces Debian's Upstart. Used for service supervision and management. Much easier to use than SysV init and supports restarting daemons when they crash. Much easier to use and more lightweight than Upstart. <br><br>*This service is part of the multiple-process-stack.*|
+| :cron | Cron daemon. <br><br>*This service is part of the multiple-process-stack.*|
+| :syslog-ng-core | Syslog daemon so that many services - including the kernel itself - can correctly log to /var/log/syslog. If no syslog daemon is running, a lot of important messages are silently swallowed. <br><br>Only listens locally. All syslog messages are forwarded to "docker logs".<br><br>*This service is part of the multiple-process-stack.* |
+| :logrotate | Rotates and compresses logs on a regular basis. <br><br>*This service is part of the multiple-process-stack.*|
+| :cfssl | CFSSL is CloudFlare's PKI/TLS swiss army knife. It's a command line tool for signing, verifying, and bundling TLS certificates. <br><br>Comes with cfssl-helper tool that make it docker friendly by taking command line parameters from environment variables. |
 
 
 ## Advanced User Guide
@@ -576,14 +576,14 @@ Here simple Dockerfile example how to add a service-available to an image:
         # Add cfssl and cron service-available and get nginx and php5-fpm.
         # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
         RUN apt-get -y update \
-            && /container/tool/add-service-available .cfssl .cron \
+            && /container/tool/add-service-available :cfssl :cron \
             && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
                nginx \
                php5-fpm
         ...
 
 
-Note: Most of predefined service available start with a `.` to make sure they are installed before regular services (so they can be used by regular services). The install-service tool process services in /container/service in alphabetical order.
+Note: Most of predefined service available start with a `:` to make sure they are installed before regular services (so they can be used by regular services). The install-service tool process services in /container/service in alphabetical order.
 
 To create a service-available just create a regular service, add a download.sh file to set how the needed content is downloaded and add it to /container/service-available directory. The download.sh script is not mandatory if nothing need to be downloaded.
 
