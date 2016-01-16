@@ -669,6 +669,7 @@ def wait_for_runit_services():
 		done = os.system("/usr/bin/sv status "+RUN_PROCESS_DIR+"/* | grep -q '^run:'") != 0
 		if not done:
 			time.sleep(0.1)
+			shutdown_runit_services()
 
 def run_multiple_process_container(args):
 	if not is_runit_installed():
@@ -700,7 +701,7 @@ def run_single_process_container(args):
 		sys.exit(exit_status)
 	finally:
 		if not background_process_exited:
-			stop_child_process("runit daemon", background_process_pid)
+			stop_child_process(container_process, background_process_pid)
 
 def run_no_process_container(args):
 	if len(args.main_command) == 0:
