@@ -1,31 +1,39 @@
-#!/bin/bash -e
+#!/usr/bin/python -u
+import os, os.path, subprocess
 
-echo "install-service"
+SERVICE_DIR = "/container/service"
+nb_process = 0
 
+print("install-service")
 # Auto run global install script if available
-if [ -f "/container/service/install.sh" ]; then
-  echo "run /container/service/install.sh"
-  ./container/service/install.sh
-  echo "remove /container/service/install.sh"
-  rm -f /container/service/install.sh
-fi
+if os.path.isfile(SERVICE_DIR + os.sep + "install.sh"):
+    print("run " + SERVICE_DIR + os.sep + "install.sh")
+    subprocess.call([SERVICE_DIR + os.sep + "install.sh"],shell=True)
+
+    print("remove " + SERVICE_DIR + os.sep + "install.sh\n")
+    os.remove(SERVICE_DIR + os.sep + "install.sh")
+
 
 # Process install script of services in /container/service
-for i in $(find /container/service -mindepth 2 -maxdepth 2 -type f -name "install.sh" | sort); do
-  echo "run $i"
-  $i
-  echo "remove $i"
-  rm -f $i
-done
+for service in sorted(os.listdir(SERVICE_DIR)):
 
-echo "Searching process..."
-nbProcess=$(find /container/service -mindepth 2 -maxdepth 2 -type f -name "process.sh" | wc -l )
-echo "$nbProcess process found"
+    if os.path.isfile(SERVICE_DIR + os.sep + service + os.sep + "install.sh"):
+        print("run " + SERVICE_DIR + os.sep + service + os.sep + "install.sh")
+        subprocess.call([SERVICE_DIR + os.sep + service + os.sep + "install.sh"],shell=True)
+
+        print("remove " + SERVICE_DIR + os.sep + service + os.sep + "install.sh")
+        os.remove(SERVICE_DIR + os.sep + service + os.sep + "install.sh")
+
+    if os.path.isfile(SERVICE_DIR + os.sep + service + os.sep + "process.sh"):
+        nb_process += 1
+
+
+print(str(nb_process) + " process found.")
 
 # Multiple process image
-if [ "$nbProcess" -gt 1 ] && [ ! -e "/container/multiple_process_stack_added" ]; then
-  echo "This image has multiple process."
-  /container/tool/add-multiple-process-stack
-  echo "For better image build process consider adding :"
-  echo "\"/container/tool/add-multiple-process-stack\" after an apt-get update in your Dockerfile."
-fi
+if nb_process > 1:
+    if not os.path.exists("/container/multiple_process_stack_added"):
+        print("This image has multiple process.")
+        subprocess.call(["/container/tool/add-multiple-process-stack"],shell=True)
+        print("For better image build process consider adding:")
+        print("\"/container/tool/add-multiple-process-stack\" after an apt-get update in your Dockerfile.")

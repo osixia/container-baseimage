@@ -72,7 +72,7 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
   CFSSL_PROFILE=${!PREFIX_CFSSL_PROFILE:-$CFSSL_PROFILE}
   CFSSL_LABEL=${!PREFIX_CFSSL_LABEL:-$CFSSL_LABEL}
 
-  source ${CONTAINER_SERVICE_DIR}/.cfssl/assets/default-env
+  source ${CONTAINER_SERVICE_DIR}/:cfssl/assets/default-env
 
   # set csr file
   CSR_FILE="/tmp/csr-file"
