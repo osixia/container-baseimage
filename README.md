@@ -643,9 +643,9 @@ What it does:
 
 At the container first start it will search in /container/service or /container/run/service (if --copy-service option is used) all image's services.
 
-In a service directory for example /container/service/nginx:
-  - If a startup.sh file is found, the file is linked to /container/run/startup/service-nginx
-  - If a process.sh file is found, the file is linked to /container/run/process/service-nginx/run
+In a service directory for example /container/service/my-service:
+  - If a startup.sh file is found, the file is linked to /container/run/startup/my-service
+  - If a process.sh file is found, the file is linked to /container/run/process/my-service/run
 
 ##### Startup files environment setup
 *Run tool* takes all file in /container/environment/* and import the variables values to the container environment.
