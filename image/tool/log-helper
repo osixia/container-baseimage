@@ -113,9 +113,9 @@ function level() {
   local loglevel=LOG_LEVEL_$loglevel_str
 
   if [ ${!loglevel} -$operator $LOG_LEVEL ]; then
-    return 0
+    exit 0
   else
-    return 1
+    exit 1
   fi
 }
 
