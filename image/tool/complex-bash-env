@@ -3,24 +3,7 @@
 CALL=$1
 
 function iterate() {
-  local ENV_VAR=$(complex-bash-env stripTablePrefix "$1")
-  local ENV_VAR_TABLE=($ENV_VAR)
-  local RETURN=()
-
-  for subenvvar in "${ENV_VAR_TABLE[@]}"
-  do
-    subenvvar_value=${!subenvvar}
-
-    if [ $(complex-bash-env isTable "$subenvvar_value") = true ] || [ $(complex-bash-env isRow "$subenvvar_value") = true ]; then
-        RETURN+=($subenvvar)
-    elif [ -n "${subenvvar_value}" ]; then
-      RETURN+=($subenvvar_value)
-    else
-      RETURN+=($subenvvar)
-    fi
-  done
-
-  echo ${RETURN[@]}
+  echo $(complex-bash-env stripTablePrefix "$1")
 }
 
 function isTable() {

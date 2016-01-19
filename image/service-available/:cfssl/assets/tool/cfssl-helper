@@ -176,7 +176,14 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
   fi
   log-helper debug "done :)"
 
+elif [ ! -e "$KEY_FILE" ]; then
+  log-helper error "Certificate file $CERT_FILE exists but not key file $KEY_FILE"
+  exit 1
+elif [ ! -e "$CERT_FILE" ]; then
+  log-helper error "Key file $KEY_FILE exists but not certificate file $CERT_FILE"
+  exit 1
 else
-  log-helper info "Files $CERT_FILE or $KEY_FILE already exists,"
-  log-helper info "do nothing."
+  log-helper debug "Files $CERT_FILE and $KEY_FILE exists, fix files permissions"
+  chmod 644 $CERT_FILE
+  chmod 600 $KEY_FILE
 fi
