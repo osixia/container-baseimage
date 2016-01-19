@@ -749,7 +749,7 @@ will produce this bash environment variables:
 
 complex-bash-env make it easy to iterate trough this variable:
 
-      for fruit in $(complex-bash-env iterate "${FRUITS}")
+      for fruit in $(complex-bash-env iterate FRUITS)
       do
         echo $fruit
       done
