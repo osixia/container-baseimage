@@ -751,7 +751,7 @@ complex-bash-env make it easy to iterate trough this variable:
 
       for fruit in $(complex-bash-env iterate FRUITS)
       do
-        echo $fruit
+        echo ${!fruit}
       done
 
 A more complete example can be found [osixia/phpLDAPadmin](https://github.com/osixia/docker-phpLDAPadmin) image.
