@@ -234,7 +234,7 @@ default.yaml file define variables that can be used at any time in the container
 
 ##### default.yaml.startup
 default.yaml.startup define variables that are only available during the container **first start** in **startup files**.
-*\*.yaml.startup* are deleted right after startup files are processed for the first time,
+\*.yaml.startup are deleted right after startup files are processed for the first time,
 then all variables they contains will not be available in the container environment.
 
 This helps to keep the container configuration secret. If you don't care all environment variables can be defined in **default.yaml** and everything will work fine.
@@ -573,8 +573,10 @@ Here simple Dockerfile example how to add a service-available to an image:
         FROM osixia/light-baseimage:0.2.1
         MAINTAINER Your Name <your@name.com>
 
-        # Add cfssl and cron service-available and get nginx and php5-fpm.
-        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
+        # Add cfssl and cron service-available
+        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-service-available
+        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/service-available/:cfssl/download.sh
+        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/service-available/:cron/download.sh
         RUN apt-get -y update \
             && /container/tool/add-service-available :cfssl :cron \
             && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
