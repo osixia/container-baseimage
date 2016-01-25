@@ -1,48 +1,41 @@
-#!/bin/bash -e
+#!/usr/bin/python -u
+import os, os.path, subprocess
 
-echo "install-service"
+SERVICE_DIR = "/container/service"
+INSTALL_FILENAME = "install.sh"
+PROCESS_FILENAME = "process.sh"
+nb_process = 0
 
+print("install-service")
 # Auto run global install script if available
-if [ -f "/container/service/install.sh" ]; then
-  echo "Processing file /container/service/install.sh"
-  ./container/service/install.sh
-  rm -f /container/service/install.sh
-fi
+if os.path.isfile(SERVICE_DIR + os.sep + INSTALL_FILENAME):
+    print("run " + SERVICE_DIR + os.sep + INSTALL_FILENAME)
+    subprocess.call([SERVICE_DIR + os.sep + INSTALL_FILENAME],shell=True)
 
-# Process install of services in /container/service
-for d in $(find /container/service -mindepth 1 -maxdepth 1 -type d | sort); do
-  echo "Processing directory ${d}"
-  service=$(basename $d)
+    print("remove " + SERVICE_DIR + os.sep + INSTALL_FILENAME + "\n")
+    os.remove(SERVICE_DIR + os.sep + INSTALL_FILENAME)
 
-  # Service install script
-  if [ -f "${d}/install.sh" ]; then
-    echo "run ${d}/install.sh"
-    ${d}/install.sh
-    rm -f ${d}/install.sh
-  fi
 
-  # Service container start script
-  if [ -f "${d}/container-start.sh" ]; then
-    echo "link ${d}/container-start.sh to /etc/my_init.d/$service"
-    ln -fs ${d}/container-start.sh /etc/my_init.d/$service
-  fi
+# Process install script of services in /container/service
+for service in sorted(os.listdir(SERVICE_DIR)):
 
-  # Service process
-  if [ -f "${d}/daemon.sh" ]; then
-    echo "link ${d}/daemon.sh to /etc/service/$service/run"
-    mkdir -p /etc/service/$service
-    ln -fs ${d}/daemon.sh /etc/service/$service/run
-  fi
+    if os.path.isfile(SERVICE_DIR + os.sep + service + os.sep + INSTALL_FILENAME):
+        print("run " + SERVICE_DIR + os.sep + service + os.sep + INSTALL_FILENAME)
+        subprocess.call([SERVICE_DIR + os.sep + service + os.sep + INSTALL_FILENAME],shell=True)
 
-done
+        print("remove " + SERVICE_DIR + os.sep + service + os.sep + INSTALL_FILENAME)
+        os.remove(SERVICE_DIR + os.sep + service + os.sep + INSTALL_FILENAME)
 
-echo "Searching process..."
-nbDirectories=$(find /etc/service -mindepth 1 -maxdepth 1 -type d | wc -l )
-echo "$nbDirectories process found"
+    if os.path.isfile(SERVICE_DIR + os.sep + service + os.sep + PROCESS_FILENAME):
+        nb_process += 1
 
-if [ "$nbDirectories" -gt 1 ] && [ ! -e "/etc/multiple_process_stack_installed" ]; then
-  echo "This image has multiple process."
-  /container/tool/install-multiple-process-stack
-  echo "For better image build process consider adding :"
-  echo "\"/container/tool/install-multiple-process-stack\" after an apt-get update in your dockerfile."
-fi
+
+print(str(nb_process) + " process found.")
+
+# Multiple process image
+if nb_process > 1:
+    if not os.path.exists("/container/multiple_process_stack_added"):
+        print("This image has multiple process.")
+        subprocess.call(["/container/tool/add-multiple-process-stack"],shell=True)
+        print("For better image build process consider adding:")
+        print("\"/container/tool/add-multiple-process-stack\" after an apt-get update in your Dockerfile.")

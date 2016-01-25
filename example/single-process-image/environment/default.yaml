@@ -1,0 +1,8 @@
+# This is the default image configuration file
+# These values will persists in container environment.
+
+# All environment variables used after the container first start
+# must be defined here.
+# more information : https://github.com/osixia/docker-light-baseimage
+
+WHO_AM_I: We are Anonymous. We are Legion. We do not forgive. We do not forget. Expect us.
