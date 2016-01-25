@@ -15,78 +15,78 @@ LOG_LEVEL_DEBUG=4
 LOG_LEVEL_TRACE=5
 
 # default log level if CONTAINER_LOG_LEVEL is not set -> info
-LOG_LEVEL=${CONTAINER_LOG_LEVEL:-${LOG_LEVEL_INFO}}
+log_level=${CONTAINER_LOG_LEVEL:-${LOG_LEVEL_INFO}}
 
-CALL=$1 # function to call (error, warning, info, debug, trace, level)
-if [[ ! "$CALL" =~ ^(error|warning|info|debug|trace|level)$ ]]; then
-  echo "Error: Function $CALL not found"
+call=$1 # function to call (error, warning, info, debug, trace, level)
+if [[ ! "$call" =~ ^(error|warning|info|debug|trace|level)$ ]]; then
+  echo "Error: Function $call not found"
   echo "Allowed functions are: error, warning, info, debug, trace, level"
   echo "usage example: log-helper info hello !"
   exit 1
 fi
 
 
-ECHO_MSG="" # message to print if required log level is set
-ECHO_PARAM="" # echo command parameters
+echo_msg="" # message to print if required log level is set
+echo_param="" # echo command parameters
 
 function error() {
   getEchoParams $@
 
-  if [ $LOG_LEVEL -ge 1 ]; then
-    [[ -z "$ECHO_MSG" ]] && getMsgFromStdin
-    echo $ECHO_PARAM  "$ECHO_MSG"
+  if [ $log_level -ge 1 ]; then
+    [[ -z "$echo_msg" ]] && getMsgFromStdin
+    echo $echo_param  "$echo_msg"
   fi
 }
 
 function warning() {
   getEchoParams $@
 
-  if [ $LOG_LEVEL -ge 2 ]; then
-    [[ -z "$ECHO_MSG" ]] && getMsgFromStdin
-    echo $ECHO_PARAM  "$ECHO_MSG"
+  if [ $log_level -ge 2 ]; then
+    [[ -z "$echo_msg" ]] && getMsgFromStdin
+    echo $echo_param  "$echo_msg"
   fi
 }
 
 function info() {
   getEchoParams $@
 
-  if [ $LOG_LEVEL -ge 3 ]; then
-    [[ -z "$ECHO_MSG" ]] && getMsgFromStdin
-    echo $ECHO_PARAM "$ECHO_MSG"
+  if [ $log_level -ge 3 ]; then
+    [[ -z "$echo_msg" ]] && getMsgFromStdin
+    echo $echo_param "$echo_msg"
   fi
 }
 
 function debug() {
   getEchoParams $@
 
-  if [ $LOG_LEVEL -ge 4 ]; then
-    [[ -z "$ECHO_MSG" ]] && getMsgFromStdin
-    echo $ECHO_PARAM "$ECHO_MSG"
+  if [ $log_level -ge 4 ]; then
+    [[ -z "$echo_msg" ]] && getMsgFromStdin
+    echo $echo_param "$echo_msg"
   fi
 }
 
 function trace() {
   getEchoParams $@
 
-  if [ $LOG_LEVEL -ge 5 ]; then
-    [[ -z "$ECHO_MSG" ]] && getMsgFromStdin
-    echo $ECHO_PARAM "$ECHO_MSG"
+  if [ $log_level -ge 5 ]; then
+    [[ -z "$echo_msg" ]] && getMsgFromStdin
+    echo $echo_param "$echo_msg"
   fi
 }
 
 function getMsgFromStdin() {
   if [ -z "$2" ]; then
-    read -r ECHO_MSG
+    read -r echo_msg
   fi
 }
 
 function getEchoParams() {
 
-  ECHO_MSG="$@"
+  echo_msg="$@"
 
   if [[ "$1" =~ ^(-e|-n|-E)$ ]]; then
-    ECHO_PARAM=$1
-    ECHO_MSG=${ECHO_MSG#$1 }
+    echo_param=$1
+    echo_msg=${echo_msg#$1 }
   fi
 }
 
@@ -110,9 +110,9 @@ function level() {
     exit 1
   fi
 
-  local loglevel=LOG_LEVEL_$loglevel_str
+  local log_level_var=LOG_LEVEL_$loglevel_str
 
-  if [ ${!loglevel} -$operator $LOG_LEVEL ]; then
+  if [ ${!log_level_var} -$operator $log_level ]; then
     exit 0
   else
     exit 1
@@ -120,6 +120,6 @@ function level() {
 }
 
 shift
-$CALL "$@"
+$call "$@"
 
 exit 0

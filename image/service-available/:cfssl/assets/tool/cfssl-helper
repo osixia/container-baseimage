@@ -40,7 +40,6 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
   esac
 
   # set env vars
-  PREFIX=$1
   PREFIX=${PREFIX^^} # uppercase
 
   # search for prefixed env var first

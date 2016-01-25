@@ -16,7 +16,7 @@ cp /container/file/dpkg_nolocales /etc/dpkg/dpkg.cfg.d/01_nolocales
 # General config
 export LC_ALL=C
 export DEBIAN_FRONTEND=noninteractive
-minimal_apt_get_install='apt-get install -y --no-install-recommends'
+MINIMAL_APT_GET_INSTALL='apt-get install -y --no-install-recommends'
 
 ## Temporarily disable dpkg fsync to make building faster.
 if [[ ! -e /etc/dpkg/dpkg.cfg.d/docker-apt-speedup ]]; then
@@ -44,7 +44,7 @@ dpkg-divert --local --rename --add /usr/bin/ischroot
 ln -sf /bin/true /usr/bin/ischroot
 
 ## Install apt-utils.
-$minimal_apt_get_install apt-utils python locales
+$MINIMAL_APT_GET_INSTALL apt-utils python locales
 
 ## Upgrade all packages.
 apt-get dist-upgrade -y --no-install-recommends
