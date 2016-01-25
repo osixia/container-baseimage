@@ -234,7 +234,7 @@ default.yaml file define variables that can be used at any time in the container
 
 ##### default.yaml.startup
 default.yaml.startup define variables that are only available during the container **first start** in **startup files**.
-*\*.yaml.startup* are deleted right after startup files are processed for the first time,
+\*.yaml.startup are deleted right after startup files are processed for the first time,
 then all variables they contains will not be available in the container environment.
 
 This helps to keep the container configuration secret. If you don't care all environment variables can be defined in **default.yaml** and everything will work fine.
@@ -573,8 +573,10 @@ Here simple Dockerfile example how to add a service-available to an image:
        FROM osixia/ubuntu-light-baseimage:0.1.4
        MAINTAINER Your Name <your@name.com>
 
-        # Add cfssl and cron service-available and get nginx and php5-fpm.
-        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
+        # Add cfssl and cron service-available
+        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-service-available
+        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/service-available/:cfssl/download.sh
+        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/service-available/:cron/download.sh
         RUN apt-get -y update \
             && /container/tool/add-service-available :cfssl :cron \
             && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -606,7 +608,7 @@ What it does:
 
 *Run tool* takes several options, to list them:
 
-    docker run osixia/light-baseimage:0.2.1 --help
+    docker run osixia/ubuntu-light-baseimage:0.2.1 --help
     usage: run [-h] [-e] [-s] [-p] [-k] [-c]
                [-l {none,error,warning,info,debug,trace}]
                [MAIN_COMMAND [MAIN_COMMAND ...]]
@@ -688,7 +690,7 @@ If a main command is set for example:
 If a main command is set *run tool* launch it otherwise bash is launched.
 Example:
 
-    docker run -it osixia/light-baseimage:0.2.1
+    docker run -it osixia/ubuntu-light-baseimage:0.2.1
 
 
 ##### Extra environment variables
@@ -749,9 +751,9 @@ will produce this bash environment variables:
 
 complex-bash-env make it easy to iterate trough this variable:
 
-      for fruit in $(complex-bash-env iterate "${FRUITS}")
+      for fruit in $(complex-bash-env iterate FRUITS)
       do
-        echo $fruit
+        echo ${!fruit}
       done
 
 A more complete example can be found [osixia/phpLDAPadmin](https://github.com/osixia/docker-phpLDAPadmin) image.
@@ -764,8 +766,8 @@ Note this yaml definition:
 
 Can also be set by command line converted in python or json:
 
-    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:0.2.1 printenv
-    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:0.2.1 printenv
+    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/ubuntu-light-baseimage:0.2.1 printenv
+    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/ubuntu-light-baseimage:0.2.1 printenv
 
 ### Tests
 

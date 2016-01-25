@@ -1,31 +1,21 @@
 #!/bin/bash -e
 
-CALL=$1
+call=$1
 
 function iterate() {
-  local ENV_VAR=$(complex-bash-env stripTablePrefix "$1")
-  local ENV_VAR_TABLE=($ENV_VAR)
-  local RETURN=()
+  local env_var_name=$1
+  local env_var=${!env_var_name}
 
-  for subenvvar in "${ENV_VAR_TABLE[@]}"
-  do
-    subenvvar_value=${!subenvvar}
-
-    if [ $(complex-bash-env isTable "$subenvvar_value") = true ] || [ $(complex-bash-env isRow "$subenvvar_value") = true ]; then
-        RETURN+=($subenvvar)
-    elif [ -n "${subenvvar_value}" ]; then
-      RETURN+=($subenvvar_value)
-    else
-      RETURN+=($subenvvar)
-    fi
-  done
-
-  echo ${RETURN[@]}
+  if [ $(complex-bash-env isTable "$env_var") = true ]; then
+    echo $(complex-bash-env stripTablePrefix "$env_var")
+  else
+    echo "$env_var_name"
+  fi
 }
 
 function isTable() {
-  local ENV_VAR=$1
-  if [ $(echo $ENV_VAR | grep "#COMPLEX_BASH_ENV:TABLE:" -c ) -eq 1 ]; then
+  local env_var=$1
+  if [ $(echo $env_var | grep "#COMPLEX_BASH_ENV:TABLE:" -c ) -eq 1 ]; then
     echo true
   else
     echo false
@@ -33,8 +23,8 @@ function isTable() {
 }
 
 function isRow() {
-  local ENV_VAR=$1
-  if [ $(echo $ENV_VAR | grep "#COMPLEX_BASH_ENV:ROW:" -c ) -eq 1 ]; then
+  local env_var=$1
+  if [ $(echo $env_var | grep "#COMPLEX_BASH_ENV:ROW:" -c ) -eq 1 ]; then
     echo true
   else
     echo false
@@ -42,43 +32,56 @@ function isRow() {
 }
 
 function getRowKey() {
-  local ENV_VAR=$1
-  if [ $(complex-bash-env isRow "$ENV_VAR") = true ]; then
-    local ENV_VAR=$(complex-bash-env stripRowPrefix "$ENV_VAR")
-    local ENV_VAR_TABLE=($ENV_VAR)
-    echo "${!ENV_VAR_TABLE[0]}"
-  else
-    echo "$ENV_VAR is not a complex bash env row"
-  fi
+  local env_var=$1
+  local row_key_var_name=$(complex-bash-env getRowKeyVarName "$env_var")
+  echo "${!row_key_var_name}"
 }
 
 function getRowValue() {
-  local ENV_VAR=$1
-  if [ $(complex-bash-env isRow "$ENV_VAR") = true ]; then
-    local ENV_VAR=$(complex-bash-env stripRowPrefix "$ENV_VAR")
-    local ENV_VAR_TABLE=($ENV_VAR)
-    echo "${!ENV_VAR_TABLE[1]}"
+  local env_var=$1
+  local row_value_var_name=$(complex-bash-env getRowValueVarName "$env_var")
+  echo "${!row_value_var_name}"
+}
+
+function getRowKeyVarName() {
+  local env_var=$1
+  local row=($(complex-bash-env getRow "$env_var"))
+  echo "${row[0]}"
+}
+
+function getRowValueVarName() {
+  local env_var=$1
+  local row=($(complex-bash-env getRow "$env_var"))
+  echo "${row[1]}"
+}
+
+function getRow() {
+  local env_var=$1
+  if [ $(complex-bash-env isRow "$env_var") = true ]; then
+    local env_var=$(complex-bash-env stripRowPrefix "$env_var")
+    echo "${env_var}"
   else
-    echo "$ENV_VAR is not a complex bash env row"
+    echo "$env_var is not a complex bash env row"
+    exit 1
   fi
 }
 
 function stripTablePrefix() {
-  local ENV_VAR=$1
-  stripPrefix "$ENV_VAR" "#COMPLEX_BASH_ENV:TABLE:"
+  local env_var=$1
+  stripPrefix "$env_var" "#COMPLEX_BASH_ENV:TABLE:"
 }
 
 function stripRowPrefix() {
-  local ENV_VAR=$1
-  stripPrefix "$ENV_VAR" "#COMPLEX_BASH_ENV:ROW:"
+  local env_var=$1
+  stripPrefix "$env_var" "#COMPLEX_BASH_ENV:ROW:"
 }
 
 function stripPrefix() {
-  local ENV_VAR=$1
-  local PREFIX=$2
-  local RETURN=${ENV_VAR#$PREFIX}
-  echo $RETURN
+  local env_var=$1
+  local prefix=$2
+  local r=${env_var#$prefix}
+  echo $r
 }
 
 shift
-$CALL "$@"
+$call "$@"
