@@ -593,7 +593,7 @@ To create a service-available just create a regular service, add a download.sh f
 For example a simple image example that add service-available to this baseimage: [osixia/web-baseimage](https://github.com/osixia/docker-web-baseimage)
 
 
-## Fix docker mounted file problems
+### Fix docker mounted file problems
 
 For some reasons you will probably have to mount custom files to your container. For example in the *mutliple process image example* you can customise the nginx config by mounting your custom config to "/container/service/php5-fpm/config/default" :
 
