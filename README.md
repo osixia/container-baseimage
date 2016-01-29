@@ -34,7 +34,7 @@ Table of Contents
 	- [Services available](#services-available)
 - [Advanced User Guide](#advanced-user-guide)
 	- [Service available](#service-available)
-  - [Fix docker mounted file problems](#fix-docker-mounted-file-problems)
+	- [Fix docker mounted file problems](#fix-docker-mounted-file-problems)
 	- [Mastering image tools](#mastering-image-tools)
 		- [run](#run)
             - [Run command line options](#run-command-line-options)
