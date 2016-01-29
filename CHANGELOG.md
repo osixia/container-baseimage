@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.5
+  - Fix --copy-service error if /container/run/service already exists
+  - Fix /container/run/startup.sh file detection if no other startup files exists
+
 ## 0.1.4
   - Add cfssl as available service to generate ssl certs
     Warning: ssl-helper ssl-helper-openssl and ssl-helper-gnutls

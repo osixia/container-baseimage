@@ -1,9 +1,9 @@
 # osixia/ubuntu-light-baseimage
 
-[![](https://badge.imagelayers.io/osixia/ubuntu-light-baseimage:latest.svg)](https://imagelayers.io/?images=osixia/ubuntu-light-baseimage:latest 'Get your own badge on imagelayers.io') | Latest release: 0.2.1 -  [Changelog](CHANGELOG.md)
+[![](https://badge.imagelayers.io/osixia/ubuntu-light-baseimage:latest.svg)](https://imagelayers.io/?images=osixia/ubuntu-light-baseimage:latest 'Get your own badge on imagelayers.io') | Latest release: 0.1.5 -  [Changelog](CHANGELOG.md)
 | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/)
 
-A Ubuntu Trusty (14:04) based docker image to help you build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimised build.
+A Ubuntu Trusty (14:04) based docker image to help you build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
 
 The aims of this image is to be used as a base for your own Docker images. It's base on the awesome work of: [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
 
@@ -34,6 +34,7 @@ Table of Contents
 	- [Services available](#services-available)
 - [Advanced User Guide](#advanced-user-guide)
 	- [Service available](#service-available)
+	- [Fix docker mounted file problems](#fix-docker-mounted-file-problems)
 	- [Mastering image tools](#mastering-image-tools)
 		- [run](#run)
             - [Run command line options](#run-command-line-options)
@@ -134,7 +135,7 @@ In the Dockerfile we are going to:
 
        # Use osixia/ubuntu-light-baseimage
        # https://github.com/osixia/docker-light-baseimage
-       FROM osixia/ubuntu-light-baseimage:0.1.4
+       FROM osixia/ubuntu-light-baseimage:0.1.5
        MAINTAINER Your Name <your@name.com>
 
         # Download nginx from apt-get
@@ -377,7 +378,7 @@ In the Dockerfile we are going to:
 
        # Use osixia/ubuntu-light-baseimage
        # https://github.com/osixia/docker-light-baseimage
-       FROM osixia/ubuntu-light-baseimage:0.1.4
+       FROM osixia/ubuntu-light-baseimage:0.1.5
        MAINTAINER Your Name <your@name.com>
 
         # Install multiple process stack, nginx and php5-fpm
@@ -570,7 +571,7 @@ Here simple Dockerfile example how to add a service-available to an image:
 
        # Use osixia/ubuntu-light-baseimage
        # https://github.com/osixia/docker-light-baseimage
-       FROM osixia/ubuntu-light-baseimage:0.1.4
+       FROM osixia/ubuntu-light-baseimage:0.1.5
        MAINTAINER Your Name <your@name.com>
 
         # Add cfssl and cron service-available
@@ -591,6 +592,32 @@ To create a service-available just create a regular service, add a download.sh f
 
 For example a simple image example that add service-available to this baseimage: [osixia/web-baseimage](https://github.com/osixia/docker-web-baseimage)
 
+
+### Fix docker mounted file problems
+
+For some reasons you will probably have to mount custom files to your container. For example in the *mutliple process image example* you can customise the nginx config by mounting your custom config to "/container/service/php5-fpm/config/default" :
+
+    docker run -v /data/my-nginx-config:/container/service/php5-fpm/config/default example/multiple-process
+
+In this case every thing should work fine, but if the startup script makes some `sed` replacement or change file owner and permissions this can results in "Device or resource busy" error. See [Docker documentation](https://docs.docker.com/v1.4/userguide/dockervolumes/#mount-a-host-file-as-a-data-volume).
+
+    sed -i "s|listen 80|listen 8080|g" /container/service/php5-fpm/config/default
+
+To prevent that king of error light-baseimage provide *--copy-service* command argument :
+
+    docker run -v /data/my-nginx-config:/container/service/php5-fpm/config/default example/multiple-process --copy-service
+
+On startup this will copy all /container/service directory to /container/run/service.
+
+
+At run time you can get the container service directory with `CONTAINER_SERVICE_DIR` environment variable.
+If *--copy-service* is used *CONTAINER_SERVICE_DIR=/container/run/service* otherwise *CONTAINER_SERVICE_DIR=/container/service*
+
+So to always apply sed on the correct file in the startup script the command becomes :
+
+    sed -i "s|listen 80|listen 8080|g" ${CONTAINER_SERVICE_DIR}/php5-fpm/config/default
+
+
 ### Mastering image tools
 
 #### run
@@ -608,7 +635,7 @@ What it does:
 
 *Run tool* takes several options, to list them:
 
-    docker run osixia/ubuntu-light-baseimage:0.2.1 --help
+    docker run osixia/ubuntu-light-baseimage:0.1.5 --help
     usage: run [-h] [-e] [-s] [-p] [-k] [-c]
                [-l {none,error,warning,info,debug,trace}]
                [MAIN_COMMAND [MAIN_COMMAND ...]]
@@ -690,7 +717,7 @@ If a main command is set for example:
 If a main command is set *run tool* launch it otherwise bash is launched.
 Example:
 
-    docker run -it osixia/ubuntu-light-baseimage:0.2.1
+    docker run -it osixia/ubuntu-light-baseimage:0.1.5
 
 
 ##### Extra environment variables
@@ -766,8 +793,8 @@ Note this yaml definition:
 
 Can also be set by command line converted in python or json:
 
-    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/ubuntu-light-baseimage:0.2.1 printenv
-    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/ubuntu-light-baseimage:0.2.1 printenv
+    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/ubuntu-light-baseimage:0.1.5 printenv
+    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/ubuntu-light-baseimage:0.1.5 printenv
 
 ### Tests
 
