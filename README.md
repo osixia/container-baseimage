@@ -34,6 +34,7 @@ Table of Contents
 	- [Services available](#services-available)
 - [Advanced User Guide](#advanced-user-guide)
 	- [Service available](#service-available)
+  - [Fix docker mounted file problems](#fix-docker-mounted-file-problems)
 	- [Mastering image tools](#mastering-image-tools)
 		- [run](#run)
             - [Run command line options](#run-command-line-options)
@@ -590,6 +591,32 @@ Note: Most of predefined service available start with a `:` to make sure they ar
 To create a service-available just create a regular service, add a download.sh file to set how the needed content is downloaded and add it to /container/service-available directory. The download.sh script is not mandatory if nothing need to be downloaded.
 
 For example a simple image example that add service-available to this baseimage: [osixia/web-baseimage](https://github.com/osixia/docker-web-baseimage)
+
+
+## Fix docker mounted file problems
+
+For some reasons you will probably have to mount custom files to your container. For example in the *mutliple process image example* you can customise the nginx config by mounting your custom config to "/container/service/php5-fpm/config/default" :
+
+    docker run -v /data/my-nginx-config:/container/service/php5-fpm/config/default example/multiple-process
+
+In this case every thing should work fine, but if the startup script makes some `sed` replacement or change file owner and permissions this can results in "Device or resource busy" error. See [Docker documentation](https://docs.docker.com/v1.4/userguide/dockervolumes/#mount-a-host-file-as-a-data-volume).
+
+    sed -i "s|listen 80|listen 8080|g" /container/service/php5-fpm/config/default
+
+To prevent that king of error light-baseimage provide *--copy-service* command argument :
+
+    docker run -v /data/my-nginx-config:/container/service/php5-fpm/config/default example/multiple-process --copy-service
+
+On startup this will copy all /container/service directory to /container/run/service.
+
+
+At run time you can get the container service directory with `CONTAINER_SERVICE_DIR` environment variable.
+If *--copy-service* is used *CONTAINER_SERVICE_DIR=/container/run/service* otherwise *CONTAINER_SERVICE_DIR=/container/service*
+
+So to always apply sed on the correct file in the startup script the command becomes :
+
+    sed -i "s|listen 80|listen 8080|g" ${CONTAINER_SERVICE_DIR}/php5-fpm/config/default
+
 
 ### Mastering image tools
 
