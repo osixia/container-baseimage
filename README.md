@@ -1,6 +1,13 @@
 # osixia/light-baseimage
 
-[![](https://badge.imagelayers.io/osixia/light-baseimage:latest.svg)](https://imagelayers.io/?images=osixia/light-baseimage:latest 'Get your own badge on imagelayers.io') | Latest release: 0.2.1 -  [Changelog](CHANGELOG.md)
+[![Docker Pulls](https://img.shields.io/docker/pulls/osixia/light-baseimage.svg)][hub]
+[![Docker Stars](https://img.shields.io/docker/stars/osixia/light-baseimage.svg)][hub]
+[![Image Size](https://img.shields.io/imagelayers/image-size/osixia/light-baseimage/latest.svg)](https://imagelayers.io/?images=osixia/light-baseimage:latest)
+[![Image Layers](https://img.shields.io/imagelayers/layers/osixia/light-baseimage/latest.svg)](https://imagelayers.io/?images=osixia/light-baseimage:latest)
+
+[hub]: https://hub.docker.com/r/osixia/light-baseimage/
+
+Latest release: 0.2.1 -  [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
 
 A Debian based docker image to help you build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
