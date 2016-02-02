@@ -2,8 +2,8 @@
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/osixia/ubuntu-light-baseimage.svg)][hub]
 [![Docker Stars](https://img.shields.io/docker/stars/osixia/ubuntu-light-baseimage.svg)][hub]
-[![Image Size](https://img.shields.io/imagelayers/image-size/osixia/ubuntu-light-baseimage/latest.svg)](https://imagelayers.io/?images=osixia/light-baseimage:latest)
-[![Image Layers](https://img.shields.io/imagelayers/layers/osixia/ubuntu-light-baseimage/latest.svg)](https://imagelayers.io/?images=osixia/light-baseimage:latest)
+[![Image Size](https://img.shields.io/imagelayers/image-size/osixia/ubuntu-light-baseimage/latest.svg)](https://imagelayers.io/?images=osixia/ubuntu-light-baseimage:latest)
+[![Image Layers](https://img.shields.io/imagelayers/layers/osixia/ubuntu-light-baseimage/latest.svg)](https://imagelayers.io/?images=osixia/ubuntu-light-baseimage:latest)
 
 [hub]: https://hub.docker.com/r/osixia/ubuntu-light-baseimage/
 
