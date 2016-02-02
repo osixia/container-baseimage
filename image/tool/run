@@ -385,12 +385,23 @@ def setup_run_directories(args):
 				if os.path.isdir(d_path):
 					if is_exe(d_path + os.sep + IMPORT_STARTUP_FILENAME):
 						info('link ' + d_path + os.sep + IMPORT_STARTUP_FILENAME + ' to ' + RUN_STARTUP_DIR + os.sep + d)
-						os.symlink(d_path + os.sep + IMPORT_STARTUP_FILENAME, RUN_STARTUP_DIR + os.sep + d)
+						try:
+							os.symlink(d_path + os.sep + IMPORT_STARTUP_FILENAME, RUN_STARTUP_DIR + os.sep + d)
+						except OSError as detail: :
+							warning("Failed to link " d_path + os.sep + IMPORT_STARTUP_FILENAME + ' to ' + RUN_STARTUP_DIR + os.sep + d + ": " + detail)
 
 					if is_exe(d_path + os.sep + IMPORT_PROCESS_FILENAME):
 						info('link ' + d_path + os.sep + IMPORT_PROCESS_FILENAME + ' to ' + RUN_PROCESS_DIR + os.sep + d + os.sep + 'run')
-						os.makedirs(RUN_PROCESS_DIR + os.sep + d)
-						os.symlink(d_path + os.sep + IMPORT_PROCESS_FILENAME, RUN_PROCESS_DIR + os.sep + d + os.sep + 'run')
+
+						if not os.path.exists(RUN_PROCESS_DIR + os.sep + d):
+							os.makedirs(RUN_PROCESS_DIR + os.sep + d)
+						else:
+							warning("Directory " + RUN_PROCESS_DIR + os.sep + d + " already exists")
+
+						try:
+							os.symlink(d_path + os.sep + IMPORT_PROCESS_FILENAME, RUN_PROCESS_DIR + os.sep + d + os.sep + 'run')
+						except OSError as detail: :
+							warning("Failed to link file: " + detail)
 
 def set_dir_env():
 	if state_is_service_copied_to_run_dir():
