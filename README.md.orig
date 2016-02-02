@@ -1,14 +1,19 @@
 # osixia/experimental-light-baseimage
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/osixia/experimental-light-baseimage.svg)][hub]
-[![Docker Stars](https://img.shields.io/docker/stars/osixia/experimental-light-baseimage.svg)][hub]
-[![Image Size](https://img.shields.io/imagelayers/image-size/osixia/experimental-light-baseimage/latest.svg)](https://imagelayers.io/?images=osixia/experimental-light-baseimage:latest)
-[![Image Layers](https://img.shields.io/imagelayers/layers/osixia/experimental-light-baseimage/latest.svg)](https://imagelayers.io/?images=osixia/experimental-light-baseimage:latest)
+<<<<<<< HEAD
+[![](https://badge.imagelayers.io/osixia/experimental-light-baseimage:latest.svg)](https://imagelayers.io/?images=osixia/experimental-light-baseimage:latest 'Get your own badge on imagelayers.io') | Latest release: 0.1.2 -  [Changelog](CHANGELOG.md)
+| [Docker Hub](https://hub.docker.com/r/osixia/experimental-light-baseimage/)
+=======
+[![Docker Pulls](https://img.shields.io/docker/pulls/osixia/light-baseimage.svg)][hub]
+[![Docker Stars](https://img.shields.io/docker/stars/osixia/light-baseimage.svg)][hub]
+[![Image Size](https://img.shields.io/imagelayers/image-size/osixia/light-baseimage/latest.svg)](https://imagelayers.io/?images=osixia/light-baseimage:latest)
+[![Image Layers](https://img.shields.io/imagelayers/layers/osixia/light-baseimage/latest.svg)](https://imagelayers.io/?images=osixia/light-baseimage:latest)
 
-[hub]: https://hub.docker.com/r/osixia/experimental-light-baseimage/
+[hub]: https://hub.docker.com/r/osixia/light-baseimage/
 
-Latest release: 0.1.2 -  [Changelog](CHANGELOG.md)
+Latest release: 0.2.2 -  [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
+>>>>>>> hotfix-0.2.2
 
 A Debian Experimental based docker image to help you build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
 
