@@ -1,7 +1,14 @@
 # osixia/ubuntu-light-baseimage
 
-[![](https://badge.imagelayers.io/osixia/ubuntu-light-baseimage:latest.svg)](https://imagelayers.io/?images=osixia/ubuntu-light-baseimage:latest 'Get your own badge on imagelayers.io') | Latest release: 0.1.5 -  [Changelog](CHANGELOG.md)
-| [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/osixia/ubuntu-light-baseimage.svg)][hub]
+[![Docker Stars](https://img.shields.io/docker/stars/osixia/ubuntu-light-baseimage.svg)][hub]
+[![Image Size](https://img.shields.io/imagelayers/image-size/osixia/ubuntu-light-baseimage/latest.svg)](https://imagelayers.io/?images=osixia/light-baseimage:latest)
+[![Image Layers](https://img.shields.io/imagelayers/layers/osixia/ubuntu-light-baseimage/latest.svg)](https://imagelayers.io/?images=osixia/light-baseimage:latest)
+
+[hub]: https://hub.docker.com/r/osixia/ubuntu-light-baseimage/
+
+Latest release: 0.1.5 -  [Changelog](CHANGELOG.md)
+ | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/) 
 
 A Ubuntu Trusty (14:04) based docker image to help you build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
 

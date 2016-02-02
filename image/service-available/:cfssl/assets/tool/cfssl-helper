@@ -155,9 +155,6 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
   log-helper debug "move /tmp/$CERT_NAME-key.pem to $KEY_FILE"
   mv /tmp/$CERT_NAME-key.pem $KEY_FILE
 
-  # delete tmp files
-  rm -f /tmp/$CERT_NAME.csr $CONFIG_FILE $CSR_FILE
-
   # if ca file don't exists
   if [ ! -e "$CA_FILE" ]; then
 
@@ -173,6 +170,10 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
     fi
 
   fi
+
+  # delete tmp files
+  rm -f /tmp/$CERT_NAME.csr $CONFIG_FILE $CSR_FILE
+
   log-helper debug "done :)"
 
 elif [ ! -e "$KEY_FILE" ]; then
