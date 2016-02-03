@@ -818,7 +818,6 @@ finally:
 				pass
 		except:
 			info("Keepalived process ended.")
-			pass
 
 	if args.kill_all_on_exit:
 		kill_all_processes(KILL_ALL_PROCESSES_TIMEOUT)
