@@ -643,9 +643,9 @@ What it does:
 *Run tool* takes several options, to list them:
 
     docker run osixia/experimental-light-baseimage:0.1.2 --help
-    usage: run [-h] [-e] [-s] [-p] [-k] [-c]
-               [-l {none,error,warning,info,debug,trace}]
-               [MAIN_COMMAND [MAIN_COMMAND ...]]
+    usage: run [-h] [-e] [-s] [-p] [-k] [--copy-service] [--keep-startup-env]
+           [--keepalived] [-l {none,error,warning,info,debug,trace}]
+           [MAIN_COMMAND [MAIN_COMMAND ...]]
 
     Initialize the system.
 
@@ -664,7 +664,10 @@ What it does:
                             Skip running container process file(s)
       -k, --no-kill-all-on-exit
                             Don't kill all processes on the system upon exiting
-      -c, --copy-service    Copy /container/service to /container/run/service
+      --copy-service        Copy /container/service to /container/run/service
+      --keep-startup-env    Don't remove ('.yaml.startup', '.json.startup')
+                            environment files after startup scripts
+      --keepalived          Keepalived container even if all process exited
       -l {none,error,warning,info,debug,trace}, --loglevel {none,error,warning,info,debug,trace}
                             Log level (default: info)
 
