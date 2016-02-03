@@ -804,13 +804,20 @@ signal.signal(signal.SIGALRM, lambda signum, frame: raise_alarm_exception())
 
 try:
 	main(args)
+
 except KeyboardInterrupt:
 	warning("Init system aborted.")
 	exit(2)
+
 finally:
+
 	if args.keepalived:
-		while True:
+		try:
+			info("All process have exited, keep container alived...")
+			while True:
+				pass
+		except:
 			pass
 
-	elif args.kill_all_on_exit:
+	if args.kill_all_on_exit:
 		kill_all_processes(KILL_ALL_PROCESSES_TIMEOUT)
