@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 log-helper level eq trace && set -x
 
 # This tool helps to generate tls certificates with cfssl
@@ -152,7 +152,8 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
   retry=0
   while [  $retry -lt 5 ]; do
     log-helper debug "cfssl $LOG_LEVEL_PARAM gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME"
-    cfssl $LOG_LEVEL_PARAM gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME && break || sleep $CFSSL_RETRY_SLEEP
+    cfssl $LOG_LEVEL_PARAM gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME && break
+    sleep $CFSSL_RETRY_SLEEP
     ((retry++))
   done
 
@@ -173,7 +174,8 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
 
       retry=0
       while [  $retry -lt $CFSSL_RETRY ]; do
-        cfssl $LOG_LEVEL_PARAM info $REMOTE_PARAM $CONFIG_PARAM $PROFILE_PARAM $LABEL_PARAM | sed -e "s/.*certificate\":\"\(.*-----\)\".*/\1/g" | sed 's/\\n/\n/g' > $CA_FILE && break || sleep $CFSSL_RETRY_SLEEP
+        cfssl $LOG_LEVEL_PARAM info $REMOTE_PARAM $CONFIG_PARAM $PROFILE_PARAM $LABEL_PARAM | sed -e "s/.*certificate\":\"\(.*-----\)\".*/\1/g" | sed 's/\\n/\n/g' > $CA_FILE && break
+        sleep $CFSSL_RETRY_SLEEP
         log-helper debug "CA certificate returned save as $CA_FILE"
         ((retry++))
       done
