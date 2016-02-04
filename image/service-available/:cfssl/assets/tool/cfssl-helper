@@ -150,7 +150,7 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
   [[ -n "$CFSSL_LABEL" ]] && LABEL_PARAM="-label $CFSSL_LABEL"
 
   retry=0
-  while [  $retry -lt 5 ]; do
+  while [  $retry -lt $CFSSL_RETRY ]; do
     log-helper debug "cfssl $LOG_LEVEL_PARAM gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME"
     cfssl $LOG_LEVEL_PARAM gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME && break
     sleep $CFSSL_RETRY_SLEEP
