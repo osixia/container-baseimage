@@ -12,11 +12,11 @@ if [ $(dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok in
 fi
 
 if [ -n "$to_install" ]; then
-  LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $to_install
+  apk add $to_install
 fi
 
 # download libltdl-dev from apt-get
-LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libltdl-dev
+apk add libltdl
 
 curl -o /usr/sbin/cfssl -SL https://github.com/osixia/cfssl/raw/master/bin/cfssl
 chmod 700 /usr/sbin/cfssl
@@ -26,5 +26,5 @@ chmod 700 /usr/sbin/cfssljson
 
 # remove tools installed to download cfssl
 if [ -n "$to_install" ]; then
-  apt-get remove -y --purge --auto-remove $to_install
+  apk del --purge $to_install
 fi
