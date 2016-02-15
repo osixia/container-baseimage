@@ -724,7 +724,7 @@ def run_single_process_container(args):
 
 def run_no_process_container(args):
 	if len(args.main_command) == 0:
-		args.main_command=['bash'] # run bash by default
+		args.main_command=['sh'] # run sh by default
 
 	exit_status = run_foreground_process(args.main_command)
 	sys.exit(exit_status)

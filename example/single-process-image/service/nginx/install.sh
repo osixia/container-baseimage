@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 # this script is run during the image build
 
 rm -rf /var/www/html/index.nginx-debian.html

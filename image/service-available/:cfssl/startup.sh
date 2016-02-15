@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 log-helper level eq trace && set -x
 
 chmod 700 ${CONTAINER_SERVICE_DIR}/:cfssl/assets/tool/*

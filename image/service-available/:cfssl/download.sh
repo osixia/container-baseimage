@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
 # download curl and ca-certificate from apt-get if needed
 to_install=""

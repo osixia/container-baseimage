@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 FIRST_START_DONE="${CONTAINER_STATE_DIR}/nginx-first-start-done"
 
 # container first start

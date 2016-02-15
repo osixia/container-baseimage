@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM alpine:3.3
 MAINTAINER Bertrand Gouny <bertrand.gouny@osixia.net>
 
 ADD . /container

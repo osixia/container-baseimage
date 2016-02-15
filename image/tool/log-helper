@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
 # log helper base on environment variable CONTAINER_LOG_LEVEL
 # CONTAINER_LOG_LEVEL environment variable is set by run tool based on --log-level argument (info by default)

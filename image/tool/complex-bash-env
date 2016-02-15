@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
 call=$1
 

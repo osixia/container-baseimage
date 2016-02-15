@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 # this script is run during the image build
 
 # config

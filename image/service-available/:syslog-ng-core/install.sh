@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
 mkdir -p /var/lib/syslog-ng
 rm -f /etc/default/syslog-ng
