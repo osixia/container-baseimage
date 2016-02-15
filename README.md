@@ -179,7 +179,7 @@ This file must only contain directives for the service initial setup. Files down
 
 In this example, for the initial setup we just delete the default nginx debian index file and create a custom index.html:
 
-    #!/bin/sh -e
+    #!/bin/bash -e
     # this script is run during the image build
 
     rm -rf /var/www/html/index.nginx-debian.html
@@ -196,7 +196,7 @@ This file is used to make process.sh ready to be run and customize the service s
 
 For example at run time we would like to introduce ourselves so we will use an environment variable WHO_AM_I set by command line with --env. So we add WHO_AM_I value to index.html file but we want to do that only on the first container start because on restart the index.html file will already contains our name:
 
-    #!/bin/sh -e
+    #!/bin/bash -e
     FIRST_START_DONE="${CONTAINER_STATE_DIR}/nginx-first-start-done"
 
     # container first start
@@ -215,7 +215,7 @@ As you can see we use CONTAINER_STATE_DIR variable, it contains the directory wh
 
 This file define the command to run:
 
-    #!/bin/sh -e
+    #!/bin/bash -e
     exec /usr/sbin/nginx -g "daemon off;"
 
 Make sure process.sh can be executed (chmod +x process.sh).
@@ -253,7 +253,7 @@ But for this tutorial we will add a variable to this file:
 
 And try to get its value in **startup.sh** script:
 
-    #!/bin/sh -e
+    #!/bin/bash -e
     FIRST_START_DONE="${CONTAINER_STATE_DIR}/nginx-first-start-done"
 
     # container first start
@@ -268,7 +268,7 @@ And try to get its value in **startup.sh** script:
 
 And in **process.sh** script:
 
-    #!/bin/sh -e
+    #!/bin/bash -e
     echo "The secret is: $FIRST_START_SETUP_ONLY_SECRET"
     exec /usr/sbin/nginx -g "daemon off;"
 
@@ -429,7 +429,7 @@ This file must only contains directives for the service initial setup. Files dow
 
 In this example, for the initial setup we set some php5-fpm default configuration, replace the default nginx server config and add phpinfo.php file:
 
-    #!/bin/sh -e
+    #!/bin/bash -e
     # this script is run during the image build
 
     # config
@@ -451,7 +451,7 @@ Make sure install.sh can be executed (chmod +x install.sh).
 
 This file define the command to run:
 
-    #!/bin/sh -e
+    #!/bin/bash -e
     exec /usr/sbin/php5-fpm --nodaemonize
 
 Make sure process.sh can be executed (chmod +x process.sh).

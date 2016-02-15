@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 log-helper level eq trace && set -x
 
 # This tool helps to generate tls certificates with cfssl

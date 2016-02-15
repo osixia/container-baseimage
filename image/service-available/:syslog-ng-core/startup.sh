@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 log-helper level eq trace && set -x
 
 ln -sf ${CONTAINER_SERVICE_DIR}/:syslog-ng-core/assets/config/syslog_ng_default /etc/default/syslog-ng

@@ -23,7 +23,7 @@ echo -n C.UTF-8 > /container/environment/LANGUAGE
 echo -n C.UTF-8 > /container/environment/LC_CTYPE
 
 ## Install bash and python apt-utils.
-apk add --update python
+apk add --update bash python
 
 # install PyYAML
 cd /container/file/PyYAML-3.11/
