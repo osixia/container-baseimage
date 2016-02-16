@@ -156,7 +156,7 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
   done
 
   # move generated files
-  [[ ! -e "/tmp/$CERT_NAME.pem" ]] && exit 1
+  [[ ! -e "/tmp/$CERT_NAME.pem" ]] && exit 1
   log-helper debug "move /tmp/$CERT_NAME.pem to $CERT_FILE"
   mv /tmp/$CERT_NAME.pem $CERT_FILE
 
