@@ -11,7 +11,6 @@ addgroup -g 8377 docker_env
 
 # General config
 export LC_ALL=C
-MINIMAL_APT_GET_INSTALL='apt-get install -y --no-install-recommends'
 
 ## Prevent initramfs updates from trying to run grub and lilo.
 ## https://journal.paul.querna.org/articles/2013/10/15/docker-ubuntu-on-rackspace/
