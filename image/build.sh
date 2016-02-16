@@ -22,16 +22,10 @@ echo -n C.UTF-8 > /container/environment/LANGUAGE
 echo -n C.UTF-8 > /container/environment/LC_CTYPE
 
 ## Install bash and python apt-utils.
-apk add --update bash python
-
-# install PyYAML
-cd /container/file/PyYAML-3.11/
-python setup.py install
-cd -
+apk add --update bash python py-yaml
 
 rm -rf /var/cache/apk/*
 rm -rf /tmp/* /var/tmp/*
 
 # Remove useless files
-rm -rf /container/file
 rm -rf /container/build.sh /container/Dockerfile
