@@ -155,7 +155,7 @@ In the Dockerfile we are going to:
         # Add service directory to /container/service
         ADD service /container/service
 
-        # Use baseimage install-service script and clean all
+        # Use baseimage install-service script
         # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
         RUN /container/tool/install-service
 
@@ -401,7 +401,7 @@ In the Dockerfile we are going to:
         # Add service directory to /container/service
         ADD service /container/service
 
-        # Use baseimage install-service script and clean all
+        # Use baseimage install-service script
         # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
         RUN /container/tool/install-service
 
