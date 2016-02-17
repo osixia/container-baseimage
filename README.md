@@ -642,7 +642,7 @@ What it does:
 
 *Run tool* takes several options, to list them:
 
-    docker run osixia/ubuntu-light-baseimage:0.1.5 --help
+    docker run osixia/light-baseimage:0.1.5 --help
     usage: run [-h] [-e] [-s] [-p] [-k] [--copy-service] [--keep-startup-env]
            [--keepalived] [-l {none,error,warning,info,debug,trace}]
            [MAIN_COMMAND [MAIN_COMMAND ...]]
