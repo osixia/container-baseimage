@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 log-helper level eq trace && set -x
 
 # This tool helps to generate tls certificates with cfssl
@@ -57,6 +57,8 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
   PREFIX_CFSSL_HOSTNAME=${PREFIX}_CFSSL_HOSTNAME
   PREFIX_CFSSL_PROFILE=${PREFIX}_CFSSL_PROFILE
   PREFIX_CFSSL_LABEL=${PREFIX}_CFSSL_LABEL
+  PREFIX_CFSSL_RETRY=${PREFIX}_CFSSL_RETRY
+  PREFIX_CFSSL_RETRY_DELAY=${PREFIX}_CFSSL_RETRY_DELAY
 
   # assign CFSSL_REMOTE=${!PREFIX_CFSSL_REMOTE} if value is not empty otherwise CFSSL_REMOTE=CFSSL_REMOTE
   CFSSL_REMOTE=${!PREFIX_CFSSL_REMOTE:-$CFSSL_REMOTE}
@@ -70,6 +72,8 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
   CFSSL_HOSTNAME=${!PREFIX_CFSSL_HOSTNAME:-$CFSSL_HOSTNAME}
   CFSSL_PROFILE=${!PREFIX_CFSSL_PROFILE:-$CFSSL_PROFILE}
   CFSSL_LABEL=${!PREFIX_CFSSL_LABEL:-$CFSSL_LABEL}
+  CFSSL_RETRY=${!PREFIX_CFSSL_RETRY:-$CFSSL_RETRY}
+  CFSSL_RETRY_DELAY=${!PREFIX_CFSSL_RETRY_DELAY:-$CFSSL_RETRY_DELAY}
 
   source ${CONTAINER_SERVICE_DIR}/:cfssl/assets/default-env
 
@@ -145,10 +149,16 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
   [[ -n "$CFSSL_PROFILE" ]] && PROFILE_PARAM="-profile $CFSSL_PROFILE"
   [[ -n "$CFSSL_LABEL" ]] && LABEL_PARAM="-label $CFSSL_LABEL"
 
-  log-helper debug "cfssl $LOG_LEVEL_PARAM gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME"
-  cfssl $LOG_LEVEL_PARAM gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME
+  retry=0
+  while [  $retry -lt $CFSSL_RETRY ]; do
+    log-helper debug "cfssl $LOG_LEVEL_PARAM gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME"
+    cfssl $LOG_LEVEL_PARAM gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME && break
+    sleep $CFSSL_RETRY_DELAY
+    ((retry++))
+  done
 
   # move generated files
+  [[ ! -e "/tmp/$CERT_NAME.pem" ]] && exit 1
   log-helper debug "move /tmp/$CERT_NAME.pem to $CERT_FILE"
   mv /tmp/$CERT_NAME.pem $CERT_FILE
 
@@ -161,8 +171,16 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
     if [ -n "$CFSSL_REMOTE" ]; then
       log-helper debug "Get CA certificate from $CFSSL_REMOTE"
       log-helper debug "cfssl $LOG_LEVEL_PARAM info $REMOTE_PARAM $CONFIG_PARAM $PROFILE_PARAM $LABEL_PARAM"
-      cfssl $LOG_LEVEL_PARAM info $REMOTE_PARAM $CONFIG_PARAM $PROFILE_PARAM $LABEL_PARAM | sed -e "s/.*certificate\":\"\(.*-----\)\".*/\1/g" | sed 's/\\n/\n/g' > $CA_FILE
-      log-helper debug "CA certificate returned save as $CA_FILE"
+
+      retry=0
+      while [  $retry -lt $CFSSL_RETRY ]; do
+        cfssl $LOG_LEVEL_PARAM info $REMOTE_PARAM $CONFIG_PARAM $PROFILE_PARAM $LABEL_PARAM | sed -e "s/.*certificate\":\"\(.*-----\)\".*/\1/g" | sed 's/\\n/\n/g' > $CA_FILE && break
+        sleep $CFSSL_RETRY_DELAY
+        log-helper debug "CA certificate returned save as $CA_FILE"
+        ((retry++))
+      done
+
+      [[ ! -e "$CA_FILE" ]] && exit 1
 
     elif [ -n "$CFSSL_CA_CERT" ]; then
       log-helper info "Link $CFSSL_CA_CERT to $CA_FILE"
@@ -187,3 +205,5 @@ else
   chmod 644 $CERT_FILE
   chmod 600 $KEY_FILE
 fi
+
+exit 0

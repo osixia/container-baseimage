@@ -76,7 +76,7 @@ function trace() {
 
 function getMsgFromStdin() {
   if [ -z "$2" ]; then
-    read -r echo_msg
+    read -r echo_msg || true
   fi
 }
 
