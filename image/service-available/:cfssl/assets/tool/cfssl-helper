@@ -180,7 +180,7 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
         ((retry++))
       done
 
-      [[ ! -e "$CA_FILE" ]] && exit 1
+      [[ ! -e "$CA_FILE" ]] && exit 1
 
     elif [ -n "$CFSSL_CA_CERT" ]; then
       log-helper info "Link $CFSSL_CA_CERT to $CA_FILE"
