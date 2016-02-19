@@ -3,6 +3,7 @@
 ## 0.1.2
   - Fix --copy-service error if /container/run/service already exists
   - Fix /container/run/startup.sh file detection if no other startup files exists
+  - Fix set_env_hostname_to_etc_hosts() on container restart
 
 ## 0.1.1
   - Add cfssl as available service to generate ssl certs

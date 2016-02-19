@@ -735,9 +735,7 @@ def main(args):
 
 	state_reset_startup_done()
 	setup_run_directories(args)
-
-	if state_is_first_start():
-		set_env_hostname_to_etc_hosts()
+	set_env_hostname_to_etc_hosts()
 
 	if not args.skip_startup_files:
 		run_startup_files(args)
