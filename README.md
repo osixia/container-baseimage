@@ -7,7 +7,7 @@
 
 [hub]: https://hub.docker.com/r/osixia/light-baseimage/
 
-Latest release: 0.2.1 -  [Changelog](CHANGELOG.md)
+Latest release: 0.2.2 -  [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
 
 A Debian based docker image to help you build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
@@ -41,6 +41,7 @@ Table of Contents
 	- [Services available](#services-available)
 - [Advanced User Guide](#advanced-user-guide)
 	- [Service available](#service-available)
+	- [Fix docker mounted file problems](#fix-docker-mounted-file-problems)
 	- [Mastering image tools](#mastering-image-tools)
 		- [run](#run)
             - [Run command line options](#run-command-line-options)
@@ -141,22 +142,22 @@ In the Dockerfile we are going to:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.1
+        FROM osixia/light-baseimage:0.2.2
         MAINTAINER Your Name <your@name.com>
 
-        # Download nginx from apt-get
+        # Download nginx from apt-get and clean apt-get files
         RUN apt-get -y update \
             && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-               nginx
+               nginx \
+            && apt-get clean \
+            && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
         # Add service directory to /container/service
         ADD service /container/service
 
-        # Use baseimage install-service script and clean all
+        # Use baseimage install-service script
         # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
-        RUN /container/tool/install-service \
-            && apt-get clean \
-            && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+        RUN /container/tool/install-service
 
         # Add default env directory
         ADD environment /container/environment/99-default
@@ -384,25 +385,25 @@ In the Dockerfile we are going to:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.1
+        FROM osixia/light-baseimage:0.2.2
         MAINTAINER Your Name <your@name.com>
 
-        # Install multiple process stack, nginx and php5-fpm
+        # Install multiple process stack, nginx and php5-fpm and clean apt-get files
         # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
         RUN apt-get -y update \
             && /container/tool/add-multiple-process-stack \
             && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
                nginx \
-               php5-fpm
+               php5-fpm \
+            && apt-get clean \
+            && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
         # Add service directory to /container/service
         ADD service /container/service
 
-        # Use baseimage install-service script and clean all
+        # Use baseimage install-service script
         # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
-        RUN /container/tool/install-service \
-            && apt-get clean \
-            && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+        RUN /container/tool/install-service
 
         # Add default env directory
         ADD environment /container/environment/99-default
@@ -577,7 +578,7 @@ Here simple Dockerfile example how to add a service-available to an image:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.1
+        FROM osixia/light-baseimage:0.2.2
         MAINTAINER Your Name <your@name.com>
 
         # Add cfssl and cron service-available
@@ -598,6 +599,32 @@ To create a service-available just create a regular service, add a download.sh f
 
 For example a simple image example that add service-available to this baseimage: [osixia/web-baseimage](https://github.com/osixia/docker-web-baseimage)
 
+
+### Fix docker mounted file problems
+
+For some reasons you will probably have to mount custom files to your container. For example in the *mutliple process image example* you can customise the nginx config by mounting your custom config to "/container/service/php5-fpm/config/default" :
+
+    docker run -v /data/my-nginx-config:/container/service/php5-fpm/config/default example/multiple-process
+
+In this case every thing should work fine, but if the startup script makes some `sed` replacement or change file owner and permissions this can results in "Device or resource busy" error. See [Docker documentation](https://docs.docker.com/v1.4/userguide/dockervolumes/#mount-a-host-file-as-a-data-volume).
+
+    sed -i "s|listen 80|listen 8080|g" /container/service/php5-fpm/config/default
+
+To prevent that king of error light-baseimage provide *--copy-service* command argument :
+
+    docker run -v /data/my-nginx-config:/container/service/php5-fpm/config/default example/multiple-process --copy-service
+
+On startup this will copy all /container/service directory to /container/run/service.
+
+
+At run time you can get the container service directory with `CONTAINER_SERVICE_DIR` environment variable.
+If *--copy-service* is used *CONTAINER_SERVICE_DIR=/container/run/service* otherwise *CONTAINER_SERVICE_DIR=/container/service*
+
+So to always apply sed on the correct file in the startup script the command becomes :
+
+    sed -i "s|listen 80|listen 8080|g" ${CONTAINER_SERVICE_DIR}/php5-fpm/config/default
+
+
 ### Mastering image tools
 
 #### run
@@ -615,10 +642,10 @@ What it does:
 
 *Run tool* takes several options, to list them:
 
-    docker run osixia/light-baseimage:0.2.1 --help
-    usage: run [-h] [-e] [-s] [-p] [-k] [-c]
-               [-l {none,error,warning,info,debug,trace}]
-               [MAIN_COMMAND [MAIN_COMMAND ...]]
+    docker run osixia/light-baseimage:0.2.2 --help
+    usage: run [-h] [-e] [-s] [-p] [-k] [--copy-service] [--keep-startup-env]
+           [--keepalived] [-l {none,error,warning,info,debug,trace}]
+           [MAIN_COMMAND [MAIN_COMMAND ...]]
 
     Initialize the system.
 
@@ -637,7 +664,10 @@ What it does:
                             Skip running container process file(s)
       -k, --no-kill-all-on-exit
                             Don't kill all processes on the system upon exiting
-      -c, --copy-service    Copy /container/service to /container/run/service
+      --copy-service        Copy /container/service to /container/run/service
+      --keep-startup-env    Don't remove ('.yaml.startup', '.json.startup')
+                            environment files after startup scripts
+      --keepalived          Keepalived container even if all process exited
       -l {none,error,warning,info,debug,trace}, --loglevel {none,error,warning,info,debug,trace}
                             Log level (default: info)
 
@@ -697,7 +727,7 @@ If a main command is set for example:
 If a main command is set *run tool* launch it otherwise bash is launched.
 Example:
 
-    docker run -it osixia/light-baseimage:0.2.1
+    docker run -it osixia/light-baseimage:0.2.2
 
 
 ##### Extra environment variables
@@ -773,8 +803,8 @@ Note this yaml definition:
 
 Can also be set by command line converted in python or json:
 
-    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:0.2.1 printenv
-    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:0.2.1 printenv
+    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:0.2.2 printenv
+    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:0.2.2 printenv
 
 ### Tests
 

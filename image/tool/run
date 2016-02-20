@@ -307,16 +307,16 @@ def import_env_files():
 				except:
 					warning('failed to parse: ' + filepath)
 
-def remove_setup_env_files():
+def remove_startup_env_files():
 
 	if os.path.isdir(IMPORT_FIRST_STARTUP_ENVIRONMENT_DIR):
 		try:
 			shutil.rmtree(IMPORT_FIRST_STARTUP_ENVIRONMENT_DIR)
 		except:
-			warning("remove_setup_env_files: failed to remove "+IMPORT_FIRST_STARTUP_ENVIRONMENT_DIR)
+			warning("remove_startup_env_files: failed to remove "+IMPORT_FIRST_STARTUP_ENVIRONMENT_DIR)
 
 	if not os.path.exists(IMPORT_ENVIRONMENT_DIR):
-		warning("remove_setup_env_files: "+IMPORT_ENVIRONMENT_DIR+" don't exists")
+		warning("remove_startup_env_files: "+IMPORT_ENVIRONMENT_DIR+" don't exists")
 		return
 
 	for subdir, dirs, files in sorted(os.walk(IMPORT_ENVIRONMENT_DIR)):
@@ -327,7 +327,7 @@ def remove_setup_env_files():
 					os.remove(filepath)
 					info("Remove file "+filepath)
 				except:
-					warning("remove_setup_env_files: failed to remove "+filepath)
+					warning("remove_startup_env_files: failed to remove "+filepath)
 
 def restore_environ():
 	clear_environ()
@@ -343,20 +343,21 @@ def set_startup_scripts_env():
 	clear_run_envvars() # clear previous environment
 	create_run_envvars() # create run envvars with all env files
 
-def set_process_env():
+def set_process_env(keep_startup_env = False):
 	info("Set environment for container process")
-	remove_setup_env_files()
+	if not keep_startup_env:
+		remove_startup_env_files()
 	clear_run_envvars()
 
 	restore_environ()
-	create_run_envvars() # recreate env var without setup files
+	create_run_envvars() # recreate env var without startup env files
 
 def setup_run_directories(args):
 
 	directories = (RUN_PROCESS_DIR, RUN_STARTUP_DIR, RUN_STATE_DIR, RUN_ENVIRONMENT_DIR)
 	for directory in directories:
 		if not os.path.exists(directory):
-		    	os.makedirs(directory)
+			os.makedirs(directory)
 
 			if directory == RUN_ENVIRONMENT_DIR:
 				os.chmod(directory, 700)
@@ -385,12 +386,23 @@ def setup_run_directories(args):
 				if os.path.isdir(d_path):
 					if is_exe(d_path + os.sep + IMPORT_STARTUP_FILENAME):
 						info('link ' + d_path + os.sep + IMPORT_STARTUP_FILENAME + ' to ' + RUN_STARTUP_DIR + os.sep + d)
-						os.symlink(d_path + os.sep + IMPORT_STARTUP_FILENAME, RUN_STARTUP_DIR + os.sep + d)
+						try:
+							os.symlink(d_path + os.sep + IMPORT_STARTUP_FILENAME, RUN_STARTUP_DIR + os.sep + d)
+						except OSError as detail:
+							warning('failed to link ' +  d_path + os.sep + IMPORT_STARTUP_FILENAME + ' to ' + RUN_STARTUP_DIR + os.sep + d + ': ' + xstr(detail))
 
 					if is_exe(d_path + os.sep + IMPORT_PROCESS_FILENAME):
 						info('link ' + d_path + os.sep + IMPORT_PROCESS_FILENAME + ' to ' + RUN_PROCESS_DIR + os.sep + d + os.sep + 'run')
-						os.makedirs(RUN_PROCESS_DIR + os.sep + d)
-						os.symlink(d_path + os.sep + IMPORT_PROCESS_FILENAME, RUN_PROCESS_DIR + os.sep + d + os.sep + 'run')
+
+						if not os.path.exists(RUN_PROCESS_DIR + os.sep + d):
+							os.makedirs(RUN_PROCESS_DIR + os.sep + d)
+						else:
+							warning('directory ' + RUN_PROCESS_DIR + os.sep + d + ' already exists')
+
+						try:
+							os.symlink(d_path + os.sep + IMPORT_PROCESS_FILENAME, RUN_PROCESS_DIR + os.sep + d + os.sep + 'run')
+						except OSError as detail:
+							warning('failed to link ' + d_path + os.sep + IMPORT_PROCESS_FILENAME + ' to ' + RUN_PROCESS_DIR + os.sep + d + os.sep + 'run : ' + xstr(detail))
 
 def set_dir_env():
 	if state_is_service_copied_to_run_dir():
@@ -407,7 +419,14 @@ def set_log_level_env():
 	trace("set : "+ENVIRONMENT_LOG_LEVEL_KEY+" = " + os.environ[ENVIRONMENT_LOG_LEVEL_KEY])
 
 def copy_service_to_run_dir():
+
+	if os.path.exists(RUN_SERVICE_DIR):
+		warning("Copy "+IMPORT_SERVICE_DIR+" to "+RUN_SERVICE_DIR + " ignored")
+		warning(RUN_SERVICE_DIR + " already exists")
+		return
+
 	info("Copy "+IMPORT_SERVICE_DIR+" to "+RUN_SERVICE_DIR)
+
 	shutil.copytree(IMPORT_SERVICE_DIR, RUN_SERVICE_DIR)
 	state_set_service_copied_to_run_dir()
 
@@ -572,7 +591,7 @@ def kill_all_processes(time_limit):
 		signal.alarm(0)
 
 def container_had_startup_script():
-	return len(listdir(RUN_STARTUP_DIR)) > 0
+	return (len(listdir(RUN_STARTUP_DIR)) > 0 or is_exe(RUN_STARTUP_FINAL_FILE))
 
 def run_startup_files(args):
 
@@ -716,9 +735,7 @@ def main(args):
 
 	state_reset_startup_done()
 	setup_run_directories(args)
-
-	if state_is_first_start():
-		set_env_hostname_to_etc_hosts()
+	set_env_hostname_to_etc_hosts()
 
 	if not args.skip_startup_files:
 		run_startup_files(args)
@@ -727,7 +744,7 @@ def main(args):
 	state_set_first_startup_done()
 
 	if not args.skip_env_files:
-		set_process_env()
+		set_process_env(args.keep_startup_env)
 
 	debug_env_dump()
 
@@ -756,9 +773,15 @@ parser.add_argument('-p', '--skip-process-files', dest = 'skip_process_files',
 parser.add_argument('-k', '--no-kill-all-on-exit', dest = 'kill_all_on_exit',
 	action = 'store_const', const = False, default = True,
 	help = 'Don\'t kill all processes on the system upon exiting')
-parser.add_argument('-c', '--copy-service', dest = 'copy_service',
+parser.add_argument('--copy-service', dest = 'copy_service',
 	action = 'store_const', const = True, default = False,
 	help = 'Copy '+IMPORT_SERVICE_DIR+' to '+RUN_SERVICE_DIR)
+parser.add_argument('--keep-startup-env', dest = 'keep_startup_env',
+	action = 'store_const', const = True, default = False,
+	help = 'Don\'t remove ' + xstr(ENV_FILES_STARTUP_EXTENSIONS) + ' environment files after startup scripts')
+parser.add_argument('--keepalived', dest = 'keepalived',
+	action = 'store_const', const = True, default = False,
+	help = 'Keepalived container even if all process exited')
 parser.add_argument('-l', '--loglevel', type=str, choices=["none","error","warning","info","debug","trace"], dest = 'log_level', default = "info",
 	help = 'Log level (default: info)')
 
@@ -779,9 +802,20 @@ signal.signal(signal.SIGALRM, lambda signum, frame: raise_alarm_exception())
 
 try:
 	main(args)
+
 except KeyboardInterrupt:
 	warning("Init system aborted.")
 	exit(2)
+
 finally:
+
+	if args.keepalived:
+		try:
+			info("All process have exited, keep container alived...")
+			while True:
+				pass
+		except:
+			info("Keepalived process ended.")
+
 	if args.kill_all_on_exit:
 		kill_all_processes(KILL_ALL_PROCESSES_TIMEOUT)
