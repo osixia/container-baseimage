@@ -2,12 +2,10 @@
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/osixia/ubuntu-light-baseimage.svg)][hub]
 [![Docker Stars](https://img.shields.io/docker/stars/osixia/ubuntu-light-baseimage.svg)][hub]
-[![Image Size](https://img.shields.io/imagelayers/image-size/osixia/ubuntu-light-baseimage/latest.svg)](https://imagelayers.io/?images=osixia/ubuntu-light-baseimage:latest)
-[![Image Layers](https://img.shields.io/imagelayers/layers/osixia/ubuntu-light-baseimage/latest.svg)](https://imagelayers.io/?images=osixia/ubuntu-light-baseimage:latest)
 
 [hub]: https://hub.docker.com/r/osixia/ubuntu-light-baseimage/
 
-Latest release: 0.1.5 -  [Changelog](CHANGELOG.md)
+Latest release: 0.1.6 -  [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/) 
 
 A Ubuntu Trusty (14:04) based docker image to help you build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
@@ -142,7 +140,7 @@ In the Dockerfile we are going to:
 
        # Use osixia/ubuntu-light-baseimage
        # https://github.com/osixia/docker-light-baseimage
-       FROM osixia/ubuntu-light-baseimage:0.1.5
+       FROM osixia/ubuntu-light-baseimage:0.1.6
        MAINTAINER Your Name <your@name.com>
 
         # Download nginx from apt-get and clean apt-get files
@@ -385,7 +383,7 @@ In the Dockerfile we are going to:
 
        # Use osixia/ubuntu-light-baseimage
        # https://github.com/osixia/docker-light-baseimage
-       FROM osixia/ubuntu-light-baseimage:0.1.5
+       FROM osixia/ubuntu-light-baseimage:0.1.6
        MAINTAINER Your Name <your@name.com>
 
         # Install multiple process stack, nginx and php5-fpm and clean apt-get files
@@ -578,7 +576,7 @@ Here simple Dockerfile example how to add a service-available to an image:
 
        # Use osixia/ubuntu-light-baseimage
        # https://github.com/osixia/docker-light-baseimage
-       FROM osixia/ubuntu-light-baseimage:0.1.5
+       FROM osixia/ubuntu-light-baseimage:0.1.6
        MAINTAINER Your Name <your@name.com>
 
         # Add cfssl and cron service-available
@@ -642,7 +640,7 @@ What it does:
 
 *Run tool* takes several options, to list them:
 
-    docker run osixia/light-baseimage:0.1.5 --help
+    docker run osixia/light-baseimage:0.1.6 --help
     usage: run [-h] [-e] [-s] [-p] [-k] [--copy-service] [--keep-startup-env]
            [--keepalived] [-l {none,error,warning,info,debug,trace}]
            [MAIN_COMMAND [MAIN_COMMAND ...]]
@@ -727,7 +725,7 @@ If a main command is set for example:
 If a main command is set *run tool* launch it otherwise bash is launched.
 Example:
 
-    docker run -it osixia/ubuntu-light-baseimage:0.1.5
+    docker run -it osixia/ubuntu-light-baseimage:0.1.6
 
 
 ##### Extra environment variables
@@ -803,8 +801,8 @@ Note this yaml definition:
 
 Can also be set by command line converted in python or json:
 
-    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/ubuntu-light-baseimage:0.1.5 printenv
-    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/ubuntu-light-baseimage:0.1.5 printenv
+    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/ubuntu-light-baseimage:0.1.6 printenv
+    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/ubuntu-light-baseimage:0.1.6 printenv
 
 ### Tests
 
