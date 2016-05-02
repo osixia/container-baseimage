@@ -2,12 +2,10 @@
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/osixia/experimental-light-baseimage.svg)][hub]
 [![Docker Stars](https://img.shields.io/docker/stars/osixia/experimental-light-baseimage.svg)][hub]
-[![Image Size](https://img.shields.io/imagelayers/image-size/osixia/experimental-light-baseimage/latest.svg)](https://imagelayers.io/?images=osixia/experimental-light-baseimage:latest)
-[![Image Layers](https://img.shields.io/imagelayers/layers/osixia/experimental-light-baseimage/latest.svg)](https://imagelayers.io/?images=osixia/experimental-light-baseimage:latest)
 
 [hub]: https://hub.docker.com/r/osixia/experimental-light-baseimage/
 
-Latest release: 0.1.2 -  [Changelog](CHANGELOG.md)
+Latest release: 0.1.3 -  [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
 
 A Debian Experimental based docker image to help you build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
@@ -142,7 +140,7 @@ In the Dockerfile we are going to:
 
        # Use osixia/experimental-light-baseimage
        # https://github.com/osixia/docker-light-baseimage
-       FROM osixia/experimental-light-baseimage:0.1.2
+       FROM osixia/experimental-light-baseimage:0.1.3
        MAINTAINER Your Name <your@name.com>
 
         # Download nginx from apt-get and clean apt-get files
@@ -385,7 +383,7 @@ In the Dockerfile we are going to:
 
        # Use osixia/experimental-light-baseimage
        # https://github.com/osixia/docker-light-baseimage
-       FROM osixia/experimental-light-baseimage:0.1.2
+       FROM osixia/experimental-light-baseimage:0.1.3
        MAINTAINER Your Name <your@name.com>
 
         # Install multiple process stack, nginx and php5-fpm and clean apt-get files
@@ -578,7 +576,7 @@ Here simple Dockerfile example how to add a service-available to an image:
 
         # Use osixia/experimental-light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/experimental-light-baseimage:0.1.2
+        FROM osixia/experimental-light-baseimage:0.1.3
         MAINTAINER Your Name <your@name.com>
 
         # Add cfssl and cron service-available
@@ -642,7 +640,7 @@ What it does:
 
 *Run tool* takes several options, to list them:
 
-    docker run osixia/experimental-light-baseimage:0.1.2 --help
+    docker run osixia/experimental-light-baseimage:0.1.3 --help
     usage: run [-h] [-e] [-s] [-p] [-k] [--copy-service] [--keep-startup-env]
            [--keepalived] [-l {none,error,warning,info,debug,trace}]
            [MAIN_COMMAND [MAIN_COMMAND ...]]
@@ -727,7 +725,7 @@ If a main command is set for example:
 If a main command is set *run tool* launch it otherwise bash is launched.
 Example:
 
-    docker run -it osixia/experimental-light-baseimage:0.1.2
+    docker run -it osixia/experimental-light-baseimage:0.1.3
 
 
 ##### Extra environment variables
@@ -803,8 +801,8 @@ Note this yaml definition:
 
 Can also be set by command line converted in python or json:
 
-    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/experimental-light-baseimage:0.1.2 printenv
-    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/experimental-light-baseimage:0.1.2 printenv
+    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/experimental-light-baseimage:0.1.3 printenv
+    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/experimental-light-baseimage:0.1.3 printenv
 
 ### Tests
 

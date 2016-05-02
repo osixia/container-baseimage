@@ -1,6 +1,6 @@
 # Use osixia/experimental-light-baseimage
 # https://github.com/osixia/docker-light-baseimage
-FROM osixia/experimental-light-baseimage:0.1.2
+FROM osixia/experimental-light-baseimage:0.1.3
 MAINTAINER Your Name <your@name.com>
 
 # Install multiple process stack, nginx and php5-fpm and clean apt-get files
