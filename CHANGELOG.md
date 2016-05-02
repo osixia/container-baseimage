@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.3
+  - Periodic update of debian baseimage and packages
+
 ## 0.2.2
   - Fix --copy-service error if /container/run/service already exists
   - Fix /container/run/startup.sh file detection if no other startup files exists
