@@ -5,7 +5,7 @@
 
 [hub]: https://hub.docker.com/r/osixia/light-baseimage/
 
-Latest release: 0.2.3 -  [Changelog](CHANGELOG.md)
+Latest release: 0.2.4 -  [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
 
 A Debian based docker image to help you build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
