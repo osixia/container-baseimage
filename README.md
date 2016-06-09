@@ -40,7 +40,7 @@ Table of Contents
 - [Advanced User Guide](#advanced-user-guide)
 	- [Service available](#service-available)
 	- [Fix docker mounted file problems](#fix-docker-mounted-file-problems)
-  - [Distribution packages documentation and locales](#distribution-packages-documentation-and-locales)
+  	- [Distribution packages documentation and locales](#distribution-packages-documentation-and-locales)
 	- [Mastering image tools](#mastering-image-tools)
 		- [run](#run)
             - [Run command line options](#run-command-line-options)
