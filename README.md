@@ -626,7 +626,7 @@ So to always apply sed on the correct file in the startup script the command bec
 
 ### Distribution packages documentation and locales
 
-This image has a configuration to prevent documentation and locales to be installed from base distribution packages repositories. If you need the doc and locales remove the following files :
+This image has a configuration to prevent documentation and locales to be installed from base distribution packages repositories to make it more lightweight as possible. If you need the doc and locales remove the following files :
 **/etc/dpkg/dpkg.cfg.d/01_nodoc** and **/etc/dpkg/dpkg.cfg.d/01_nolocales**
 
 
