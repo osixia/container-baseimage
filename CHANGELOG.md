@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.4
+  - Periodic update of debian baseimage and packages
+
 ## 0.2.3
   - Periodic update of debian baseimage and packages
 

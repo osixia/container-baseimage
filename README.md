@@ -5,7 +5,7 @@
 
 [hub]: https://hub.docker.com/r/osixia/light-baseimage/
 
-Latest release: 0.2.3 -  [Changelog](CHANGELOG.md)
+Latest release: 0.2.4 -  [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
 
 A Debian based docker image to help you build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
@@ -40,6 +40,7 @@ Table of Contents
 - [Advanced User Guide](#advanced-user-guide)
 	- [Service available](#service-available)
 	- [Fix docker mounted file problems](#fix-docker-mounted-file-problems)
+  - [Distribution packages documentation and locales](#distribution-packages-documentation-and-locales)
 	- [Mastering image tools](#mastering-image-tools)
 		- [run](#run)
             - [Run command line options](#run-command-line-options)
@@ -140,7 +141,7 @@ In the Dockerfile we are going to:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.3
+        FROM osixia/light-baseimage:0.2.4
         MAINTAINER Your Name <your@name.com>
 
         # Download nginx from apt-get and clean apt-get files
@@ -383,7 +384,7 @@ In the Dockerfile we are going to:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.3
+        FROM osixia/light-baseimage:0.2.4
         MAINTAINER Your Name <your@name.com>
 
         # Install multiple process stack, nginx and php5-fpm and clean apt-get files
@@ -576,7 +577,7 @@ Here simple Dockerfile example how to add a service-available to an image:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.3
+        FROM osixia/light-baseimage:0.2.4
         MAINTAINER Your Name <your@name.com>
 
         # Add cfssl and cron service-available
@@ -623,6 +624,12 @@ So to always apply sed on the correct file in the startup script the command bec
     sed -i "s|listen 80|listen 8080|g" ${CONTAINER_SERVICE_DIR}/php5-fpm/config/default
 
 
+### Distribution packages documentation and locales
+
+This image has a configuration to prevent documentation and locales to be installed from base distribution packages repositories. If you need the doc and locales remove the following files :
+**/etc/dpkg/dpkg.cfg.d/01_nodoc** and **/etc/dpkg/dpkg.cfg.d/01_nolocales**
+
+
 ### Mastering image tools
 
 #### run
@@ -640,7 +647,7 @@ What it does:
 
 *Run tool* takes several options, to list them:
 
-    docker run osixia/light-baseimage:0.2.3 --help
+    docker run osixia/light-baseimage:0.2.4 --help
     usage: run [-h] [-e] [-s] [-p] [-k] [--copy-service] [--keep-startup-env]
            [--keepalived] [-l {none,error,warning,info,debug,trace}]
            [MAIN_COMMAND [MAIN_COMMAND ...]]
@@ -725,7 +732,7 @@ If a main command is set for example:
 If a main command is set *run tool* launch it otherwise bash is launched.
 Example:
 
-    docker run -it osixia/light-baseimage:0.2.3
+    docker run -it osixia/light-baseimage:0.2.4
 
 
 ##### Extra environment variables
@@ -801,8 +808,8 @@ Note this yaml definition:
 
 Can also be set by command line converted in python or json:
 
-    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:0.2.3 printenv
-    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:0.2.3 printenv
+    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:0.2.4 printenv
+    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:0.2.4 printenv
 
 ### Tests
 
