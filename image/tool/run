@@ -462,7 +462,7 @@ def get_container_process():
 		return RUN_PROCESS_DIR + os.sep + p + os.sep + 'run'
 
 def is_runit_installed():
-	return os.path.exists('/sbin/runit')
+	return os.path.exists('/usr/bin/sv')
 
 _find_unsafe = re.compile(r'[^\w@%+=:,./-]').search
 

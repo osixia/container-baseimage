@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.7
+  - Fix is_runit_installed check /usr/bin/sv instead of /sbin/runit #6
+
 ## 0.1.6
   - Periodic update of ubuntu baseimage and packages
 
