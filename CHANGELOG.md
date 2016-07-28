@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.5
+  - Fix is_runit_installed check /usr/bin/sv instead of /sbin/runit #6
+
 ## 0.2.4
   - Periodic update of debian baseimage and packages
 
