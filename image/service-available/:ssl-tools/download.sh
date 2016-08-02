@@ -15,6 +15,8 @@ if [ -n "$to_install" ]; then
   LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $to_install
 fi
 
+LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends jq
+
 curl -o /usr/sbin/cfssl -SL https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
 chmod 700 /usr/sbin/cfssl
 

@@ -1,0 +1,42 @@
+#!/bin/bash
+log-helper level eq trace && set -x
+
+# This tool helps get certificates from json files
+# like kubernetes secrets or traefik acme.json
+# It takes its configuration from environment variable.
+# See json-default-env file
+
+PREFIX=$1
+CERT_FILE=$2
+KEY_FILE=$3
+CA_FILE=$4
+
+log-helper debug "json-helper is launched, everybody on the floor!"
+
+if [ -z "$PREFIX" ] || [ -z "$CERT_FILE" ] || [ -z "$KEY_FILE" ] || [ -z "$CA_FILE" ]; then
+  log-helper error "Usage: cfssl-helper prefix cert_file key_file ca_file"
+  exit 1
+fi
+
+if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
+
+  # key to iterate
+  # traefik acme.json request example
+  # cat acme.json | jq '[.["DomainsCertificate"].Certs[].Certificate] | map(select(.Domain == "$HOSTNAME")) | .[0].Certificate'
+  # cat acme.json | jq '[.["DomainsCertificate"].Certs[].Certificate] | map(select(.Domain == "$HOSTNAME")) | .[0].PrivateKey'
+
+  log-helper debug "done :)"
+
+elif [ ! -e "$KEY_FILE" ]; then
+  log-helper error "Certificate file $CERT_FILE exists but not key file $KEY_FILE"
+  exit 1
+elif [ ! -e "$CERT_FILE" ]; then
+  log-helper error "Key file $KEY_FILE exists but not certificate file $CERT_FILE"
+  exit 1
+else
+  log-helper debug "Files $CERT_FILE and $KEY_FILE exists, fix files permissions"
+  chmod 644 $CERT_FILE
+  chmod 600 $KEY_FILE
+fi
+
+exit 0

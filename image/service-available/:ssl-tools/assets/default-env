@@ -1,0 +1,2 @@
+#!/bin/bash
+SSL_HELPER_TOOL=${SSL_HELPER_TOOL:-"cfssl-helper"}
