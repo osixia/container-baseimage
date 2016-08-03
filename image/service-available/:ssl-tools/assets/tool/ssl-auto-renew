@@ -1,5 +1,8 @@
 #!/bin/bash -e
 
+# This file aims to be called by a cron task
+# and not directly. See ssl-helper.
+
 source /container/run/environment.sh
 
 SSL_HELPER_TOOL=$1
@@ -13,65 +16,92 @@ CERT_FROM_FILE=$8
 KEY_FROM_FILE=$9
 CA_CERT_FROM_FILE=${10}
 
-# the certificate will expired in the next day
-if openssl x509 -checkend 86400 -noout -in $CERT_FILE; then
-  log-helper info "The certificate '$CERT_FILE' is ok for the next 24 hours at least."
-  exit 0
-fi
+function stop_impacted_services() {
+  # Stop impacted services
+  if [ -n "$IMPACTED_SERVICES" ]; then
+    log-helper info "Services to stop: $IMPACTED_SERVICES"
 
-log-helper info "Certificate '$CERT_FILE' has expired or will do so within 24 hours!"
-log-helper info "(or is invalid/not found)"
-log-helper info ""
-log-helper info "Auto-renew on the way!"
+    impacted_services_table=($IMPACTED_SERVICES)
+    for service in $impacted_services_table
+    do
+      log-helper info "Stopping $service..."
+      sv stop /container/run/process/$service
+    done
 
-# Stop impacted services
-if [ -n "$IMPACTED_SERVICES" ]; then
-  log-helper info "Services to stop: $IMPACTED_SERVICES"
+    log-helper info "All services are stopped"
+  fi
+}
 
-  impacted_services_table=($IMPACTED_SERVICES)
-  for service in $impacted_services_table
-  do
-    log-helper info "Stopping $service..."
-    sv stop /container/run/process/$service
-  done
+function start_impacted_services() {
+  # restart impacted services
+  if [ -n "$IMPACTED_SERVICES" ]; then
 
-  log-helper info "All services are stopped"
-fi
+    impacted_services_table=($IMPACTED_SERVICES)
+    for service in $impacted_services_table
+    do
+      log-helper info "Starting $service..."
+      sv start /container/run/process/$service
+    done
 
-# remove existing cert
-rm -f $CERT_FILE $KEY_FILE $CA_FILE
+    log-helper info "All services are started"
+  fi
+}
 
 # renew from container files
 if [ "${FROM_FILES,,}" = "true" ]; then
 
-  log-helper info "Replace certificate from files:"
-  log-helper info "$CERT_FROM_FILE"
-  log-helper info "$KEY_FROM_FILE"
-  log-helper info "$CA_CERT_FROM_FILE"
+  log-helper info "Check renew from files"
+  no_renew=true
 
-  # Assuming CA_CERT_FROM_FILE, CERT_FROM_FILE and KEY_FROM_FILE
-  # are not empty. Checked by ssl-helper before creating the cronfile
-  cp $CERT_FROM_FILE $CERT_FILE
-  cp $KEY_FROM_FILE $KEY_FILE
-  cp $CA_CERT_FROM_FILE $CA_FILE
+  cmp --silent $CERT_FILE $CERT_FROM_FILE || no_renew=false
+  cmp --silent $KEY_FILE $KEY_FROM_FILE || no_renew=false
+  cmp --silent $CA_FILE $CA_CERT_FROM_FILE || no_renew=false
+
+  if $no_renew; then
+    log-helper info "Certificate files are identicals"
+    exit 0
+  fi
+
+  log-helper info "Certificate files are differents"
+
+  stop_impacted_services
+
+  log-helper info "Copy $CERT_FROM_FILE to $CERT_FILE"
+  cp -f $CERT_FROM_FILE $CERT_FILE
+
+  log-helper info "Copy $KEY_FROM_FILE to $KEY_FILE"
+  cp -f $KEY_FROM_FILE $KEY_FILE
+
+  log-helper info "Copy $CA_CERT_FROM_FILE to $CA_FILE"
+  cp -f $CA_CERT_FROM_FILE $CA_FILE
+
+  start_impacted_services
 
 # renew with cfssl or jsonssl
 else
+  log-helper info "Check renew for cfssl or jsonssl"
+
+  # the certificate will expired in the next day
+  if openssl x509 -checkend 259200 -noout -in $CERT_FILE; then
+    log-helper info "The certificate '$CERT_FILE' is ok for the next 3 days at least."
+    exit 0
+  fi
+
+  stop_impacted_services
+
+  log-helper info "Certificate '$CERT_FILE' has expired or will do so within the next 3 days!"
+  log-helper info "(or is invalid/not found)"
+  log-helper info ""
+  log-helper info "Auto-renew on the way!"
+
+  log-helper info "Remove certificate files"
+  rm -f $CERT_FILE $KEY_FILE $CA_FILE
+
   log-helper info "Regenerate certificate with $SSL_HELPER_TOOL"
   $SSL_HELPER_TOOL $PREFIX $CERT_FILE $KEY_FILE $CA_FILE
-fi
 
-# restart impacted services
-if [ -n "$IMPACTED_SERVICES" ]; then
+  start_impacted_services
 
-  impacted_services_table=($IMPACTED_SERVICES)
-  for service in $impacted_services_table
-  do
-    log-helper info "Starting $service..."
-    sv start /container/run/process/$service
-  done
-
-  log-helper info "All services are started"
 fi
 
 log-helper info "Auto-renew finished! Champagne!"
