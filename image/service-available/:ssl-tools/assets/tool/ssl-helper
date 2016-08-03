@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 log-helper level eq trace && set -x
 
 # This tool helps to generate tls certificates with cfssl
@@ -19,7 +19,7 @@ SSL_HELPER_TOOL=${!PREFIX_SSL_HELPER_TOOL:-$SSL_HELPER_TOOL}
 
 source ${CONTAINER_SERVICE_DIR}/:ssl-tools/assets/default-env
 
-# call the certificate tool cfssl-helper (default) or json-helper
+# call the certificate tool cfssl-helper (default) or jsonssl-helper
 $SSL_HELPER_TOOL $PREFIX $CERT_FILE $KEY_FILE $CA_FILE
 
 exit 0

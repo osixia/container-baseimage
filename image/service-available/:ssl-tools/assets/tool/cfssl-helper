@@ -12,6 +12,10 @@ CA_FILE=$4
 
 log-helper debug "cfssl-helper is launched, everybody on the floor!"
 
+# before 0.2.5 retro compatibility, will be removed.
+mkdir -p ${CONTAINER_SERVICE_DIR}/:cfssl/assets/default-ca
+ln -sf ${CONTAINER_SERVICE_DIR}/:ssl-tools/assets/default-ca/default-ca.pem ${CONTAINER_SERVICE_DIR}/:cfssl/assets/default-ca/default-ca.pem
+
 if [ -z "$PREFIX" ] || [ -z "$CERT_FILE" ] || [ -z "$KEY_FILE" ] || [ -z "$CA_FILE" ]; then
   log-helper error "Usage: cfssl-helper prefix cert_file key_file ca_file"
   exit 1
