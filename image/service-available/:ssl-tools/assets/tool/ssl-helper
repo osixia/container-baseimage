@@ -15,11 +15,38 @@ log-helper debug "Hi! I'm ssl-helper, what button should i press ?"
 PREFIX=${PREFIX^^} # uppercase
 
 PREFIX_SSL_HELPER_TOOL=${PREFIX}_SSL_HELPER_TOOL
+PREFIX_SSL_HELPER_AUTO_RENEW=${PREFIX}_SSL_HELPER_AUTO_RENEW
+PREFIX_SSL_HELPER_AUTO_RENEW_SERVICES_IMPACTED=${PREFIX}_SSL_HELPER_AUTO_RENEW_SERVICES_IMPACTED
+
 SSL_HELPER_TOOL=${!PREFIX_SSL_HELPER_TOOL:-$SSL_HELPER_TOOL}
+SSL_HELPER_AUTO_RENEW=${!PREFIX_SSL_HELPER_AUTO_RENEW:-$SSL_HELPER_AUTO_RENEW}
+SSL_HELPER_AUTO_RENEW_SERVICES_IMPACTED=${!PREFIX_SSL_HELPER_AUTO_RENEW_SERVICES_IMPACTED:-$SSL_HELPER_AUTO_RENEW_SERVICES_IMPACTED}
+SSL_HELPER_AUTO_RENEW_FROM_FILE
 
 source ${CONTAINER_SERVICE_DIR}/:ssl-tools/assets/default-env
 
 # call the certificate tool cfssl-helper (default) or jsonssl-helper
 $SSL_HELPER_TOOL $PREFIX $CERT_FILE $KEY_FILE $CA_FILE
+
+# auto-renew certificates just before it expired
+if [ "${SSL_HELPER_AUTO_RENEW,,}" = "true" ]; then
+
+  # only for multiple process images (uses cron)
+  if [ ! -e "/container/multiple_process_stack_added" ]; then
+    log-helper error "auto-renew is available only with multiple process images"
+    exit 1
+  fi
+
+  # check if SSL_HELPER_AUTO_RENEW_FROM_FILE=true certificate source files
+
+
+  # add cron job every day at 00:00
+  echo "0 0 * * * root /usr/sbin/ssl-auto-renew $SSL_HELPER_TOOL $PREFIX $CERT_FILE $KEY_FILE $CA_FILE \"$SSL_HELPER_AUTO_RENEW_SERVICES_IMPACTED\" 2>&1 | /usr/bin/logger -s -t ssl-auto-renew" > /etc/cron.d/$PREFIX
+  chmod 600 /etc/cron.d/$PREFIX
+
+# disable auto-renew if it was added
+elif [ -e "/etc/cron.d/$PREFIX" ]; then
+  rm -f /etc/cron.d/$PREFIX
+fi
 
 exit 0

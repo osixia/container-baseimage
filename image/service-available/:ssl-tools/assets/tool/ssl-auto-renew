@@ -1,0 +1,79 @@
+#!/bin/bash -e
+
+source /container/run/environment.sh
+
+SSL_HELPER_TOOL=$1
+PREFIX=$2
+CERT_FILE=$3
+KEY_FILE=$4
+CA_FILE=$5
+IMPACTED_SERVICES=$6
+FROM_FILES=$7
+CERT_FROM_FILE=$8
+KEY_FROM_FILE=$9
+CA_CERT_FROM_FILE=${10}
+
+# the certificate will expired in the next day
+if openssl x509 -checkend 86400 -noout -in $CERT_FILE; then
+  log-helper info "The certificate '$CERT_FILE' is ok for the next 24 hours at least."
+  exit 0
+fi
+
+log-helper info "Certificate '$CERT_FILE' has expired or will do so within 24 hours!"
+log-helper info "(or is invalid/not found)"
+log-helper info ""
+log-helper info "Auto-renew on the way!"
+
+# Stop impacted services
+if [ -n "$IMPACTED_SERVICES" ]; then
+  log-helper info "Services to stop: $IMPACTED_SERVICES"
+
+  impacted_services_table=($IMPACTED_SERVICES)
+  for service in $impacted_services_table
+  do
+    log-helper info "Stopping $service..."
+    sv stop /container/run/process/$service
+  done
+
+  log-helper info "All services are stopped"
+fi
+
+# remove existing cert
+rm -f $CERT_FILE $KEY_FILE $CA_FILE
+
+# renew from container files
+if [ "${FROM_FILES,,}" = "true" ]; then
+
+  log-helper info "Replace certificate from files:"
+  log-helper info "$CERT_FROM_FILE"
+  log-helper info "$KEY_FROM_FILE"
+  log-helper info "$CA_CERT_FROM_FILE"
+
+  # Assuming CA_CERT_FROM_FILE, CERT_FROM_FILE and KEY_FROM_FILE
+  # are not empty. Checked by ssl-helper before creating the cronfile
+  cp $CERT_FROM_FILE $CERT_FILE
+  cp $KEY_FROM_FILE $KEY_FILE
+  cp $CA_CERT_FROM_FILE $CA_FILE
+
+# renew with cfssl or jsonssl
+else
+  log-helper info "Regenerate certificate with $SSL_HELPER_TOOL"
+  $SSL_HELPER_TOOL $PREFIX $CERT_FILE $KEY_FILE $CA_FILE
+fi
+
+# restart impacted services
+if [ -n "$IMPACTED_SERVICES" ]; then
+
+  impacted_services_table=($IMPACTED_SERVICES)
+  for service in $impacted_services_table
+  do
+    log-helper info "Starting $service..."
+    sv start /container/run/process/$service
+  done
+
+  log-helper info "All services are started"
+fi
+
+log-helper info "Auto-renew finished! Champagne!"
+
+exit 0
