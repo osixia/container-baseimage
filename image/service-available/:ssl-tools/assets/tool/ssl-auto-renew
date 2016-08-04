@@ -21,7 +21,7 @@ function stop_impacted_services() {
   if [ -n "$IMPACTED_SERVICES" ]; then
     log-helper info "Services to stop: $IMPACTED_SERVICES"
 
-    impacted_services_table=($IMPACTED_SERVICES)
+    impacted_services_table=("$IMPACTED_SERVICES")
     for service in $impacted_services_table
     do
       log-helper info "Stopping $service..."
@@ -36,7 +36,7 @@ function start_impacted_services() {
   # restart impacted services
   if [ -n "$IMPACTED_SERVICES" ]; then
 
-    impacted_services_table=($IMPACTED_SERVICES)
+    impacted_services_table=("$IMPACTED_SERVICES")
     for service in $impacted_services_table
     do
       log-helper info "Starting $service..."
@@ -53,7 +53,7 @@ if [ "${FROM_FILES,,}" = "true" ]; then
   log-helper info "Check renew from files"
   renew=false
 
-  # File previous
+  # File previous md5
   CERT_PREVIOUS_MD5=$(cat $CERT_FILE.md5) || true
   KEY_PREVIOUS_MD5=$(cat $KEY_FILE.md5) || true
   CA_CERT_PREVIOUS_MD5=$(cat $CA_FILE.md5) || true
@@ -76,14 +76,20 @@ if [ "${FROM_FILES,,}" = "true" ]; then
 
   stop_impacted_services
 
-  log-helper info "Copy $CERT_FROM_FILE to $CERT_FILE"
-  cp -f $CERT_FROM_FILE $CERT_FILE
+  if [ "$CERT_FROM_FILE" != "$CERT_FILE" ]; then
+    log-helper info "Copy $CERT_FROM_FILE to $CERT_FILE"
+    cp -f $CERT_FROM_FILE $CERT_FILE
+  fi
 
-  log-helper info "Copy $KEY_FROM_FILE to $KEY_FILE"
-  cp -f $KEY_FROM_FILE $KEY_FILE
+  if [ "$KEY_FROM_FILE" != "$KEY_FILE" ]; then
+    log-helper info "Copy $KEY_FROM_FILE to $KEY_FILE"
+    cp -f $KEY_FROM_FILE $KEY_FILE
+  fi
 
-  log-helper info "Copy $CA_CERT_FROM_FILE to $CA_FILE"
-  cp -f $CA_CERT_FROM_FILE $CA_FILE
+  if [ "$CA_CERT_FROM_FILE" != "$CA_FILE" ]; then
+    log-helper info "Copy $CA_CERT_FROM_FILE to $CA_FILE"
+    cp -f $CA_CERT_FROM_FILE $CA_FILE
+  fi
 
   echo $FROM_CERT_MD5 > $CERT_FILE.md5
   echo $FROM_KEY_MD5 > $CERT_FILE.md5
@@ -95,18 +101,30 @@ if [ "${FROM_FILES,,}" = "true" ]; then
 else
   log-helper info "Check renew for cfssl or jsonssl"
 
+  cert_ok=false
+  ca_ok=false
+
   # the certificate will expired in the next day
   if openssl x509 -checkend 259200 -noout -in $CERT_FILE; then
     log-helper info "The certificate '$CERT_FILE' is ok for the next 3 days at least."
+    cert_ok=true
+  fi
+
+  if openssl x509 -checkend 259200 -noout -in $CA_FILE; then
+    log-helper info "The CA certificate '$CA_FILE' is ok for the next 3 days at least."
+    ca_ok=true
+  fi
+
+  if [ $cert_ok ] && [ $ca_ok ]; then
+    log-helper info "Nothing to do :)"
     exit 0
   fi
 
-  stop_impacted_services
-
   log-helper info "Certificate '$CERT_FILE' has expired or will do so within the next 3 days!"
   log-helper info "(or is invalid/not found)"
-  log-helper info ""
   log-helper info "Auto-renew on the way!"
+
+  stop_impacted_services
 
   log-helper info "Remove certificate files"
   rm -f $CERT_FILE $KEY_FILE $CA_FILE

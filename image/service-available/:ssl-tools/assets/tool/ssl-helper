@@ -44,15 +44,15 @@ if [ "${SSL_HELPER_AUTO_RENEW,,}" = "true" ]; then
     exit 1
   fi
 
-  # check if SSL_HELPER_AUTO_RENEW_FROM_FILE=true certificate source files
-  if [ "${SSL_HELPER_AUTO_RENEW_FROM_FILE,,}" = "true" ]; then
+  # check if SSL_HELPER_AUTO_RENEW_FROM_FILES=true certificate source files
+  if [ "${SSL_HELPER_AUTO_RENEW_FROM_FILES,,}" = "true" ]; then
 
     [[ -z "$SSL_HELPER_AUTO_RENEW_CERT_FROM_FILE" ]] && SSL_HELPER_AUTO_RENEW_CERT_FROM_FILE=$CERT_FILE
     [[ -z "$SSL_HELPER_AUTO_RENEW_KEY_FROM_FILE" ]] && SSL_HELPER_AUTO_RENEW_KEY_FROM_FILE=$KEY_FILE
     [[ -z "$SSL_HELPER_AUTO_RENEW_CA_CERT_FROM_FILE" ]] && SSL_HELPER_AUTO_RENEW_CA_CERT_FROM_FILE=$CA_FILE
 
     if [ ! -e "$SSL_HELPER_AUTO_RENEW_CERT_FROM_FILE" ] || [ ! -e "$SSL_HELPER_AUTO_RENEW_KEY_FROM_FILE" ] || [ ! -e "$SSL_HELPER_AUTO_RENEW_CA_CERT_FROM_FILE" ]; then
-      log-helper error "with SSL_HELPER_AUTO_RENEW_FROM_FILE=true the following files must exists:"
+      log-helper error "with SSL_HELPER_AUTO_RENEW_FROM_FILES=true the following files must exists:"
       log-helper error "SSL_HELPER_AUTO_RENEW_CERT_FROM_FILE=$SSL_HELPER_AUTO_RENEW_CERT_FROM_FILE"
       log-helper error "SSL_HELPER_AUTO_RENEW_KEY_FROM_FILE=$SSL_HELPER_AUTO_RENEW_KEY_FROM_FILE"
       log-helper error "SSL_HELPER_AUTO_RENEW_CA_CERT_FROM_FILE=$SSL_HELPER_AUTO_RENEW_CA_CERT_FROM_FILE"

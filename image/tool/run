@@ -18,8 +18,9 @@ log_level = None
 environ_backup = dict(os.environ)
 terminated_child_processes = {}
 
-IMPORT_PROCESS_FILENAME="process.sh"
 IMPORT_STARTUP_FILENAME="startup.sh"
+IMPORT_PROCESS_FILENAME="process.sh"
+IMPORT_FINISH_FILENAME="finish.sh"
 
 IMPORT_ENVIRONMENT_DIR="/container/environment"
 IMPORT_FIRST_STARTUP_ENVIRONMENT_DIR="/container/environment/startup"
@@ -404,6 +405,17 @@ def setup_run_directories(args):
 						except OSError as detail:
 							warning('failed to link ' + d_path + os.sep + IMPORT_PROCESS_FILENAME + ' to ' + RUN_PROCESS_DIR + os.sep + d + os.sep + 'run : ' + xstr(detail))
 
+					if not args.skip_finish_files and is_exe(d_path + os.sep + IMPORT_FINISH_FILENAME):
+						info('link ' + d_path + os.sep + IMPORT_FINISH_FILENAME + ' to ' + RUN_PROCESS_DIR + os.sep + d + os.sep + 'finish')
+
+						if not os.path.exists(RUN_PROCESS_DIR + os.sep + d):
+							os.makedirs(RUN_PROCESS_DIR + os.sep + d)
+
+						try:
+							os.symlink(d_path + os.sep + IMPORT_FINISH_FILENAME, RUN_PROCESS_DIR + os.sep + d + os.sep + 'finish')
+						except OSError as detail:
+							warning('failed to link ' + d_path + os.sep + IMPORT_FINISH_FILENAME + ' to ' + RUN_PROCESS_DIR + os.sep + d + os.sep + 'finish : ' + xstr(detail))
+
 def set_dir_env():
 	if state_is_service_copied_to_run_dir():
 		os.environ[ENVIRONMENT_SERVICE_DIR_KEY] = RUN_SERVICE_DIR
@@ -729,6 +741,15 @@ def run_no_process_container(args):
 	exit_status = run_foreground_process(args.main_command)
 	sys.exit(exit_status)
 
+def run_finish_files():
+
+	# iterate process dir to find finish files
+	for name in listdir(RUN_PROCESS_DIR):
+		filename = RUN_PROCESS_DIR + os.sep + name + os.sep + "finish"
+		if is_exe(filename):
+			info("Running %s..." % filename)
+			run_command_killable_and_import_run_envvars(filename)
+
 def main(args):
 
 	info(ENVIRONMENT_LOG_LEVEL_KEY + " = " + xstr(log_level) + " (" + log_level_switcher_inv.get(log_level) + ")")
@@ -770,6 +791,9 @@ parser.add_argument('-s', '--skip-startup-files', dest = 'skip_startup_files',
 parser.add_argument('-p', '--skip-process-files', dest = 'skip_process_files',
 	action = 'store_const', const = True, default = False,
 	help = 'Skip running container process file(s)')
+parser.add_argument('-f', '--skip-finish-files', dest = 'skip_finish_files',
+	action = 'store_const', const = True, default = False,
+	help = 'Skip running container finish file(s)')
 parser.add_argument('-k', '--no-kill-all-on-exit', dest = 'kill_all_on_exit',
 	action = 'store_const', const = False, default = True,
 	help = 'Don\'t kill all processes on the system upon exiting')
@@ -808,6 +832,10 @@ except KeyboardInterrupt:
 	exit(2)
 
 finally:
+
+	# for multiple process images finish script are run by runit
+	if not args.skip_finish_files and not is_multiple_process_container():
+		run_finish_files()
 
 	if args.keepalived:
 		try:
