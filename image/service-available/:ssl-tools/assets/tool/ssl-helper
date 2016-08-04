@@ -46,6 +46,11 @@ if [ "${SSL_HELPER_AUTO_RENEW,,}" = "true" ]; then
 
   # check if SSL_HELPER_AUTO_RENEW_FROM_FILE=true certificate source files
   if [ "${SSL_HELPER_AUTO_RENEW_FROM_FILE,,}" = "true" ]; then
+
+    [[ -z "$SSL_HELPER_AUTO_RENEW_CERT_FROM_FILE" ]] && SSL_HELPER_AUTO_RENEW_CERT_FROM_FILE=$CERT_FILE
+    [[ -z "$SSL_HELPER_AUTO_RENEW_KEY_FROM_FILE" ]] && SSL_HELPER_AUTO_RENEW_KEY_FROM_FILE=$KEY_FILE
+    [[ -z "$SSL_HELPER_AUTO_RENEW_CA_CERT_FROM_FILE" ]] && SSL_HELPER_AUTO_RENEW_CA_CERT_FROM_FILE=$CA_FILE
+
     if [ ! -e "$SSL_HELPER_AUTO_RENEW_CERT_FROM_FILE" ] || [ ! -e "$SSL_HELPER_AUTO_RENEW_KEY_FROM_FILE" ] || [ ! -e "$SSL_HELPER_AUTO_RENEW_CA_CERT_FROM_FILE" ]; then
       log-helper error "with SSL_HELPER_AUTO_RENEW_FROM_FILE=true the following files must exists:"
       log-helper error "SSL_HELPER_AUTO_RENEW_CERT_FROM_FILE=$SSL_HELPER_AUTO_RENEW_CERT_FROM_FILE"
@@ -53,6 +58,12 @@ if [ "${SSL_HELPER_AUTO_RENEW,,}" = "true" ]; then
       log-helper error "SSL_HELPER_AUTO_RENEW_CA_CERT_FROM_FILE=$SSL_HELPER_AUTO_RENEW_CA_CERT_FROM_FILE"
       exit 1
     fi
+
+    # calculate certificates files md5
+    md5sum ${CERT_FILE} | awk '{ print $1 }' > $CERT_FILE.md5
+    md5sum ${KEY_FILE} | awk '{ print $1 }' > $KEY_FILE.md5
+    md5sum ${CA_FILE} | awk '{ print $1 }' > $CA_FILE.md5
+
   fi
 
   # add cron job every day at 00:00

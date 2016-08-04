@@ -51,13 +51,23 @@ function start_impacted_services() {
 if [ "${FROM_FILES,,}" = "true" ]; then
 
   log-helper info "Check renew from files"
-  no_renew=true
+  renew=false
 
-  cmp --silent $CERT_FILE $CERT_FROM_FILE || no_renew=false
-  cmp --silent $KEY_FILE $KEY_FROM_FILE || no_renew=false
-  cmp --silent $CA_FILE $CA_CERT_FROM_FILE || no_renew=false
+  # File previous
+  CERT_PREVIOUS_MD5=$(cat $CERT_FILE.md5) || true
+  KEY_PREVIOUS_MD5=$(cat $KEY_FILE.md5) || true
+  CA_CERT_PREVIOUS_MD5=$(cat $CA_FILE.md5) || true
 
-  if $no_renew; then
+  # from file current md5
+  FROM_CERT_MD5=$(md5sum ${CERT_FROM_FILE} | awk '{ print $1 }')
+  FROM_KEY_MD5=$(md5sum ${KEY_FROM_FILE} | awk '{ print $1 }')
+  FROM_CA_CERT_MD5=$(md5sum ${CA_CERT_FROM_FILE} | awk '{ print $1 }')
+
+  [[ "$CERT_PREVIOUS_MD5" != "$FROM_CERT_MD5" ]] && renew=true
+  [[ "$KEY_PREVIOUS_MD5" != "$FROM_KEY_MD5" ]] && renew=true
+  [[ "$CA_CERT_PREVIOUS_MD5" != "$FROM_CA_CERT_MD5" ]] && renew=true
+
+  if ! $renew; then
     log-helper info "Certificate files are identicals"
     exit 0
   fi
@@ -74,6 +84,10 @@ if [ "${FROM_FILES,,}" = "true" ]; then
 
   log-helper info "Copy $CA_CERT_FROM_FILE to $CA_FILE"
   cp -f $CA_CERT_FROM_FILE $CA_FILE
+
+  echo $FROM_CERT_MD5 > $CERT_FILE.md5
+  echo $FROM_KEY_MD5 > $CERT_FILE.md5
+  echo $FROM_CA_CERT_MD5 > $CA_FILE.md5
 
   start_impacted_services
 
