@@ -11,10 +11,11 @@ CERT_FILE=$3
 KEY_FILE=$4
 CA_FILE=$5
 IMPACTED_SERVICES=$6
-FROM_FILES=$7
-CERT_FROM_FILE=$8
-KEY_FROM_FILE=$9
-CA_CERT_FROM_FILE=${10}
+JSONSSL_FILE=$7
+FROM_FILES=$8
+CERT_FROM_FILE=$9
+KEY_FROM_FILE=${10}
+CA_CERT_FROM_FILE=${11}
 
 function stop_impacted_services() {
   # Stop impacted services
@@ -54,9 +55,9 @@ if [ "${FROM_FILES,,}" = "true" ]; then
   renew=false
 
   # File previous md5
-  CERT_PREVIOUS_MD5=$(cat $CERT_FILE.md5) || true
-  KEY_PREVIOUS_MD5=$(cat $KEY_FILE.md5) || true
-  CA_CERT_PREVIOUS_MD5=$(cat $CA_FILE.md5) || true
+  CERT_PREVIOUS_MD5=$(cat ${CONTAINER_SERVICE_DIR}/:ssl-tools/assets/md5$CERT_FILE.md5) || true
+  KEY_PREVIOUS_MD5=$(cat ${CONTAINER_SERVICE_DIR}/:ssl-tools/assets/md5$KEY_FILE.md5) || true
+  CA_CERT_PREVIOUS_MD5=$(cat ${CONTAINER_SERVICE_DIR}/:ssl-tools/assets/md5$CA_FILE.md5) || true
 
   # from file current md5
   FROM_CERT_MD5=$(md5sum ${CERT_FROM_FILE} | awk '{ print $1 }')
@@ -91,9 +92,10 @@ if [ "${FROM_FILES,,}" = "true" ]; then
     cp -f $CA_CERT_FROM_FILE $CA_FILE
   fi
 
-  echo $FROM_CERT_MD5 > $CERT_FILE.md5
-  echo $FROM_KEY_MD5 > $CERT_FILE.md5
-  echo $FROM_CA_CERT_MD5 > $CA_FILE.md5
+  log-helper info "Update file md5 with new values"
+  echo $FROM_CERT_MD5 > ${CONTAINER_SERVICE_DIR}/:ssl-tools/assets/md5$CERT_FILE.md5
+  echo $FROM_KEY_MD5 > ${CONTAINER_SERVICE_DIR}/:ssl-tools/assets/md5$KEY_FILE.md5
+  echo $FROM_CA_CERT_MD5 > ${CONTAINER_SERVICE_DIR}/:ssl-tools/assets/md5$CA_FILE.md5
 
   start_impacted_services
 
@@ -115,13 +117,19 @@ else
     ca_ok=true
   fi
 
-  if [ $cert_ok ] && [ $ca_ok ]; then
+  if [ "${SSL_HELPER_TOOL}" = "jsonssl-helper" ]; then
+    log-helper info "Check if $JSONSSL_FILE has changed"
+    JSONSSL_FILE_PREVIOUS_MD5=$(cat ${CONTAINER_SERVICE_DIR}/:ssl-tools/assets/md5$JSONSSL_FILE.md5) || true
+    JSONSSL_FILE_MD5=$(md5sum ${JSONSSL_FILE} | awk '{ print $1 }')
+
+    [[ "$JSONSSL_FILE_PREVIOUS_MD5" != "$JSONSSL_FILE_MD5" ]] && cert_ok=false
+  fi
+
+  if $cert_ok && $ca_ok; then
     log-helper info "Nothing to do :)"
     exit 0
   fi
 
-  log-helper info "Certificate '$CERT_FILE' has expired or will do so within the next 3 days!"
-  log-helper info "(or is invalid/not found)"
   log-helper info "Auto-renew on the way!"
 
   stop_impacted_services
@@ -133,6 +141,11 @@ else
   $SSL_HELPER_TOOL $PREFIX $CERT_FILE $KEY_FILE $CA_FILE
 
   start_impacted_services
+
+  if [ "${SSL_HELPER_TOOL}" = "jsonssl-helper" ]; then
+    log-helper info "Update file md5 with new values"
+    echo "$JSONSSL_FILE_MD5" > ${CONTAINER_SERVICE_DIR}/:ssl-tools/assets/md5$JSONSSL_FILE.md5
+  fi
 
 fi
 
