@@ -3,6 +3,9 @@
 ## 0.2.5
   - Fix is_runit_installed check /usr/bin/sv instead of /sbin/runit #6
   - Upgrade cfssl 1.2.0
+  - Add ssl-helper that allow certificate auto-renew and let choose
+    certificate generator (cfssl-helper default, or jsonssl-helper)
+  - Add jsonssl-helper that get certificates from a json file
 
 ## 0.2.4
   - Periodic update of debian baseimage and packages
