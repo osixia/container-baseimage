@@ -36,6 +36,7 @@ print(str(nb_process) + " process found.")
 if nb_process > 1:
     if not os.path.exists("/container/multiple_process_stack_added"):
         print("This image has multiple process.")
+        subprocess.call(["apt-get update"],shell=True)
         subprocess.call(["/container/tool/add-multiple-process-stack"],shell=True)
         print("For better image build process consider adding:")
         print("\"/container/tool/add-multiple-process-stack\" after an apt-get update in your Dockerfile.")
