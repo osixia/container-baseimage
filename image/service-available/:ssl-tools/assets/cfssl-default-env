@@ -2,10 +2,10 @@
 #
 # Default CA config
 #
-CFSSL_DEFAULT_CACERT="${CONTAINER_SERVICE_DIR}/:cfssl/assets/default-ca/default-ca.pem"
-CFSSL_DEFAULT_CA_KEY="${CONTAINER_SERVICE_DIR}/:cfssl/assets/default-ca/default-ca-key.pem"
-CFSSL_DEFAULT_CA_CONFIG="${CONTAINER_SERVICE_DIR}/:cfssl/assets/default-ca/config/ca-config.json"
-CFSSL_DEFAULT_CSR="${CONTAINER_SERVICE_DIR}/:cfssl/assets/default-ca/config/req-csr.json.tmpl"
+CFSSL_DEFAULT_CACERT="${CONTAINER_SERVICE_DIR}/:ssl-tools/assets/default-ca/default-ca.pem"
+CFSSL_DEFAULT_CA_KEY="${CONTAINER_SERVICE_DIR}/:ssl-tools/assets/default-ca/default-ca-key.pem"
+CFSSL_DEFAULT_CA_CONFIG="${CONTAINER_SERVICE_DIR}/:ssl-tools/assets/default-ca/config/ca-config.json"
+CFSSL_DEFAULT_CSR="${CONTAINER_SERVICE_DIR}/:ssl-tools/assets/default-ca/config/req-csr.json.tmpl"
 
 # default csr file params
 CFSSL_DEFAULT_CA_CSR_CN=${CFSSL_DEFAULT_CA_CSR_CN:-${HOSTNAME}}
