@@ -2,6 +2,10 @@
 
 ## 0.1.7
   - Fix is_runit_installed check /usr/bin/sv instead of /sbin/runit #6
+  - Upgrade cfssl 1.2.0
+  - Add ssl-helper that allow certificate auto-renew and let choose
+    certificate generator (cfssl-helper default, or jsonssl-helper)
+  - Add jsonssl-helper that get certificates from a json file
 
 ## 0.1.6
   - Periodic update of ubuntu baseimage and packages

@@ -101,6 +101,7 @@ This section define a service directory that can be added in /container/service 
 - **my-service/install.sh**: install script (not mandatory).
 - **my-service/startup.sh**: startup script to setup the service when the container start (not mandatory).
 - **my-service/process.sh**: process to run (not mandatory).
+- **my-service/finish.sh**: finish script run when the process script exit (not mandatory).
 - **my-service/...** add whatever you need!
 
 Ok that's pretty all to know to start building our first images!
@@ -560,7 +561,7 @@ All container tools are available in `/container/tool` directory and are linked 
 | :cron | Cron daemon. <br><br>*This service is part of the multiple-process-stack.*|
 | :syslog-ng-core | Syslog daemon so that many services - including the kernel itself - can correctly log to /var/log/syslog. If no syslog daemon is running, a lot of important messages are silently swallowed. <br><br>Only listens locally. All syslog messages are forwarded to "docker logs".<br><br>*This service is part of the multiple-process-stack.* |
 | :logrotate | Rotates and compresses logs on a regular basis. <br><br>*This service is part of the multiple-process-stack.*|
-| :cfssl | CFSSL is CloudFlare's PKI/TLS swiss army knife. It's a command line tool for signing, verifying, and bundling TLS certificates. <br><br>Comes with cfssl-helper tool that make it docker friendly by taking command line parameters from environment variables. |
+| :ssl-tools | Add CFSSL a CloudFlare PKI/TLS swiss army knife. It's a command line tool for signing, verifying, and bundling TLS certificates. Comes with cfssl-helper tool that make it docker friendly by taking command line parameters from environment variables. <br><br>Also add jsonssl-helper to get certificates from json files, parameters are set by environment variables. |
 
 
 ## Advanced User Guide
@@ -582,10 +583,10 @@ Here simple Dockerfile example how to add a service-available to an image:
 
         # Add cfssl and cron service-available
         # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-service-available
-        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/service-available/:cfssl/download.sh
+        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/service-available/:ssl-tools/download.sh
         # https://github.com/osixia/docker-light-baseimage/blob/stable/image/service-available/:cron/download.sh
         RUN apt-get -y update \
-            && /container/tool/add-service-available :cfssl :cron \
+            && /container/tool/add-service-available :ssl-tools :cron \
             && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
                nginx \
                php5-fpm
@@ -649,7 +650,7 @@ What it does:
 
     docker run osixia/light-baseimage:0.1.7 --help
     usage: run [-h] [-e] [-s] [-p] [-k] [--copy-service] [--keep-startup-env]
-           [--keepalived] [-l {none,error,warning,info,debug,trace}]
+           [--keepalive] [-l {none,error,warning,info,debug,trace}]
            [MAIN_COMMAND [MAIN_COMMAND ...]]
 
     Initialize the system.
@@ -667,12 +668,14 @@ What it does:
                             /container/run/startup.sh file(s)
       -p, --skip-process-files
                             Skip running container process file(s)
+      -f, --skip-finish-files
+                            Skip running container finish file(s)
       -k, --no-kill-all-on-exit
                             Don't kill all processes on the system upon exiting
       --copy-service        Copy /container/service to /container/run/service
       --keep-startup-env    Don't remove ('.yaml.startup', '.json.startup')
                             environment files after startup scripts
-      --keepalived          Keepalived container even if all process exited
+      --keepalive          Keep alive container even if all process exited
       -l {none,error,warning,info,debug,trace}, --loglevel {none,error,warning,info,debug,trace}
                             Log level (default: info)
 
