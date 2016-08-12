@@ -1,12 +1,14 @@
 # Changelog
 
-## 0.1.3
+## 0.1.4
   - Fix is_runit_installed check /usr/bin/sv instead of /sbin/runit #6
   - Upgrade cfssl 1.2.0
   - Add ssl-helper that allow certificate auto-renew and let choose
     certificate generator (cfssl-helper default, or jsonssl-helper)
   - Add jsonssl-helper that get certificates from a json file
 
+## 0.1.3
+  - Periodic update of debian experimental baseimage and packages
 
 ## 0.1.2
   - Fix --copy-service error if /container/run/service already exists
