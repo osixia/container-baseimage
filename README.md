@@ -74,7 +74,7 @@ So major features are:
  - Greats building tools to minimize the image number of layers and optimize image build.
  - Simple way to install services and multiple process image stacks (runit, cron, syslog-ng-core and logrotate) if needed.
  - Getting environment variables from **.yaml** and **.json** files.
- - Special environment files **.yaml.startup** and **.json.startup** deleted after image startup files first execution to keep the image setup secret.
+ - Special environment files **.startup.yaml** and **.startup.json** deleted after image startup files first execution to keep the image setup secret.
 
 
 ## Quick Start
@@ -231,18 +231,18 @@ We could already build and test this image but two more minutes to take advantag
 
 Let's create two files:
  - single-process-image/environment/default.yaml
- - single-process-image/environment/default.yaml.startup
+ - single-process-image/environment/default.startup.yaml
 
-File name *default*.yaml and *default*.yaml.startup can be changed as you want. Also in this example we are going to use yaml files but json files works too.
+File name *default*.yaml and *default*.startup.yaml can be changed as you want. Also in this example we are going to use yaml files but json files works too.
 
 ##### default.yaml
 default.yaml file define variables that can be used at any time in the container environment:
 
     WHO_AM_I: We are Anonymous. We are Legion. We do not forgive. We do not forget. Expect us.
 
-##### default.yaml.startup
-default.yaml.startup define variables that are only available during the container **first start** in **startup files**.
-\*.yaml.startup are deleted right after startup files are processed for the first time,
+##### default.startup.yaml
+default.startup.yaml define variables that are only available during the container **first start** in **startup files**.
+\*.startup.yaml are deleted right after startup files are processed for the first time,
 then all variables they contains will not be available in the container environment.
 
 This helps to keep the container configuration secret. If you don't care all environment variables can be defined in **default.yaml** and everything will work fine.
@@ -290,7 +290,7 @@ Inspect the output and you should see that the secret is present in startup scri
 > The secret is: The database password is Baw0unga!
 
 And the secret is not defined in the process:
-> \*\*\* Remove file /container/environment/99-default/default.yaml.startup [...]
+> \*\*\* Remove file /container/environment/99-default/default.startup.yaml [...]
 
 > \*\*\* Running /container/run/process/nginx/run...
 
@@ -316,13 +316,13 @@ Refresh [http://localhost:8080/](http://localhost:8080/) and you should see:
 ##### Overriding default environment files at run time:
 Let's create two new environment files:
   - single-process-image/test-custom-env/env.yaml
-  - single-process-image/test-custom-env/env.yaml.startup
+  - single-process-image/test-custom-env/env.startup.yaml
 
 env.yaml:
 
     WHO_AM_I: I'm bobby.
 
-env.yaml.startup:
+env.startup.yaml:
 
     FIRST_START_SETUP_ONLY_SECRET: The database password is KawaaahB0unga!!!
 
@@ -687,7 +687,7 @@ What it does:
                             /container/run/state directory before starting.
                             Usefull when 2 containers share /container/run
                             directory via volume.
-      --keep-startup-env    Don't remove ('.yaml.startup', '.json.startup')
+      --keep-startup-env    Don't remove ('.startup.yaml', '.startup.json')
                             environment files after startup scripts.
       --keepalive           Keep alive container if all startup files and process
                             exited without error.
@@ -721,7 +721,7 @@ After each time *run tool* runs a startup script, it resets its own environment 
 After all startup script *run tool* run /container/run/startup.sh if exists.
 
 ##### Process environment setup
-*Run tool* delete all .yaml.startup and .json.startup in /container/environment/* and clear the previous run environment (/container/run/environment is removed)
+*Run tool* delete all .startup.yaml and .startup.json in /container/environment/* and clear the previous run environment (/container/run/environment is removed)
 Then it takes all remaining file in /container/environment/* and import the variables values to the container environment.
 The container environment is then exported to /container/run/environment and in /container/run/environment.sh
 
