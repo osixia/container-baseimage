@@ -648,10 +648,12 @@ What it does:
 
 *Run tool* takes several options, to list them:
 
-    docker run osixia/light-baseimage:0.1.7 --help
-    usage: run [-h] [-e] [-s] [-p] [-k] [--copy-service] [--keep-startup-env]
-           [--keepalive] [-l {none,error,warning,info,debug,trace}]
-           [MAIN_COMMAND [MAIN_COMMAND ...]]
+    docker run osixia/ubuntu-light-baseimage:0.1.7 --help
+    usage: run [-h] [-e] [-s] [-p] [-f] [-o {startup,process,finish}] [-c COMMAND]
+               [-k] [--copy-service] [--wait-first-startup]
+               [--wait-state FILENAME] [--keep-startup-env] [--keepalive]
+               [--keepalive-force] [-l {none,error,warning,info,debug,trace}]
+               [MAIN_COMMAND [MAIN_COMMAND ...]]
 
     Initialize the system.
 
@@ -662,20 +664,34 @@ What it does:
     optional arguments:
       -h, --help            show this help message and exit
       -e, --skip-env-files  Skip getting environment values from environment
-                            file(s)
+                            file(s).
       -s, --skip-startup-files
                             Skip running /container/run/startup/* and
-                            /container/run/startup.sh file(s)
+                            /container/run/startup.sh file(s).
       -p, --skip-process-files
-                            Skip running container process file(s)
+                            Skip running container process file(s).
       -f, --skip-finish-files
-                            Skip running container finish file(s)
+                            Skip running container finish file(s).
+      -o {startup,process,finish}, --run-only {startup,process,finish}
+                            Run only this file type and ignore others.
+      -c COMMAND, --cmd COMMAND
+                            Run this command before startup files.
       -k, --no-kill-all-on-exit
-                            Don't kill all processes on the system upon exiting
+                            Don't kill all processes on the system upon exiting.
       --copy-service        Copy /container/service to /container/run/service
+      --wait-first-startup  Wait until the first startup is done before starting.
+                            Usefull when 2 containers share /container/run
+                            directory via volume.
+      --wait-state FILENAME
+                            Wait until the container state file exists in
+                            /container/run/state directory before starting.
+                            Usefull when 2 containers share /container/run
+                            directory via volume.
       --keep-startup-env    Don't remove ('.yaml.startup', '.json.startup')
-                            environment files after startup scripts
-      --keepalive          Keep alive container even if all process exited
+                            environment files after startup scripts.
+      --keepalive           Keep alive container if all startup files and process
+                            exited without error.
+      --keepalive-force     Keep alive container in all circonstancies.
       -l {none,error,warning,info,debug,trace}, --loglevel {none,error,warning,info,debug,trace}
                             Log level (default: info)
 

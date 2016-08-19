@@ -6,6 +6,10 @@
   - Add ssl-helper that allow certificate auto-renew and let choose
     certificate generator (cfssl-helper default, or jsonssl-helper)
   - Add jsonssl-helper that get certificates from a json file
+  - Add to the 'run' tool options --run-only, --wait-first-startup, --wait-state, --cmd
+   --keepalived becomes --keepalive-force,
+   --keepalive now only keep alive container if all startup files and process
+     exited without error.
 
 ## 0.1.6
   - Periodic update of ubuntu baseimage and packages

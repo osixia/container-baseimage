@@ -85,3 +85,5 @@ function stripPrefix() {
 
 shift
 $call "$@"
+
+exit 0

@@ -15,7 +15,6 @@ if os.path.isfile(SERVICE_DIR + os.sep + INSTALL_FILENAME):
     print("remove " + SERVICE_DIR + os.sep + INSTALL_FILENAME + "\n")
     os.remove(SERVICE_DIR + os.sep + INSTALL_FILENAME)
 
-
 # Process install script of services in /container/service
 for service in sorted(os.listdir(SERVICE_DIR)):
 
