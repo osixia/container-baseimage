@@ -25,9 +25,9 @@ IMPORT_FINISH_FILENAME="finish.sh"
 IMPORT_ENVIRONMENT_DIR="/container/environment"
 IMPORT_FIRST_STARTUP_ENVIRONMENT_DIR="/container/environment/startup"
 
-ENV_FILES_YAML_EXTENSIONS = ('.yaml', '.yaml.startup')
-ENV_FILES_JSON_EXTENSIONS = ('.json', '.json.startup')
-ENV_FILES_STARTUP_EXTENSIONS = ('.yaml.startup', '.json.startup')
+ENV_FILES_YAML_EXTENSIONS = ('.yaml', '.startup.yaml')
+ENV_FILES_JSON_EXTENSIONS = ('.json', '.startup.json')
+ENV_FILES_STARTUP_EXTENSIONS = ('.startup.yaml', '.startup.json')
 
 IMPORT_SERVICE_DIR="/container/service"
 
