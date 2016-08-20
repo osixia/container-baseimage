@@ -606,12 +606,6 @@ def container_had_startup_script():
 
 def run_startup_files(args):
 
-	if not container_had_startup_script():
-		return
-
-	if not args.skip_env_files:
-		set_startup_scripts_env()
-
 	# Run /container/run/startup/*
 	for name in listdir(RUN_STARTUP_DIR):
 		filename = RUN_STARTUP_DIR + os.sep + name
@@ -760,14 +754,14 @@ def wait_states(states):
 			pass
 		debug("Check file " + filename + " [Ok]")
 
-def run_startup_cmds(args):
+def run_cmds(args, when):
+	debug("Run commands before " + when + "...")
 	if len(args.cmds) > 0:
-		if not args.skip_env_files:
-			set_startup_scripts_env()
 
 		for cmd in args.cmds:
-			info("Running '"+cmd+"'...")
-			run_command_killable_and_import_run_envvars(cmd.split())
+			if (len(cmd) > 1 and cmd[1] == when) or (len(cmd) == 1 and when == "startup"):
+				info("Running '"+cmd[0]+"'...")
+				run_command_killable_and_import_run_envvars(cmd[0].split())
 
 def main(args):
 
@@ -778,9 +772,12 @@ def main(args):
 	wait_states(args.wait_states)
 	setup_run_directories(args)
 
-	run_startup_cmds(args)
+	if not args.skip_env_files:
+		set_startup_scripts_env()
 
-	if not args.skip_startup_files:
+	run_cmds(args,"startup")
+
+	if not args.skip_startup_files and container_had_startup_script():
 		run_startup_files(args)
 
 	state_set_startup_done()
@@ -788,6 +785,8 @@ def main(args):
 
 	if not args.skip_env_files:
 		set_process_env(args.keep_startup_env)
+
+	run_cmds(args,"process")
 
 	debug_env_dump()
 
@@ -818,9 +817,9 @@ parser.add_argument('-f', '--skip-finish-files', dest = 'skip_finish_files',
 	help = 'Skip running container finish file(s).')
 parser.add_argument('-o', '--run-only', type=str, choices=["startup","process","finish"], dest = 'run_only', default = None,
 	help = 'Run only this file type and ignore others.')
-parser.add_argument('-c', '--cmd', metavar = 'COMMAND', dest = 'cmds', type = str,
-	action = 'append', default=[],
-	help = 'Run this command before startup files.')
+parser.add_argument('-c', '--cmd', metavar=('COMMAND', 'WHEN={startup,process,finish}'), dest = 'cmds', type = str,
+	action = 'append', default = [], nargs = "+",
+	help = 'Run this command before WHEN file(s). Default before startup file(s).')
 parser.add_argument('-k', '--no-kill-all-on-exit', dest = 'kill_all_on_exit',
 	action = 'store_const', const = False, default = True,
 	help = 'Don\'t kill all processes on the system upon exiting.')
@@ -900,6 +899,8 @@ except KeyboardInterrupt:
 	exit(2)
 
 finally:
+
+	run_cmds(args,"finish")
 
 	# for multiple process images finish script are run by runit
 	if not args.skip_finish_files and not is_multiple_process_container():
