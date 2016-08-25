@@ -1,7 +1,5 @@
-#!/bin/sh
+#!/bin/sh -e
 log-helper level eq trace && set -x
-
-set -e
 
 # If /dev/log is either a named pipe or it was placed there accidentally,
 # e.g. because of the issue documented at https://github.com/phusion/baseimage-docker/pull/25,
