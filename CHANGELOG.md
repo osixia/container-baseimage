@@ -11,6 +11,7 @@
    --keepalive now only keep alive container if all startup files and process
      exited without error.
   - Change .yaml.startup and .json.startup files to .startup.yaml and .startup.json
+  - Fix logrotate config
 
 ## 0.2.4
   - Periodic update of debian baseimage and packages
