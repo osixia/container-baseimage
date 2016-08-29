@@ -1,0 +1,18 @@
+#!/bin/sh -e
+
+# wait startup to finish
+while ! test -f ${CONTAINER_STATE_DIR}/startup-done
+do
+  sleep 0.5
+done
+
+for process in "$@"
+do
+  # wait service
+  while ! ps cax | grep -c $process > /dev/null
+  do
+    sleep 0.5
+  done
+done
+
+exit 0

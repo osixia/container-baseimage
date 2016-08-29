@@ -14,7 +14,6 @@ The aims of this image is to be used as a base for your own Docker images. It's 
 
 Other base distribution are available:
 - [Debian](https://github.com/osixia/docker-light-baseimage) | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/)
-- [Debian Experimental](https://github.com/osixia/docker-light-baseimage/tree/experimental) | [Docker Hub](https://hub.docker.com/r/osixia/experimental-light-baseimage)
 
 Table of Contents
 - [Contributing](#contributing)

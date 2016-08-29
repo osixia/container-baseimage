@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/sh -ex
 
 ## Add bash tools to /sbin
 ln -s /container/tool/* /sbin/
@@ -18,10 +18,6 @@ export LC_ALL=C
 export DEBIAN_FRONTEND=noninteractive
 minimal_apt_get_install='apt-get install -y --no-install-recommends'
 
-## Temporarily disable dpkg fsync to make building faster.
-if [[ ! -e /etc/dpkg/dpkg.cfg.d/docker-apt-speedup ]]; then
-	echo force-unsafe-io > /etc/dpkg/dpkg.cfg.d/docker-apt-speedup
-fi
 
 ## Prevent initramfs updates from trying to run grub and lilo.
 ## https://journal.paul.querna.org/articles/2013/10/15/docker-ubuntu-on-rackspace/
@@ -56,9 +52,9 @@ $minimal_apt_get_install software-properties-common
 apt-get dist-upgrade -y --no-install-recommends
 
 # fix locale
-$minimal_apt_get_install language-pack-en
-locale-gen en_US
-update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
+locale-gen C.UTF-8
+dpkg-reconfigure locales
+/usr/sbin/update-locale LANG=C.UTF-8
 
 echo -n C.UTF-8 > /container/environment/LANG
 echo -n C.UTF-8 > /container/environment/LANGUAGE
