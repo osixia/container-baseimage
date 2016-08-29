@@ -13,7 +13,6 @@ A Debian based docker image to help you build reliable image quickly. This image
 The aims of this image is to be used as a base for your own Docker images. It's base on the awesome work of: [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
 
 Other base distribution are available:
- - [Debian Experimental](https://github.com/osixia/docker-light-baseimage/tree/experimental) | [Docker Hub](https://hub.docker.com/r/osixia/experimental-light-baseimage/)
  - [Ubuntu 14:04](https://github.com/osixia/docker-light-baseimage/tree/ubuntu) | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/)
 
 Table of Contents
