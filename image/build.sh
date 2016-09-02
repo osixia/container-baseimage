@@ -55,9 +55,9 @@ $minimal_apt_get_install language-pack-en
 locale-gen en_US
 update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
 
-echo -n en_US.UTF- > /container/environment/LANG
-echo -n en_US.UTF- > /container/environment/LANGUAGE
-echo -n en_US.UTF- > /container/environment/LC_CTYPE
+echo -n en_US.UTF-8 > /container/environment/LANG
+echo -n en_US.UTF-8 > /container/environment/LANGUAGE
+echo -n en_US.UTF-8 > /container/environment/LC_CTYPE
 
 # install PyYAML
 tar -C /container/file/ -xvf /container/file/PyYAML-3.11.tar.gz
