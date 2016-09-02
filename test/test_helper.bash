@@ -38,8 +38,8 @@ is_file_exists() {
   is_file_exists_by_cid $CONTAINER_ID $1
 }
 
-wait_service() {
-  wait_service_by_cid $CONTAINER_ID $@
+wait_process() {
+  wait_process_by_cid $CONTAINER_ID $@
 }
 
 
@@ -86,7 +86,7 @@ is_file_exists_by_cid() {
   docker exec $1 cat $2 > /dev/null 2>&1
 }
 
-wait_service_by_cid() {
+wait_process_by_cid() {
 
   cid=$1
 
