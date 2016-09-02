@@ -15,7 +15,6 @@ if os.path.isfile(SERVICE_DIR + os.sep + INSTALL_FILENAME):
     print("remove " + SERVICE_DIR + os.sep + INSTALL_FILENAME + "\n")
     os.remove(SERVICE_DIR + os.sep + INSTALL_FILENAME)
 
-
 # Process install script of services in /container/service
 for service in sorted(os.listdir(SERVICE_DIR)):
 
@@ -36,6 +35,7 @@ print(str(nb_process) + " process found.")
 if nb_process > 1:
     if not os.path.exists("/container/multiple_process_stack_added"):
         print("This image has multiple process.")
+        subprocess.call(["apt-get update"],shell=True)
         subprocess.call(["/container/tool/add-multiple-process-stack"],shell=True)
         print("For better image build process consider adding:")
         print("\"/container/tool/add-multiple-process-stack\" after an apt-get update in your Dockerfile.")

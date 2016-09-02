@@ -5,7 +5,7 @@
 
 [hub]: https://hub.docker.com/r/osixia/light-baseimage/
 
-Latest release: 0.2.4 -  [Changelog](CHANGELOG.md)
+Latest release: 0.2.5 -  [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
 
 A Debian based docker image to help you build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
@@ -13,7 +13,6 @@ A Debian based docker image to help you build reliable image quickly. This image
 The aims of this image is to be used as a base for your own Docker images. It's base on the awesome work of: [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
 
 Other base distribution are available:
- - [Debian Experimental](https://github.com/osixia/docker-light-baseimage/tree/experimental) | [Docker Hub](https://hub.docker.com/r/osixia/experimental-light-baseimage/)
  - [Ubuntu 14:04](https://github.com/osixia/docker-light-baseimage/tree/ubuntu) | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/)
 
 Table of Contents
@@ -74,7 +73,7 @@ So major features are:
  - Greats building tools to minimize the image number of layers and optimize image build.
  - Simple way to install services and multiple process image stacks (runit, cron, syslog-ng-core and logrotate) if needed.
  - Getting environment variables from **.yaml** and **.json** files.
- - Special environment files **.yaml.startup** and **.json.startup** deleted after image startup files first execution to keep the image setup secret.
+ - Special environment files **.startup.yaml** and **.startup.json** deleted after image startup files first execution to keep the image setup secret.
 
 
 ## Quick Start
@@ -101,6 +100,7 @@ This section define a service directory that can be added in /container/service 
 - **my-service/install.sh**: install script (not mandatory).
 - **my-service/startup.sh**: startup script to setup the service when the container start (not mandatory).
 - **my-service/process.sh**: process to run (not mandatory).
+- **my-service/finish.sh**: finish script run when the process script exit (not mandatory).
 - **my-service/...** add whatever you need!
 
 Ok that's pretty all to know to start building our first images!
@@ -141,7 +141,7 @@ In the Dockerfile we are going to:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.4
+        FROM osixia/light-baseimage:0.2.5
         MAINTAINER Your Name <your@name.com>
 
         # Download nginx from apt-get and clean apt-get files
@@ -230,18 +230,18 @@ We could already build and test this image but two more minutes to take advantag
 
 Let's create two files:
  - single-process-image/environment/default.yaml
- - single-process-image/environment/default.yaml.startup
+ - single-process-image/environment/default.startup.yaml
 
-File name *default*.yaml and *default*.yaml.startup can be changed as you want. Also in this example we are going to use yaml files but json files works too.
+File name *default*.yaml and *default*.startup.yaml can be changed as you want. Also in this example we are going to use yaml files but json files works too.
 
 ##### default.yaml
 default.yaml file define variables that can be used at any time in the container environment:
 
     WHO_AM_I: We are Anonymous. We are Legion. We do not forgive. We do not forget. Expect us.
 
-##### default.yaml.startup
-default.yaml.startup define variables that are only available during the container **first start** in **startup files**.
-\*.yaml.startup are deleted right after startup files are processed for the first time,
+##### default.startup.yaml
+default.startup.yaml define variables that are only available during the container **first start** in **startup files**.
+\*.startup.yaml are deleted right after startup files are processed for the first time,
 then all variables they contains will not be available in the container environment.
 
 This helps to keep the container configuration secret. If you don't care all environment variables can be defined in **default.yaml** and everything will work fine.
@@ -289,7 +289,7 @@ Inspect the output and you should see that the secret is present in startup scri
 > The secret is: The database password is Baw0unga!
 
 And the secret is not defined in the process:
-> \*\*\* Remove file /container/environment/99-default/default.yaml.startup [...]
+> \*\*\* Remove file /container/environment/99-default/default.startup.yaml [...]
 
 > \*\*\* Running /container/run/process/nginx/run...
 
@@ -315,13 +315,13 @@ Refresh [http://localhost:8080/](http://localhost:8080/) and you should see:
 ##### Overriding default environment files at run time:
 Let's create two new environment files:
   - single-process-image/test-custom-env/env.yaml
-  - single-process-image/test-custom-env/env.yaml.startup
+  - single-process-image/test-custom-env/env.startup.yaml
 
 env.yaml:
 
     WHO_AM_I: I'm bobby.
 
-env.yaml.startup:
+env.startup.yaml:
 
     FIRST_START_SETUP_ONLY_SECRET: The database password is KawaaahB0unga!!!
 
@@ -384,7 +384,7 @@ In the Dockerfile we are going to:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.4
+        FROM osixia/light-baseimage:0.2.5
         MAINTAINER Your Name <your@name.com>
 
         # Install multiple process stack, nginx and php5-fpm and clean apt-get files
@@ -513,7 +513,6 @@ So we have a container with two process supervised by runit running in our conta
 
 Single process images:
 - [osixia/openldap](https://github.com/osixia/docker-openldap)
-- [osixia/openldap-backup](https://github.com/osixia/docker-openldap-backup)
 - [osixia/keepalived](https://github.com/osixia/docker-keepalived)
 - [osixia/tinc](https://github.com/osixia/docker-tinc)
 - [osixia/registry-ldap-auth](https://github.com/osixia/docker-registry-ldap-auth)
@@ -522,6 +521,7 @@ Single process images:
 - [osixia/mmc-agent](https://github.com/osixia/docker-mmc-agent)
 
 Multiple process images:
+- [osixia/openldap-backup](https://github.com/osixia/docker-openldap-backup)
 - [osixia/mariadb](https://github.com/osixia/docker-mariadb)
 - [osixia/wordpress](https://github.com/osixia/docker-wordpress)
 - [osixia/roundcube](https://github.com/osixia/docker-roundcube)
@@ -560,7 +560,7 @@ All container tools are available in `/container/tool` directory and are linked 
 | :cron | Cron daemon. <br><br>*This service is part of the multiple-process-stack.*|
 | :syslog-ng-core | Syslog daemon so that many services - including the kernel itself - can correctly log to /var/log/syslog. If no syslog daemon is running, a lot of important messages are silently swallowed. <br><br>Only listens locally. All syslog messages are forwarded to "docker logs".<br><br>*This service is part of the multiple-process-stack.* |
 | :logrotate | Rotates and compresses logs on a regular basis. <br><br>*This service is part of the multiple-process-stack.*|
-| :cfssl | CFSSL is CloudFlare's PKI/TLS swiss army knife. It's a command line tool for signing, verifying, and bundling TLS certificates. <br><br>Comes with cfssl-helper tool that make it docker friendly by taking command line parameters from environment variables. |
+| :ssl-tools | Add CFSSL a CloudFlare PKI/TLS swiss army knife. It's a command line tool for signing, verifying, and bundling TLS certificates. Comes with cfssl-helper tool that make it docker friendly by taking command line parameters from environment variables. <br><br>Also add jsonssl-helper to get certificates from json files, parameters are set by environment variables. |
 
 
 ## Advanced User Guide
@@ -577,15 +577,15 @@ Here simple Dockerfile example how to add a service-available to an image:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.4
+        FROM osixia/light-baseimage:0.2.5
         MAINTAINER Your Name <your@name.com>
 
         # Add cfssl and cron service-available
         # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-service-available
-        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/service-available/:cfssl/download.sh
+        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/service-available/:ssl-tools/download.sh
         # https://github.com/osixia/docker-light-baseimage/blob/stable/image/service-available/:cron/download.sh
         RUN apt-get -y update \
-            && /container/tool/add-service-available :cfssl :cron \
+            && /container/tool/add-service-available :ssl-tools :cron \
             && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
                nginx \
                php5-fpm
@@ -647,10 +647,12 @@ What it does:
 
 *Run tool* takes several options, to list them:
 
-    docker run osixia/light-baseimage:0.2.4 --help
-    usage: run [-h] [-e] [-s] [-p] [-k] [--copy-service] [--keep-startup-env]
-           [--keepalived] [-l {none,error,warning,info,debug,trace}]
-           [MAIN_COMMAND [MAIN_COMMAND ...]]
+    docker run osixia/light-baseimage:0.2.5 --help
+    usage: run [-h] [-e] [-s] [-p] [-f] [-o {startup,process,finish}] [-c COMMAND]
+               [-k] [--copy-service] [--wait-first-startup]
+               [--wait-state FILENAME] [--keep-startup-env] [--keepalive]
+               [--keepalive-force] [-l {none,error,warning,info,debug,trace}]
+               [MAIN_COMMAND [MAIN_COMMAND ...]]
 
     Initialize the system.
 
@@ -661,18 +663,34 @@ What it does:
     optional arguments:
       -h, --help            show this help message and exit
       -e, --skip-env-files  Skip getting environment values from environment
-                            file(s)
+                            file(s).
       -s, --skip-startup-files
                             Skip running /container/run/startup/* and
-                            /container/run/startup.sh file(s)
+                            /container/run/startup.sh file(s).
       -p, --skip-process-files
-                            Skip running container process file(s)
+                            Skip running container process file(s).
+      -f, --skip-finish-files
+                            Skip running container finish file(s).
+      -o {startup,process,finish}, --run-only {startup,process,finish}
+                            Run only this file type and ignore others.
+      -c COMMAND, --cmd COMMAND
+                            Run this command before startup files.
       -k, --no-kill-all-on-exit
-                            Don't kill all processes on the system upon exiting
+                            Don't kill all processes on the system upon exiting.
       --copy-service        Copy /container/service to /container/run/service
-      --keep-startup-env    Don't remove ('.yaml.startup', '.json.startup')
-                            environment files after startup scripts
-      --keepalived          Keepalived container even if all process exited
+      --wait-first-startup  Wait until the first startup is done before starting.
+                            Usefull when 2 containers share /container/run
+                            directory via volume.
+      --wait-state FILENAME
+                            Wait until the container state file exists in
+                            /container/run/state directory before starting.
+                            Usefull when 2 containers share /container/run
+                            directory via volume.
+      --keep-startup-env    Don't remove ('.startup.yaml', '.startup.json')
+                            environment files after startup scripts.
+      --keepalive           Keep alive container if all startup files and process
+                            exited without error.
+      --keepalive-force     Keep alive container in all circonstancies.
       -l {none,error,warning,info,debug,trace}, --loglevel {none,error,warning,info,debug,trace}
                             Log level (default: info)
 
@@ -702,7 +720,7 @@ After each time *run tool* runs a startup script, it resets its own environment 
 After all startup script *run tool* run /container/run/startup.sh if exists.
 
 ##### Process environment setup
-*Run tool* delete all .yaml.startup and .json.startup in /container/environment/* and clear the previous run environment (/container/run/environment is removed)
+*Run tool* delete all .startup.yaml and .startup.json in /container/environment/* and clear the previous run environment (/container/run/environment is removed)
 Then it takes all remaining file in /container/environment/* and import the variables values to the container environment.
 The container environment is then exported to /container/run/environment and in /container/run/environment.sh
 
@@ -732,7 +750,7 @@ If a main command is set for example:
 If a main command is set *run tool* launch it otherwise bash is launched.
 Example:
 
-    docker run -it osixia/light-baseimage:0.2.4
+    docker run -it osixia/light-baseimage:0.2.5
 
 
 ##### Extra environment variables
@@ -808,8 +826,8 @@ Note this yaml definition:
 
 Can also be set by command line converted in python or json:
 
-    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:0.2.4 printenv
-    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:0.2.4 printenv
+    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:0.2.5 printenv
+    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:0.2.5 printenv
 
 ### Tests
 

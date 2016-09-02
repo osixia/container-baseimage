@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
 chmod 600 /etc/crontab
 
@@ -9,3 +9,5 @@ rm -f /etc/cron.daily/upstart
 rm -f /etc/cron.daily/dpkg
 rm -f /etc/cron.daily/password
 rm -f /etc/cron.weekly/fstrim
+
+exit 0
