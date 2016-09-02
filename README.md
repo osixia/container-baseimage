@@ -513,7 +513,6 @@ So we have a container with two process supervised by runit running in our conta
 
 Single process images:
 - [osixia/openldap](https://github.com/osixia/docker-openldap)
-- [osixia/openldap-backup](https://github.com/osixia/docker-openldap-backup)
 - [osixia/keepalived](https://github.com/osixia/docker-keepalived)
 - [osixia/tinc](https://github.com/osixia/docker-tinc)
 - [osixia/registry-ldap-auth](https://github.com/osixia/docker-registry-ldap-auth)
@@ -522,6 +521,7 @@ Single process images:
 - [osixia/mmc-agent](https://github.com/osixia/docker-mmc-agent)
 
 Multiple process images:
+- [osixia/openldap-backup](https://github.com/osixia/docker-openldap-backup)
 - [osixia/mariadb](https://github.com/osixia/docker-mariadb)
 - [osixia/wordpress](https://github.com/osixia/docker-wordpress)
 - [osixia/roundcube](https://github.com/osixia/docker-roundcube)
