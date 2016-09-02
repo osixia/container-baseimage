@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 log-helper level eq trace && set -x
 
 # prevent NUMBER OF HARD LINKS > 1 error
@@ -10,3 +10,5 @@ find /etc/cron.daily/ -exec touch {} \;
 find /etc/cron.hourly/ -exec touch {} \;
 find /etc/cron.monthly/ -exec touch {} \;
 find /etc/cron.weekly/ -exec touch {} \;
+
+exit 0

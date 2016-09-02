@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
 # download curl and ca-certificate from apt-get if needed
 to_install=""
@@ -27,3 +27,5 @@ chmod 700 /usr/sbin/cfssljson
 if [ -n "$to_install" ]; then
   apt-get remove -y --purge --auto-remove $to_install
 fi
+
+exit 0

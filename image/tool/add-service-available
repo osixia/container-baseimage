@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
 # Usage :
 # RUN /container/tool/add-service-available [service1] [service2] ...
