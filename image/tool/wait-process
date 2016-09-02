@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-source /container/run/environment.sh
+. /container/run/environment.sh
 
 # wait startup to finish
 while ! test -f ${CONTAINER_STATE_DIR}/startup-done
