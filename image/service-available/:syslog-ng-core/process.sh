@@ -9,7 +9,7 @@ if [ ! -S /var/lib/syslog-ng/syslog-ng.ctl ]; then rm -f /var/lib/syslog-ng/sysl
 
 SYSLOGNG_OPTS=""
 
-[ -r /etc/default/syslog-ng ] && . /etc/default/syslog-ng
+[ -r /etc/syslog-ng/syslog-ng ] && . /etc/syslog-ng/syslog-ng
 
 case "x$CONSOLE_LOG_LEVEL" in
   x[1-8])

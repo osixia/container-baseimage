@@ -133,57 +133,59 @@ Let's now create the nginx service directory:
 #### Dockerfile
 
 In the Dockerfile we are going to:
-  - Download nginx from apt-get.
+  - Download nginx from apk.
   - Add the service directory to the image.
   - Install service and clean up.
   - Add the environment directory to the image.
   - Define ports exposed and volumes if needed.
 
 
-        # Use osixia/alpine-light-baseimage
-        # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/alpine-light-baseimage:0.1.0
-        MAINTAINER Your Name <your@name.com>
+    # Use osixia/alpine-light-baseimage
+    # https://github.com/osixia/docker-light-baseimage
+    FROM osixia/alpine-light-baseimage:0.1.0
+    MAINTAINER Your Name <your@name.com>
 
-        # Download nginx from apt-get and clean apt-get files
-        RUN apt-get -y update \
-            && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-               nginx \
-            && apt-get clean \
-            && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    # Download nginx from apk and clean apk files
+    RUN apk update \
+        && apk add \
+           nginx \
+        && rm -rf /var/cache/apk/*
 
-        # Add service directory to /container/service
-        ADD service /container/service
+    # Add service directory to /container/service
+    ADD service /container/service
 
-        # Use baseimage install-service script
-        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
-        RUN /container/tool/install-service
+    # Use baseimage install-service script
+    # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
+    RUN /container/tool/install-service
 
-        # Add default env directory
-        ADD environment /container/environment/99-default
+    # Add default env directory
+    ADD environment /container/environment/99-default
 
-        # Set /var/www/ in a data volume
-        VOLUME /var/www/
+    # Set /var/www/ in a data volume
+    VOLUME /var/www/
 
-        # Expose default http and https ports
-        EXPOSE 80 443
+    # Expose default http and https ports
+    EXPOSE 80 443
 
 
-The Dockerfile contains directives to download nginx from apt-get but all the initial setup will take place in install.sh file (called by /container/tool/install-service tool) for a better build experience. The time consuming download task is decoupled from the initial setup to make great use of docker build cache. If install.sh file is changed the builder won't have to download again nginx, and will just run install scripts.
+The Dockerfile contains directives to download nginx from apk but all the initial setup will take place in install.sh file (called by /container/tool/install-service tool) for a better build experience. The time consuming download task is decoupled from the initial setup to make great use of docker build cache. If install.sh file is changed the builder won't have to download again nginx, and will just run install scripts.
 
 #### Service files
 
 ##### install.sh
 
-This file must only contain directives for the service initial setup. Files download and apt-get command takes place in the Dockerfile for a better image building experience (see [Dockerfile](#dockerfile)).
+This file must only contain directives for the service initial setup. Files download and apk command takes place in the Dockerfile for a better image building experience (see [Dockerfile](#dockerfile)).
 
 In this example, for the initial setup we just delete the default nginx debian index file and create a custom index.html:
 
     #!/bin/bash -e
     # this script is run during the image build
 
-    rm -rf /var/www/html/index.nginx-debian.html
-    echo "Hi!" > /var/www/html/index.html
+    mkdir -p /run/nginx
+
+    rm -rf /var/lib/nginx/html/index.html
+    echo "Hi!" > /var/lib/nginx/html/index.html
+
 
 Make sure install.sh can be executed (chmod +x install.sh).
 
@@ -201,11 +203,12 @@ For example at run time we would like to introduce ourselves so we will use an e
 
     # container first start
     if [ ! -e "$FIRST_START_DONE" ]; then
-      echo "I'm ${WHO_AM_I}."  >> /var/www/html/index.html
+      echo ${WHO_AM_I}  >> /var/lib/nginx/html/index.html
       touch $FIRST_START_DONE
     fi
 
     exit 0
+
 
 Make sure startup.sh can be executed (chmod +x startup.sh).
 
@@ -258,7 +261,7 @@ And try to get its value in **startup.sh** script:
 
     # container first start
     if [ ! -e "$FIRST_START_DONE" ]; then
-      echo ${WHO_AM_I}  >> /var/www/html/index.html
+      echo ${WHO_AM_I}  >> /var/lib/nginx/html/index.html
       touch $FIRST_START_DONE
     fi
 
@@ -376,7 +379,7 @@ Let's now create the nginx and php5-fpm directories:
 
 In the Dockerfile we are going to:
   - Add the multiple process stack
-  - Download nginx and php5-fpm from apt-get.
+  - Download nginx and php5-fpm from apk.
   - Add the service directory to the image.
   - Install service and clean up.
   - Add the environment directory to the image.

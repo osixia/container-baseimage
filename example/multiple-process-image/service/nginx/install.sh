@@ -1,5 +1,7 @@
 #!/bin/bash -e
 # this script is run during the image build
 
-rm -rf /var/www/html/index.nginx-debian.html
-echo "Hi!" > /var/www/html/index.html
+mkdir -p /run/nginx
+
+rm -rf /var/lib/nginx/html/index.html
+echo "Hi!" > /var/lib/nginx/html/index.html

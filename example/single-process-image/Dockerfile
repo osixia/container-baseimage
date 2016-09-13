@@ -3,12 +3,11 @@
 FROM osixia/alpine-light-baseimage:0.1.0
 MAINTAINER Your Name <your@name.com>
 
-# Download nginx from apt-get and clean apt-get files
-RUN apt-get -y update \
-    && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+# Download nginx from apk and clean apk files
+RUN apk update \
+    && apk add \
        nginx \
-   && apt-get clean \
-   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    && rm -rf /var/cache/apk/*
 
 # Add service directory to /container/service
 ADD service /container/service
