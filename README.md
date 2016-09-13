@@ -140,32 +140,32 @@ In the Dockerfile we are going to:
   - Define ports exposed and volumes if needed.
 
 
-    # Use osixia/alpine-light-baseimage
-    # https://github.com/osixia/docker-light-baseimage
-    FROM osixia/alpine-light-baseimage:0.1.0
-    MAINTAINER Your Name <your@name.com>
-
-    # Download nginx from apk and clean apk files
-    RUN apk update \
-        && apk add \
-           nginx \
-        && rm -rf /var/cache/apk/*
-
-    # Add service directory to /container/service
-    ADD service /container/service
-
-    # Use baseimage install-service script
-    # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
-    RUN /container/tool/install-service
-
-    # Add default env directory
-    ADD environment /container/environment/99-default
-
-    # Set /var/lib/nginx/html/ in a data volume
-    VOLUME /var/lib/nginx/html/
-
-    # Expose default http and https ports
-    EXPOSE 80 443
+	    # Use osixia/alpine-light-baseimage
+	    # https://github.com/osixia/docker-light-baseimage
+	    FROM osixia/alpine-light-baseimage:0.1.0
+	    MAINTAINER Your Name <your@name.com>
+	
+	    # Download nginx from apk and clean apk files
+	    RUN apk update \
+	        && apk add \
+	           nginx \
+	        && rm -rf /var/cache/apk/*
+	
+	    # Add service directory to /container/service
+	    ADD service /container/service
+	
+	    # Use baseimage install-service script
+	    # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
+	    RUN /container/tool/install-service
+	
+	    # Add default env directory
+	    ADD environment /container/environment/99-default
+	
+	    # Set /var/lib/nginx/html/ in a data volume
+	    VOLUME /var/lib/nginx/html/
+	
+	    # Expose default http and https ports
+	    EXPOSE 80 443
 
 
 The Dockerfile contains directives to download nginx from apk but all the initial setup will take place in install.sh file (called by /container/tool/install-service tool) for a better build experience. The time consuming download task is decoupled from the initial setup to make great use of docker build cache. If install.sh file is changed the builder won't have to download again nginx, and will just run install scripts.
@@ -386,35 +386,35 @@ In the Dockerfile we are going to:
   - Define ports exposed and volumes if needed.
 
 
-    # Use osixia/alpine-light-baseimage
-    # https://github.com/osixia/docker-light-baseimage
-    FROM osixia/alpine-light-baseimage:0.1.0
-    MAINTAINER Your Name <your@name.com>
-
-    # Install multiple process stack, nginx and php5-fpm and clean apk files
-    # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
-    RUN apk update \
-        && /container/tool/add-multiple-process-stack \
-        && apk add \
-           nginx \
-           php5-fpm \
-        && rm -rf /var/cache/apk/*
-
-    # Add service directory to /container/service
-    ADD service /container/service
-
-    # Use baseimage install-service script
-    # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
-    RUN /container/tool/install-service
-
-    # Add default env directory
-    ADD environment /container/environment/99-default
-
-    # Set /var/lib/nginx/html/ in a data volume
-    VOLUME /var/lib/nginx/html/
-
-    # Expose default http and https ports
-    EXPOSE 80 443
+	    # Use osixia/alpine-light-baseimage
+	    # https://github.com/osixia/docker-light-baseimage
+	    FROM osixia/alpine-light-baseimage:0.1.0
+	    MAINTAINER Your Name <your@name.com>
+	
+	    # Install multiple process stack, nginx and php5-fpm and clean apk files
+	    # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
+	    RUN apk update \
+	        && /container/tool/add-multiple-process-stack \
+	        && apk add \
+	           nginx \
+	           php5-fpm \
+	        && rm -rf /var/cache/apk/*
+	
+	    # Add service directory to /container/service
+	    ADD service /container/service
+	
+	    # Use baseimage install-service script
+	    # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
+	    RUN /container/tool/install-service
+	
+	    # Add default env directory
+	    ADD environment /container/environment/99-default
+	
+	    # Set /var/lib/nginx/html/ in a data volume
+	    VOLUME /var/lib/nginx/html/
+	
+	    # Expose default http and https ports
+	    EXPOSE 80 443
 
 The Dockerfile contains directives to download nginx and php5-fpm from apt-get but all the initial setup will take place in install.sh file (called by /container/tool/install-service tool) for a better build experience. The time consuming download task is decoupled from the initial setup to make great use of docker build cache. If an install.sh file is changed the builder will not have to download again nginx and php5-fpm add will just run install scripts.
 
