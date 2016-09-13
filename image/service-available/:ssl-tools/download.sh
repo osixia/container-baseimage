@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
 # download curl and ca-certificate from apt-get if needed
 to_install=""
@@ -15,16 +15,17 @@ if [ -n "$to_install" ]; then
   apk add $to_install
 fi
 
-# download libltdl-dev from apt-get
-apk add libltdl
+apk add openssl jq
 
-curl -o /usr/sbin/cfssl -SL https://github.com/osixia/cfssl/raw/master/bin/alpine/cfssl
+curl -o /usr/sbin/cfssl -SL https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
 chmod 700 /usr/sbin/cfssl
 
-curl -o /usr/sbin/cfssljson -SL https://github.com/osixia/cfssl/raw/master/bin/alpine/cfssljson
+curl -o /usr/sbin/cfssljson -SL https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
 chmod 700 /usr/sbin/cfssljson
 
 # remove tools installed to download cfssl
 if [ -n "$to_install" ]; then
   apk del --purge $to_install
 fi
+
+exit 0

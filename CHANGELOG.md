@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.2.5
+  - Fix is_runit_installed check /usr/bin/sv instead of /sbin/runit #6
+  - Upgrade cfssl 1.2.0
+  - Add ssl-helper that allow certificate auto-renew and let choose
+    certificate generator (cfssl-helper default, or jsonssl-helper)
+  - Add jsonssl-helper that get certificates from a json file
+  - Add to the 'run' tool options --run-only, --wait-first-startup, --wait-state, --cmd
+   --keepalived becomes --keepalive-force,
+   --keepalive now only keep alive container if all startup files and process
+     exited without error.
+  - Change .yaml.startup and .json.startup files to .startup.yaml and .startup.json
+  - Fix logrotate config
+
+## 0.2.4
+  - Periodic update of debian baseimage and packages
+
+## 0.2.3
+  - Periodic update of debian baseimage and packages
+
 ## 0.2.2
   - Fix --copy-service error if /container/run/service already exists
   - Fix /container/run/startup.sh file detection if no other startup files exists

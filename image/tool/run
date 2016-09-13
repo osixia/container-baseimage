@@ -18,15 +18,16 @@ log_level = None
 environ_backup = dict(os.environ)
 terminated_child_processes = {}
 
-IMPORT_PROCESS_FILENAME="process.sh"
 IMPORT_STARTUP_FILENAME="startup.sh"
+IMPORT_PROCESS_FILENAME="process.sh"
+IMPORT_FINISH_FILENAME="finish.sh"
 
 IMPORT_ENVIRONMENT_DIR="/container/environment"
 IMPORT_FIRST_STARTUP_ENVIRONMENT_DIR="/container/environment/startup"
 
-ENV_FILES_YAML_EXTENSIONS = ('.yaml', '.yaml.startup')
-ENV_FILES_JSON_EXTENSIONS = ('.json', '.json.startup')
-ENV_FILES_STARTUP_EXTENSIONS = ('.yaml.startup', '.json.startup')
+ENV_FILES_YAML_EXTENSIONS = ('.yaml', '.startup.yaml')
+ENV_FILES_JSON_EXTENSIONS = ('.json', '.startup.json')
+ENV_FILES_STARTUP_EXTENSIONS = ('.startup.yaml', '.startup.json')
 
 IMPORT_SERVICE_DIR="/container/service"
 
@@ -404,6 +405,17 @@ def setup_run_directories(args):
 						except OSError as detail:
 							warning('failed to link ' + d_path + os.sep + IMPORT_PROCESS_FILENAME + ' to ' + RUN_PROCESS_DIR + os.sep + d + os.sep + 'run : ' + xstr(detail))
 
+					if not args.skip_finish_files and is_exe(d_path + os.sep + IMPORT_FINISH_FILENAME):
+						info('link ' + d_path + os.sep + IMPORT_FINISH_FILENAME + ' to ' + RUN_PROCESS_DIR + os.sep + d + os.sep + 'finish')
+
+						if not os.path.exists(RUN_PROCESS_DIR + os.sep + d):
+							os.makedirs(RUN_PROCESS_DIR + os.sep + d)
+
+						try:
+							os.symlink(d_path + os.sep + IMPORT_FINISH_FILENAME, RUN_PROCESS_DIR + os.sep + d + os.sep + 'finish')
+						except OSError as detail:
+							warning('failed to link ' + d_path + os.sep + IMPORT_FINISH_FILENAME + ' to ' + RUN_PROCESS_DIR + os.sep + d + os.sep + 'finish : ' + xstr(detail))
+
 def set_dir_env():
 	if state_is_service_copied_to_run_dir():
 		os.environ[ENVIRONMENT_SERVICE_DIR_KEY] = RUN_SERVICE_DIR
@@ -462,7 +474,7 @@ def get_container_process():
 		return RUN_PROCESS_DIR + os.sep + p + os.sep + 'run'
 
 def is_runit_installed():
-	return os.path.exists('/sbin/runit')
+	return os.path.exists('/usr/bin/sv')
 
 _find_unsafe = re.compile(r'[^\w@%+=:,./-]').search
 
@@ -540,26 +552,25 @@ def stop_child_process(name, pid, signo = signal.SIGTERM, time_limit = KILL_PROC
 	finally:
 		signal.alarm(0)
 
-def run_command_killable(*argv):
-	filename = argv[0]
+def run_command_killable(command):
 	status = None
 	debug_env_dump()
-	pid = os.spawnvp(os.P_NOWAIT, filename, argv)
+	pid = os.spawnvp(os.P_NOWAIT, command[0], command)
 	try:
 		status = waitpid_reap_other_children(pid)
 	except BaseException as s:
 		warning("An error occurred. Aborting.")
-		stop_child_process(filename, pid)
+		stop_child_process(command[0], pid)
 		raise
 	if status != 0:
 		if status is None:
-			error("%s exited with unknown status\n" % filename)
+			error("%s exited with unknown status\n" % command[0])
 		else:
-			error("%s failed with status %d\n" % (filename, os.WEXITSTATUS(status)))
+			error("%s failed with status %d\n" % (command[0], os.WEXITSTATUS(status)))
 		sys.exit(1)
 
-def run_command_killable_and_import_run_envvars(*argv):
-	run_command_killable(*argv)
+def run_command_killable_and_import_run_envvars(command):
+	run_command_killable(command)
 	import_run_envvars()
 	export_run_envvars(False)
 
@@ -595,23 +606,17 @@ def container_had_startup_script():
 
 def run_startup_files(args):
 
-	if not container_had_startup_script():
-		return
-
-	if not args.skip_env_files:
-		set_startup_scripts_env()
-
 	# Run /container/run/startup/*
 	for name in listdir(RUN_STARTUP_DIR):
 		filename = RUN_STARTUP_DIR + os.sep + name
 		if is_exe(filename):
 			info("Running %s..." % filename)
-			run_command_killable_and_import_run_envvars(filename)
+			run_command_killable_and_import_run_envvars([filename])
 
 	# Run /container/run/startup.sh.
 	if is_exe(RUN_STARTUP_FINAL_FILE):
 		info("Running "+RUN_STARTUP_FINAL_FILE+"...")
-		run_command_killable_and_import_run_envvars(RUN_STARTUP_FINAL_FILE)
+		run_command_killable_and_import_run_envvars([RUN_STARTUP_FINAL_FILE])
 
 def wait_for_process_or_interrupt(pid):
 	try:
@@ -729,15 +734,50 @@ def run_no_process_container(args):
 	exit_status = run_foreground_process(args.main_command)
 	sys.exit(exit_status)
 
+def run_finish_files():
+
+	# iterate process dir to find finish files
+	for name in listdir(RUN_PROCESS_DIR):
+		filename = RUN_PROCESS_DIR + os.sep + name + os.sep + "finish"
+		if is_exe(filename):
+			info("Running %s..." % filename)
+			run_command_killable_and_import_run_envvars([filename])
+
+def wait_states(states):
+	for state in states:
+		filename = RUN_STATE_DIR + os.sep + state
+		info("Wait state: " + state)
+
+		while not os.path.exists(filename):
+			time.sleep(0.1)
+			debug("Check file " + filename)
+			pass
+		debug("Check file " + filename + " [Ok]")
+
+def run_cmds(args, when):
+	debug("Run commands before " + when + "...")
+	if len(args.cmds) > 0:
+
+		for cmd in args.cmds:
+			if (len(cmd) > 1 and cmd[1] == when) or (len(cmd) == 1 and when == "startup"):
+				info("Running '"+cmd[0]+"'...")
+				run_command_killable_and_import_run_envvars(cmd[0].split())
+
 def main(args):
 
 	info(ENVIRONMENT_LOG_LEVEL_KEY + " = " + xstr(log_level) + " (" + log_level_switcher_inv.get(log_level) + ")")
-
 	state_reset_startup_done()
-	setup_run_directories(args)
-	set_env_hostname_to_etc_hosts()
 
-	if not args.skip_startup_files:
+	set_env_hostname_to_etc_hosts()
+	wait_states(args.wait_states)
+	setup_run_directories(args)
+
+	if not args.skip_env_files:
+		set_startup_scripts_env()
+
+	run_cmds(args,"startup")
+
+	if not args.skip_startup_files and container_had_startup_script():
 		run_startup_files(args)
 
 	state_set_startup_done()
@@ -745,6 +785,8 @@ def main(args):
 
 	if not args.skip_env_files:
 		set_process_env(args.keep_startup_env)
+
+	run_cmds(args,"process")
 
 	debug_env_dump()
 
@@ -758,30 +800,47 @@ def main(args):
 		run_no_process_container(args)
 
 # Parse options.
-parser = argparse.ArgumentParser(description = 'Initialize the system.')
+parser = argparse.ArgumentParser(description = 'Initialize the system.', epilog='Osixia! Light Baseimage: https://github.com/osixia/docker-light-baseimage')
 parser.add_argument('main_command', metavar = 'MAIN_COMMAND', type = str, nargs = '*',
 	help = 'The main command to run, leave empty to only run container process.')
 parser.add_argument('-e', '--skip-env-files', dest = 'skip_env_files',
 	action = 'store_const', const = True, default = False,
-	help = 'Skip getting environment values from environment file(s)')
+	help = 'Skip getting environment values from environment file(s).')
 parser.add_argument('-s', '--skip-startup-files', dest = 'skip_startup_files',
 	action = 'store_const', const = True, default = False,
-	help = 'Skip running '+RUN_STARTUP_DIR+'/* and '+RUN_STARTUP_FINAL_FILE + ' file(s)')
+	help = 'Skip running '+RUN_STARTUP_DIR+'/* and '+RUN_STARTUP_FINAL_FILE + ' file(s).')
 parser.add_argument('-p', '--skip-process-files', dest = 'skip_process_files',
 	action = 'store_const', const = True, default = False,
-	help = 'Skip running container process file(s)')
+	help = 'Skip running container process file(s).')
+parser.add_argument('-f', '--skip-finish-files', dest = 'skip_finish_files',
+	action = 'store_const', const = True, default = False,
+	help = 'Skip running container finish file(s).')
+parser.add_argument('-o', '--run-only', type=str, choices=["startup","process","finish"], dest = 'run_only', default = None,
+	help = 'Run only this file type and ignore others.')
+parser.add_argument('-c', '--cmd', metavar=('COMMAND', 'WHEN={startup,process,finish}'), dest = 'cmds', type = str,
+	action = 'append', default = [], nargs = "+",
+	help = 'Run this command before WHEN file(s). Default before startup file(s).')
 parser.add_argument('-k', '--no-kill-all-on-exit', dest = 'kill_all_on_exit',
 	action = 'store_const', const = False, default = True,
-	help = 'Don\'t kill all processes on the system upon exiting')
+	help = 'Don\'t kill all processes on the system upon exiting.')
 parser.add_argument('--copy-service', dest = 'copy_service',
 	action = 'store_const', const = True, default = False,
 	help = 'Copy '+IMPORT_SERVICE_DIR+' to '+RUN_SERVICE_DIR)
+parser.add_argument('--wait-first-startup', dest = 'wait_first_startup',
+	action = 'store_const', const = True, default = False,
+	help = 'Wait until the first startup is done before starting. Usefull when 2 containers share '+RUN_DIR+' directory via volume.')
+parser.add_argument('--wait-state', metavar = 'FILENAME', dest = 'wait_states', type = str,
+	action = 'append', default=[],
+	help = 'Wait until the container state file exists in '+RUN_STATE_DIR+' directory before starting. Usefull when 2 containers share '+RUN_DIR+' directory via volume.')
 parser.add_argument('--keep-startup-env', dest = 'keep_startup_env',
 	action = 'store_const', const = True, default = False,
-	help = 'Don\'t remove ' + xstr(ENV_FILES_STARTUP_EXTENSIONS) + ' environment files after startup scripts')
-parser.add_argument('--keepalived', dest = 'keepalived',
+	help = 'Don\'t remove ' + xstr(ENV_FILES_STARTUP_EXTENSIONS) + ' environment files after startup scripts.')
+parser.add_argument('--keepalive', dest = 'keepalive',
 	action = 'store_const', const = True, default = False,
-	help = 'Keepalived container even if all process exited')
+	help = 'Keep alive container if all startup files and process exited without error.')
+parser.add_argument('--keepalive-force', dest = 'keepalive_force',
+	action = 'store_const', const = True, default = False,
+	help = 'Keep alive container in all circonstancies.')
 parser.add_argument('-l', '--loglevel', type=str, choices=["none","error","warning","info","debug","trace"], dest = 'log_level', default = "info",
 	help = 'Log level (default: info)')
 
@@ -791,9 +850,31 @@ log_level_switcher = {"none": LOG_LEVEL_NONE,"error": LOG_LEVEL_ERROR,"warning":
 log_level_switcher_inv = {LOG_LEVEL_NONE: "none",LOG_LEVEL_ERROR:"error",LOG_LEVEL_WARNING:"warning",LOG_LEVEL_INFO:"info",LOG_LEVEL_DEBUG:"debug",LOG_LEVEL_TRACE:"trace"}
 log_level = log_level_switcher.get(args.log_level)
 
-if args.skip_process_files and len(args.main_command) == 0:
-	error("When --skip-process-files is given, you must also pass a main command.")
-	sys.exit(1)
+# Run only arg
+if args.run_only != None:
+	if args.run_only == "startup" and args.skip_startup_files:
+		error("Error: When '--run-only startup' is set '--skip-startup-files' can't be set.")
+		sys.exit(1)
+	elif args.run_only == "process" and args.skip_startup_files:
+		error("Error: When '--run-only process' is set '--skip-process-files' can't be set.")
+		sys.exit(1)
+	elif args.run_only == "finish" and args.skip_startup_files:
+		error("Error: When '--run-only finish' is set '--skip-finish-files' can't be set.")
+		sys.exit(1)
+
+	if args.run_only == "startup":
+		args.skip_process_files = True
+		args.skip_finish_files = True
+	elif args.run_only == "process":
+		args.skip_startup_files = True
+		args.skip_finish_files = True
+	elif args.run_only == "finish":
+		args.skip_startup_files = True
+		args.skip_process_files = True
+
+# wait for startup args
+if args.wait_first_startup:
+	args.wait_states.insert(0, 'first-startup-done')
 
 # Run main function.
 signal.signal(signal.SIGTERM, lambda signum, frame: ignore_signals_and_raise_keyboard_interrupt('SIGTERM'))
@@ -803,19 +884,36 @@ signal.signal(signal.SIGALRM, lambda signum, frame: raise_alarm_exception())
 try:
 	main(args)
 
+except SystemExit as err:
+	if args.keepalive and err.code == 0:
+		try:
+			info("All process have exited without error, keep container alive...")
+			while True:
+				time.sleep(60)
+				pass
+		except:
+			info("Keep alive process ended.")
+
 except KeyboardInterrupt:
 	warning("Init system aborted.")
 	exit(2)
 
 finally:
 
-	if args.keepalived:
+	run_cmds(args,"finish")
+
+	# for multiple process images finish script are run by runit
+	if not args.skip_finish_files and not is_multiple_process_container():
+		run_finish_files()
+
+	if args.keepalive_force:
 		try:
-			info("All process have exited, keep container alived...")
+			info("All process have exited, keep container alive...")
 			while True:
+				time.sleep(60)
 				pass
 		except:
-			info("Keepalived process ended.")
+			info("Keep alive process ended.")
 
 	if args.kill_all_on_exit:
 		kill_all_processes(KILL_ALL_PROCESSES_TIMEOUT)

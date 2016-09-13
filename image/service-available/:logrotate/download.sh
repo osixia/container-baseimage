@@ -1,4 +1,6 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
 # download logrotate from apt-get
 apk add logrotate
+
+exit 0
