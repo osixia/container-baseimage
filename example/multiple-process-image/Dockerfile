@@ -22,8 +22,8 @@ RUN /container/tool/install-service
 # Add default env directory
 ADD environment /container/environment/99-default
 
-# Set /var/www/ in a data volume
-VOLUME /var/www/
+# Set /var/lib/nginx/html/ in a data volume
+VOLUME /var/lib/nginx/html/
 
 # Expose default http and https ports
 EXPOSE 80 443

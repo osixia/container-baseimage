@@ -161,8 +161,8 @@ In the Dockerfile we are going to:
     # Add default env directory
     ADD environment /container/environment/99-default
 
-    # Set /var/www/ in a data volume
-    VOLUME /var/www/
+    # Set /var/lib/nginx/html/ in a data volume
+    VOLUME /var/lib/nginx/html/
 
     # Expose default http and https ports
     EXPOSE 80 443
@@ -386,37 +386,35 @@ In the Dockerfile we are going to:
   - Define ports exposed and volumes if needed.
 
 
-        # Use osixia/alpine-light-baseimage
-        # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.1.0
-        MAINTAINER Your Name <your@name.com>
+    # Use osixia/alpine-light-baseimage
+    # https://github.com/osixia/docker-light-baseimage
+    FROM osixia/alpine-light-baseimage:0.1.0
+    MAINTAINER Your Name <your@name.com>
 
-        # Install multiple process stack, nginx and php5-fpm and clean apt-get files
-        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
-        RUN apt-get -y update \
-            && /container/tool/add-multiple-process-stack \
-            && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-               nginx \
-               php5-fpm \
-            && apt-get clean \
-            && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    # Install multiple process stack, nginx and php5-fpm and clean apk files
+    # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
+    RUN apk update \
+        && /container/tool/add-multiple-process-stack \
+        && apk add \
+           nginx \
+           php5-fpm \
+        && rm -rf /var/cache/apk/*
 
-        # Add service directory to /container/service
-        ADD service /container/service
+    # Add service directory to /container/service
+    ADD service /container/service
 
-        # Use baseimage install-service script
-        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
-        RUN /container/tool/install-service
+    # Use baseimage install-service script
+    # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
+    RUN /container/tool/install-service
 
-        # Add default env directory
-        ADD environment /container/environment/99-default
+    # Add default env directory
+    ADD environment /container/environment/99-default
 
-        # Set /var/www/ in a data volume
-        VOLUME /var/www/
+    # Set /var/lib/nginx/html/ in a data volume
+    VOLUME /var/lib/nginx/html/
 
-        # Expose default http and https ports
-        EXPOSE 80 443
-
+    # Expose default http and https ports
+    EXPOSE 80 443
 
 The Dockerfile contains directives to download nginx and php5-fpm from apt-get but all the initial setup will take place in install.sh file (called by /container/tool/install-service tool) for a better build experience. The time consuming download task is decoupled from the initial setup to make great use of docker build cache. If an install.sh file is changed the builder will not have to download again nginx and php5-fpm add will just run install scripts.
 
@@ -436,16 +434,22 @@ In this example, for the initial setup we set some php5-fpm default configuratio
     # this script is run during the image build
 
     # config
-    sed -i -e "s/expose_php = On/expose_php = Off/g" /etc/php5/fpm/php.ini
-    sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini
-    sed -i -e "s/;listen.owner = www-data/listen.owner = www-data/g" /etc/php5/fpm/pool.d/www.conf
-    sed -i -e "s/;listen.group = www-data/listen.group = www-data/g" /etc/php5/fpm/pool.d/www.conf
+    sed -i -e "s/expose_php = On/expose_php = Off/g" /etc/php5/php-fpm.conf
+    sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php5/php-fpm.conf
+    sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" /etc/php5/php-fpm.conf
+    sed -i -e "s/listen = 127.0.0.1:9000/listen = \/var\/run\/php5-fpm.sock/g" /etc/php5/php-fpm.conf
+    sed -i -e "s/;listen.owner = nobody/listen.owner = nginx/g" /etc/php5/php-fpm.conf
+    sed -i -e "s/;listen.group = nobody/listen.group = www-data/g" /etc/php5/php-fpm.conf
 
     # replace default website with php5-fpm default website
-    cp -f /container/service/php5-fpm/config/default /etc/nginx/sites-available/default
+    cp -f /container/service/php5-fpm/config/nginx.conf /etc/nginx/nginx.conf
 
     # create phpinfo.php
-    echo "<?php phpinfo(); " > /var/www/html/phpinfo.php
+    echo "<?php phpinfo(); " > /var/lib/nginx/html/phpinfo.php
+
+    # fix dir and files permissions
+    chmod 755 /var/lib/nginx/ /var/lib/nginx/html/
+    chmod 644 /var/lib/nginx/html/phpinfo.php
 
 
 Make sure install.sh can be executed (chmod +x install.sh).
@@ -463,35 +467,50 @@ Make sure process.sh can be executed (chmod +x process.sh).
 
 That why we run php5-fpm with `--nodaemonize"`
 
-##### config/default
+##### config/nginx.conf
 nginx server configuration:
 
-      server {
-      	listen 80 default_server;
-      	listen [::]:80 default_server;
+    worker_processes  1;
 
-      	root /var/www/html;
+    events {
+        worker_connections  1024;
+    }
 
-      	# Add index.php to the list if you are using PHP
-      	index index.html index.htm index.nginx-debian.html;
 
-      	server_name _;
+    http {
+        include       mime.types;
+        default_type  application/octet-stream;
 
-      	location / {
-      		# First attempt to serve request as file, then
-      		# as directory, then fall back to displaying a 404.
-      		try_files $uri $uri/ =404;
-      	}
+        sendfile        on;
 
-      	location ~ \.php$ {
-      		fastcgi_split_path_info ^(.+\.php)(/.+)$;
-      		# With php5-fpm:
-      		fastcgi_pass unix:/var/run/php5-fpm.sock;
-      		fastcgi_index index.php;
-      		include fastcgi_params;
-      		include fastcgi.conf;
-      	}
-      }
+        keepalive_timeout  65;
+
+        server {
+        	listen 80 default_server;
+        	listen [::]:80 default_server;
+
+        	root /var/lib/nginx/html;
+
+        	index index.html index.htm index.php;
+
+        	server_name _;
+
+        	location / {
+        		# First attempt to serve request as file, then
+        		# as directory, then fall back to displaying a 404.
+        		try_files $uri $uri/ =404;
+        	}
+
+          location ~ \.php$ {
+        		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        		# With php5-fpm:
+        		fastcgi_pass unix:/var/run/php5-fpm.sock;
+        		fastcgi_index index.php;
+        		include fastcgi_params;
+        		include fastcgi.conf;
+        	}
+        }
+    }
 
 That's it we have a multiple process image that run nginx and php5-fpm!
 
