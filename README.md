@@ -2,6 +2,7 @@
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/osixia/alpine-light-baseimage.svg)][hub]
 [![Docker Stars](https://img.shields.io/docker/stars/osixia/alpine-light-baseimage.svg)][hub]
+[![](https://images.microbadger.com/badges/image/osixia/alpine-light-baseimage.svg)](http://microbadger.com/images/osixia/alpine-light-baseimage "Get your own image badge on microbadger.com")
 
 [hub]: https://hub.docker.com/r/osixia/alpine-light-baseimage/
 
@@ -13,8 +14,8 @@ A Debian based docker image to help you build reliable image quickly. This image
 The aims of this image is to be used as a base for your own Docker images. It's base on the awesome work of: [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
 
 Other base distribution are available:
-- [Debian Jessie](https://github.com/osixia/docker-light-baseimage) | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/)
- - [Ubuntu 14:04](https://github.com/osixia/docker-light-baseimage/tree/ubuntu) | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/)
+- [Debian Jessie](https://github.com/osixia/docker-light-baseimage)  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) |  [![](https://images.microbadger.com/badges/image/osixia/light-baseimage.svg)](http://microbadger.com/images/osixia/light-baseimage "Get your own image badge on microbadger.com")
+- [Ubuntu 14:04](https://github.com/osixia/docker-light-baseimage/tree/ubuntu) | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/) |  [![](https://images.microbadger.com/badges/image/osixia/ubuntu-light-baseimage.svg)](http://microbadger.com/images/osixia/ubuntu-light-baseimage "Get your own image badge on microbadger.com")
 
 Table of Contents
 - [Contributing](#contributing)
@@ -144,26 +145,26 @@ In the Dockerfile we are going to:
 	    # https://github.com/osixia/docker-light-baseimage
 	    FROM osixia/alpine-light-baseimage:0.1.0
 	    MAINTAINER Your Name <your@name.com>
-	
+
 	    # Download nginx from apk and clean apk files
 	    RUN apk update \
 	        && apk add \
 	           nginx \
 	        && rm -rf /var/cache/apk/*
-	
+
 	    # Add service directory to /container/service
 	    ADD service /container/service
-	
+
 	    # Use baseimage install-service script
 	    # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
 	    RUN /container/tool/install-service
-	
+
 	    # Add default env directory
 	    ADD environment /container/environment/99-default
-	
+
 	    # Set /var/lib/nginx/html/ in a data volume
 	    VOLUME /var/lib/nginx/html/
-	
+
 	    # Expose default http and https ports
 	    EXPOSE 80 443
 
@@ -390,7 +391,7 @@ In the Dockerfile we are going to:
 	    # https://github.com/osixia/docker-light-baseimage
 	    FROM osixia/alpine-light-baseimage:0.1.0
 	    MAINTAINER Your Name <your@name.com>
-	
+
 	    # Install multiple process stack, nginx and php5-fpm and clean apk files
 	    # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
 	    RUN apk update \
@@ -399,20 +400,20 @@ In the Dockerfile we are going to:
 	           nginx \
 	           php5-fpm \
 	        && rm -rf /var/cache/apk/*
-	
+
 	    # Add service directory to /container/service
 	    ADD service /container/service
-	
+
 	    # Use baseimage install-service script
 	    # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
 	    RUN /container/tool/install-service
-	
+
 	    # Add default env directory
 	    ADD environment /container/environment/99-default
-	
+
 	    # Set /var/lib/nginx/html/ in a data volume
 	    VOLUME /var/lib/nginx/html/
-	
+
 	    # Expose default http and https ports
 	    EXPOSE 80 443
 
