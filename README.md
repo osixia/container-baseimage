@@ -6,7 +6,7 @@
 
 [hub]: https://hub.docker.com/r/osixia/alpine-light-baseimage/
 
-Latest release: 0.1.0 - beta -  [Changelog](CHANGELOG.md)
+Latest release: 0.1.0 - Beta -  [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/alpine-light-baseimage/) 
 
 A linux Alpine 3.4 based docker image to help you build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
