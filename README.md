@@ -9,7 +9,7 @@
 Latest release: 0.1.0 - Beta -  [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/alpine-light-baseimage/) 
 
-A linux Alpine 3.4 based docker image to help you build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
+A linux Alpine 3.4 based docker image to build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
 
 The aims of this image is to be used as a base for your own Docker images. It's base on the awesome work of: [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
 
@@ -41,7 +41,6 @@ Table of Contents
 - [Advanced User Guide](#advanced-user-guide)
 	- [Service available](#service-available)
 	- [Fix docker mounted file problems](#fix-docker-mounted-file-problems)
-  	- [Distribution packages documentation and locales](#distribution-packages-documentation-and-locales)
 	- [Mastering image tools](#mastering-image-tools)
 		- [run](#run)
             - [Run command line options](#run-command-line-options)
@@ -646,13 +645,6 @@ If *--copy-service* is used *CONTAINER_SERVICE_DIR=/container/run/service* other
 So to always apply sed on the correct file in the startup script the command becomes :
 
     sed -i "s|listen 80|listen 8080|g" ${CONTAINER_SERVICE_DIR}/php5-fpm/config/default
-
-
-### Distribution packages documentation and locales
-
-This image has a configuration to prevent documentation and locales to be installed from base distribution packages repositories to make it more lightweight as possible. If you need the doc and locales remove the following files :
-**/etc/dpkg/dpkg.cfg.d/01_nodoc** and **/etc/dpkg/dpkg.cfg.d/01_nolocales**
-
 
 ### Mastering image tools
 
