@@ -108,9 +108,8 @@ def set_env_hostname_to_etc_hosts():
 			with open('/etc/hostname', 'r') as f:
 				etc_hostname = f.readline().rstrip()
 
-			ip_address = socket.gethostbyname(etc_hostname)
-
 			if os.environ["HOSTNAME"] != etc_hostname:
+				ip_address = socket.gethostbyname(etc_hostname)
 				with open("/etc/hosts", "a") as myfile:
 					myfile.write(ip_address+" "+os.environ["HOSTNAME"]+"\n")
 	except:
@@ -768,7 +767,9 @@ def main(args):
 	info(ENVIRONMENT_LOG_LEVEL_KEY + " = " + xstr(log_level) + " (" + log_level_switcher_inv.get(log_level) + ")")
 	state_reset_startup_done()
 
-	set_env_hostname_to_etc_hosts()
+	if args.set_env_hostname_to_etc_hosts:
+		set_env_hostname_to_etc_hosts()
+
 	wait_states(args.wait_states)
 	setup_run_directories(args)
 
@@ -823,18 +824,21 @@ parser.add_argument('-c', '--cmd', metavar=('COMMAND', 'WHEN={startup,process,fi
 parser.add_argument('-k', '--no-kill-all-on-exit', dest = 'kill_all_on_exit',
 	action = 'store_const', const = False, default = True,
 	help = 'Don\'t kill all processes on the system upon exiting.')
-parser.add_argument('--copy-service', dest = 'copy_service',
-	action = 'store_const', const = True, default = False,
-	help = 'Copy '+IMPORT_SERVICE_DIR+' to '+RUN_SERVICE_DIR)
-parser.add_argument('--wait-first-startup', dest = 'wait_first_startup',
-	action = 'store_const', const = True, default = False,
-	help = 'Wait until the first startup is done before starting. Usefull when 2 containers share '+RUN_DIR+' directory via volume.')
 parser.add_argument('--wait-state', metavar = 'FILENAME', dest = 'wait_states', type = str,
 	action = 'append', default=[],
 	help = 'Wait until the container state file exists in '+RUN_STATE_DIR+' directory before starting. Usefull when 2 containers share '+RUN_DIR+' directory via volume.')
+parser.add_argument('--wait-first-startup', dest = 'wait_first_startup',
+	action = 'store_const', const = True, default = False,
+	help = 'Wait until the first startup is done before starting. Usefull when 2 containers share '+RUN_DIR+' directory via volume.')
 parser.add_argument('--keep-startup-env', dest = 'keep_startup_env',
 	action = 'store_const', const = True, default = False,
 	help = 'Don\'t remove ' + xstr(ENV_FILES_STARTUP_EXTENSIONS) + ' environment files after startup scripts.')
+parser.add_argument('--copy-service', dest = 'copy_service',
+	action = 'store_const', const = True, default = False,
+	help = 'Copy '+IMPORT_SERVICE_DIR+' to '+RUN_SERVICE_DIR+'. Help to fix docker mounted files problems.')
+parser.add_argument('--dont-touch-etc-hosts', dest = 'set_env_hostname_to_etc_hosts',
+	action = 'store_const', const = False, default = True,
+	help = 'Don\'t add in /etc/hosts a line with the container ip and $HOSTNAME environment variable value.')
 parser.add_argument('--keepalive', dest = 'keepalive',
 	action = 'store_const', const = True, default = False,
 	help = 'Keep alive container if all startup files and process exited without error.')
