@@ -206,8 +206,8 @@ elif [ ! -e "$CERT_FILE" ]; then
   exit 1
 else
   log-helper debug "Files $CERT_FILE and $KEY_FILE exists, fix files permissions"
-  chmod 644 $CERT_FILE || true
-  chmod 600 $KEY_FILE || true
+  chmod 644 $CERT_FILE
+  chmod 600 $KEY_FILE
 fi
 
 exit 0
