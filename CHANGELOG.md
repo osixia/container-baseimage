@@ -2,6 +2,7 @@
 
 ## 0.2.6
   - Add to the 'run' tool option --dont-touch-etc-hosts Don't add in /etc/hosts a line with the container ip and $HOSTNAME environment variable value.
+  - Fix wait-process script
 
 ## 0.2.5
   - Fix is_runit_installed check /usr/bin/sv instead of /sbin/runit #6
