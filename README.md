@@ -6,7 +6,7 @@
 
 [hub]: https://hub.docker.com/r/osixia/light-baseimage/
 
-Latest release: 0.2.5 -  [Changelog](CHANGELOG.md)
+Latest release: 0.2.6 -  [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
 
 A Debian Jessie based docker image to build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
@@ -143,7 +143,7 @@ In the Dockerfile we are going to:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.5
+        FROM osixia/light-baseimage:0.2.6
         MAINTAINER Your Name <your@name.com>
 
         # Download nginx from apt-get and clean apt-get files
@@ -386,7 +386,7 @@ In the Dockerfile we are going to:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.5
+        FROM osixia/light-baseimage:0.2.6
         MAINTAINER Your Name <your@name.com>
 
         # Install multiple process stack, nginx and php5-fpm and clean apt-get files
@@ -519,6 +519,7 @@ Single process images:
 - [osixia/tinc](https://github.com/osixia/docker-tinc)
 - [osixia/registry-ldap-auth](https://github.com/osixia/docker-registry-ldap-auth)
 - [osixia/cfssl-multirootca](https://github.com/osixia/docker-cfssl-multirootca)
+- [osixia/backup](https://github.com/osixia/docker-backup)
 - [osixia/backup-manager](https://github.com/osixia/docker-backup-manager)
 - [osixia/mmc-agent](https://github.com/osixia/docker-mmc-agent)
 
@@ -527,13 +528,17 @@ Multiple process images:
 - [osixia/mariadb](https://github.com/osixia/docker-mariadb)
 - [osixia/wordpress](https://github.com/osixia/docker-wordpress)
 - [osixia/roundcube](https://github.com/osixia/docker-roundcube)
+- [osixia/piwik](https://github.com/osixia/docker-piwik)
 - [osixia/phpMyAdmin](https://github.com/osixia/docker-phpMyAdmin)
 - [osixia/phpLDAPadmin](https://github.com/osixia/docker-phpLDAPadmin)
-- [osixia/kubernetes-reverseproxy](https://github.com/osixia/kubernetes-reverseproxy)
 - [osixia/keepalived-confd](https://github.com/osixia/docker-keepalived-confd)
 - [osixia/tinc-etcd](https://github.com/osixia/docker-tinc-etcd)
+- [osixia/postfix-gateway-confd](https://github.com/osixia/docker-postfix-gateway-confd)
 - [osixia/mmc-mail](https://github.com/osixia/docker-mmc-mail)
 - [osixia/mmc-web](https://github.com/osixia/docker-mmc-web)
+
+Image adding light-baseimage tools to an existing image
+- [osixia/gitlab](https://github.com/osixia/docker-gitlab)
 
 Send me a message to add your image in this list.
 
@@ -579,7 +584,7 @@ Here simple Dockerfile example how to add a service-available to an image:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.2.5
+        FROM osixia/light-baseimage:0.2.6
         MAINTAINER Your Name <your@name.com>
 
         # Add cfssl and cron service-available
@@ -649,10 +654,11 @@ What it does:
 
 *Run tool* takes several options, to list them:
 
-    docker run osixia/light-baseimage:0.2.5 --help
-    usage: run [-h] [-e] [-s] [-p] [-f] [-o {startup,process,finish}] [-c COMMAND]
-               [-k] [--copy-service] [--wait-first-startup]
-               [--wait-state FILENAME] [--keep-startup-env] [--keepalive]
+    docker run osixia/light-baseimage:0.2.6 --help
+    usage: run [-h] [-e] [-s] [-p] [-f] [-o {startup,process,finish}]
+               [-c COMMAND [WHEN={startup,process,finish} ...]] [-k]
+               [--wait-state FILENAME] [--wait-first-startup] [--keep-startup-env]
+               [--copy-service] [--dont-touch-etc-hosts] [--keepalive]
                [--keepalive-force] [-l {none,error,warning,info,debug,trace}]
                [MAIN_COMMAND [MAIN_COMMAND ...]]
 
@@ -675,26 +681,33 @@ What it does:
                             Skip running container finish file(s).
       -o {startup,process,finish}, --run-only {startup,process,finish}
                             Run only this file type and ignore others.
-      -c COMMAND, --cmd COMMAND
-                            Run this command before startup files.
+      -c COMMAND [WHEN={startup,process,finish} ...], --cmd COMMAND [WHEN={startup,process,finish} ...]
+                            Run this command before WHEN file(s). Default before
+                            startup file(s).
       -k, --no-kill-all-on-exit
                             Don't kill all processes on the system upon exiting.
-      --copy-service        Copy /container/service to /container/run/service
-      --wait-first-startup  Wait until the first startup is done before starting.
-                            Usefull when 2 containers share /container/run
-                            directory via volume.
       --wait-state FILENAME
                             Wait until the container state file exists in
                             /container/run/state directory before starting.
                             Usefull when 2 containers share /container/run
                             directory via volume.
+      --wait-first-startup  Wait until the first startup is done before starting.
+                            Usefull when 2 containers share /container/run
+                            directory via volume.
       --keep-startup-env    Don't remove ('.startup.yaml', '.startup.json')
                             environment files after startup scripts.
+      --copy-service        Copy /container/service to /container/run/service.
+                            Help to fix docker mounted files problems.
+      --dont-touch-etc-hosts
+                            Don't add in /etc/hosts a line with the container ip
+                            and $HOSTNAME environment variable value.
       --keepalive           Keep alive container if all startup files and process
                             exited without error.
       --keepalive-force     Keep alive container in all circonstancies.
       -l {none,error,warning,info,debug,trace}, --loglevel {none,error,warning,info,debug,trace}
                             Log level (default: info)
+
+    Osixia! Light Baseimage: https://github.com/osixia/docker-light-baseimage
 
 
 ##### Run directory setup
@@ -752,7 +765,7 @@ If a main command is set for example:
 If a main command is set *run tool* launch it otherwise bash is launched.
 Example:
 
-    docker run -it osixia/light-baseimage:0.2.5
+    docker run -it osixia/light-baseimage:0.2.6
 
 
 ##### Extra environment variables
@@ -828,8 +841,8 @@ Note this yaml definition:
 
 Can also be set by command line converted in python or json:
 
-    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:0.2.5 printenv
-    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:0.2.5 printenv
+    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:0.2.6 printenv
+    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:0.2.6 printenv
 
 ### Tests
 
