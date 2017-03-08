@@ -3,13 +3,8 @@
 # download curl and ca-certificate from apt-get if needed
 to_install=""
 
-if [ $(dpkg-query -W -f='${Status}' curl 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-  to_install="curl"
-fi
-
-if [ $(dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-  to_install="$to_install ca-certificates"
-fi
+apk info curl || to_install="curl"
+apk info ca-certificates || to_install="$to_install ca-certificates"
 
 if [ -n "$to_install" ]; then
   apk add $to_install
