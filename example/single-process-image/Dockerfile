@@ -1,6 +1,6 @@
 # Use osixia/alpine-light-baseimage
 # https://github.com/osixia/docker-light-baseimage
-FROM osixia/alpine-light-baseimage:0.1.1
+FROM osixia/alpine-light-baseimage:0.1.2
 MAINTAINER Your Name <your@name.com>
 
 # Download nginx from apk and clean apk files
@@ -13,7 +13,7 @@ RUN apk update \
 ADD service /container/service
 
 # Use baseimage install-service script
-# https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
+# https://github.com/osixia/docker-light-baseimage/blob/alpine/image/tool/install-service
 RUN /container/tool/install-service
 
 # Add default env directory

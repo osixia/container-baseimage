@@ -3,8 +3,8 @@
 # download curl and ca-certificate from apt-get if needed
 to_install=""
 
-apk info curl || to_install="curl"
-apk info ca-certificates || to_install="$to_install ca-certificates"
+apk info | grep -q curl || to_install="curl"
+apk info | grep -q ca-certificates || to_install="$to_install ca-certificates"
 
 if [ -n "$to_install" ]; then
   apk add $to_install

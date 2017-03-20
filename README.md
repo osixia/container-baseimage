@@ -6,7 +6,7 @@
 
 [hub]: https://hub.docker.com/r/osixia/alpine-light-baseimage/
 
-Latest release: 0.1.1 - Beta -  [Changelog](CHANGELOG.md)
+Latest release: 0.1.2 - Beta -  [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/alpine-light-baseimage/) 
 
 A linux Alpine 3.4 based docker image to build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
@@ -142,7 +142,7 @@ In the Dockerfile we are going to:
 
 	    # Use osixia/alpine-light-baseimage
 	    # https://github.com/osixia/docker-light-baseimage
-	    FROM osixia/alpine-light-baseimage:0.1.1
+	    FROM osixia/alpine-light-baseimage:0.1.2
 	    MAINTAINER Your Name <your@name.com>
 
 	    # Download nginx from apk and clean apk files
@@ -155,7 +155,7 @@ In the Dockerfile we are going to:
 	    ADD service /container/service
 
 	    # Use baseimage install-service script
-	    # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
+	    # https://github.com/osixia/docker-light-baseimage/blob/alpine/image/tool/install-service
 	    RUN /container/tool/install-service
 
 	    # Add default env directory
@@ -388,11 +388,11 @@ In the Dockerfile we are going to:
 
 	    # Use osixia/alpine-light-baseimage
 	    # https://github.com/osixia/docker-light-baseimage
-	    FROM osixia/alpine-light-baseimage:0.1.1
+	    FROM osixia/alpine-light-baseimage:0.1.2
 	    MAINTAINER Your Name <your@name.com>
 
 	    # Install multiple process stack, nginx and php5-fpm and clean apk files
-	    # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
+	    # https://github.com/osixia/docker-light-baseimage/blob/alpine/image/tool/add-multiple-process-stack
 	    RUN apk update \
 	        && /container/tool/add-multiple-process-stack \
 	        && apk add \
@@ -404,7 +404,7 @@ In the Dockerfile we are going to:
 	    ADD service /container/service
 
 	    # Use baseimage install-service script
-	    # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
+	    # https://github.com/osixia/docker-light-baseimage/blob/alpine/image/tool/install-service
 	    RUN /container/tool/install-service
 
 	    # Add default env directory
@@ -605,13 +605,13 @@ Here simple Dockerfile example how to add a service-available to an image:
 
         # Use osixia/alpine-light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:0.1.1
+        FROM osixia/light-baseimage:0.1.2
         MAINTAINER Your Name <your@name.com>
 
         # Add cfssl and cron service-available
-        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-service-available
-        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/service-available/:ssl-tools/download.sh
-        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/service-available/:cron/download.sh
+        # https://github.com/osixia/docker-light-baseimage/blob/alpine/image/tool/add-service-available
+        # https://github.com/osixia/docker-light-baseimage/blob/alpine/image/service-available/:ssl-tools/download.sh
+        # https://github.com/osixia/docker-light-baseimage/blob/alpine/image/service-available/:cron/download.sh
         RUN apt-get -y update \
             && /container/tool/add-service-available :ssl-tools :cron \
             && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -668,7 +668,7 @@ What it does:
 
 *Run tool* takes several options, to list them:
 
-    docker run osixia/alpine-light-baseimage:0.1.1 --help
+    docker run osixia/alpine-light-baseimage:0.1.2 --help
     usage: run [-h] [-e] [-s] [-p] [-f] [-o {startup,process,finish}]
                [-c COMMAND [WHEN={startup,process,finish} ...]] [-k]
                [--wait-state FILENAME] [--wait-first-startup] [--keep-startup-env]
@@ -779,7 +779,7 @@ If a main command is set for example:
 If a main command is set *run tool* launch it otherwise bash is launched.
 Example:
 
-    docker run -it osixia/alpine-light-baseimage:0.1.1
+    docker run -it osixia/alpine-light-baseimage:0.1.2
 
 
 ##### Extra environment variables
@@ -855,8 +855,8 @@ Note this yaml definition:
 
 Can also be set by command line converted in python or json:
 
-    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/alpine-light-baseimage:0.1.1 printenv
-    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/alpine-light-baseimage:0.1.1 printenv
+    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/alpine-light-baseimage:0.1.2 printenv
+    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/alpine-light-baseimage:0.1.2 printenv
 
 ### Tests
 
