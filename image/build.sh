@@ -45,9 +45,9 @@ $MINIMAL_APT_GET_INSTALL apt-utils python locales
 apt-get dist-upgrade -y --no-install-recommends
 
 # fix locale
-locale-gen en_US.UTF-8
-dpkg-reconfigure locales
-/usr/sbin/update-locale LANG=en_US.UTF-8
+echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+locale-gen en_US
+update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
 
 echo -n en_US.UTF-8 > /container/environment/LANG
 echo -n en_US.UTF-8 > /container/environment/LANGUAGE
