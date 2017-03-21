@@ -1,5 +1,5 @@
 NAME = osixia/light-baseimage
-VERSION = 0.2.6
+VERSION = 0.2.7
 
 .PHONY: all build build-nocache test tag_latest release
 

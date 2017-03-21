@@ -45,13 +45,13 @@ $MINIMAL_APT_GET_INSTALL apt-utils python locales
 apt-get dist-upgrade -y --no-install-recommends
 
 # fix locale
-locale-gen C.UTF-8
+locale-gen en_US.UTF-8
 dpkg-reconfigure locales
-/usr/sbin/update-locale LANG=C.UTF-8
+/usr/sbin/update-locale LANG=en_US.UTF-8
 
-echo -n C.UTF-8 > /container/environment/LANG
-echo -n C.UTF-8 > /container/environment/LANGUAGE
-echo -n C.UTF-8 > /container/environment/LC_CTYPE
+echo -n en_US.UTF-8 > /container/environment/LANG
+echo -n en_US.UTF-8 > /container/environment/LANGUAGE
+echo -n en_US.UTF-8 > /container/environment/LC_CTYPE
 
 # install PyYAML
 tar -C /container/file/ -xvf /container/file/PyYAML-3.11.tar.gz
