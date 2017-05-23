@@ -1,4 +1,6 @@
 #!/usr/bin/python -u
+# -*- coding: utf-8 -*-
+
 import os, os.path, sys, stat, signal, errno, argparse, time, json, re, yaml, ast, socket, shutil, pwd, grp
 
 KILL_PROCESS_TIMEOUT = int(os.environ.get('KILL_PROCESS_TIMEOUT', 5))
@@ -48,7 +50,7 @@ class AlarmException(Exception):
 	pass
 
 def error(message):
-	if log_level >= LOG_LEVEL_ERROR:
+  	if log_level >= LOG_LEVEL_ERROR:
 		sys.stderr.write("*** %s\n" % message)
 
 def warning(message):
@@ -198,7 +200,7 @@ def generic_import_envvars(path, override_existing_environment):
 			trace("import " + name + " from " + filePath + " --- ")
 
 	for name, value in new_env.items():
-		if override_existing_environment or not name in os.environ:
+		if override_existing_environment or name not in os.environ:
 			os.environ[name] = value
 			trace("set : " + name + " = "+ os.environ[name])
 		else:
@@ -231,12 +233,12 @@ def export_run_envvars(to_dir = True):
 	trace("export "+RUN_ENVIRONMENT_FILE_EXPORT+" --- ")
 
 def create_run_envvars():
-		set_dir_env()
-		set_log_level_env()
-		import_envvars()
-		import_env_files()
-		decode_envvars()
-		export_run_envvars()
+	set_dir_env()
+	set_log_level_env()
+	import_envvars()
+	import_env_files()
+	decode_envvars()
+	export_run_envvars()
 
 def clear_run_envvars():
 	try:
@@ -557,7 +559,7 @@ def run_command_killable(command):
 	pid = os.spawnvp(os.P_NOWAIT, command[0], command)
 	try:
 		status = waitpid_reap_other_children(pid)
-	except BaseException as s:
+	except BaseException:
 		warning("An error occurred. Aborting.")
 		stop_child_process(command[0], pid)
 		raise
@@ -674,7 +676,7 @@ def run_foreground_process(command):
 	except KeyboardInterrupt:
 		stop_child_process(command[0], pid)
 		raise
-	except BaseException as s:
+	except BaseException:
 		warning("An error occurred. Aborting.")
 		stop_child_process(command[0], pid)
 		raise

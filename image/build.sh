@@ -42,7 +42,7 @@ ln -sf /bin/true /usr/bin/ischroot
 $MINIMAL_APT_GET_INSTALL apt-utils python locales
 
 ## Upgrade all packages.
-apt-get dist-upgrade -y --no-install-recommends
+apt-get dist-upgrade -y --no-install-recommends -o Dpkg::Options::="--force-confold"
 
 # fix locale
 echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
