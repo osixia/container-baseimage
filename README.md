@@ -209,7 +209,6 @@ For example at run time we would like to introduce ourselves so we will use an e
 
     exit 0
 
-
 Make sure startup.sh can be executed (chmod +x startup.sh).
 
 As you can see we use CONTAINER_STATE_DIR variable, it contains the directory where container state is saved, this variable is automatically set by run tool. Refer to the [Advanced User Guide](#extra-environment-variables) for more information.
