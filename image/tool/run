@@ -475,7 +475,7 @@ def get_container_process():
 		return RUN_PROCESS_DIR + os.sep + p + os.sep + 'run'
 
 def is_runit_installed():
-	return os.path.exists('/usr/bin/sv')
+	return os.path.exists('/sbin/sv')
 
 _find_unsafe = re.compile(r'[^\w@%+=:,./-]').search
 
@@ -685,13 +685,13 @@ def run_foreground_process(command):
 
 def shutdown_runit_services():
 	debug("Begin shutting down runit services...")
-	os.system("/usr/bin/sv -w %d down "+RUN_PROCESS_DIR+"/* > /dev/null" % KILL_PROCESS_TIMEOUT)
+	os.system("/sbin/sv -w %d down "+RUN_PROCESS_DIR+"/* > /dev/null" % KILL_PROCESS_TIMEOUT)
 
 def wait_for_runit_services():
 	debug("Waiting for runit services to exit...")
 	done = False
 	while not done:
-		done = os.system("/usr/bin/sv status "+RUN_PROCESS_DIR+"/* | grep -q '^run:'") != 0
+		done = os.system("/sbin/sv status "+RUN_PROCESS_DIR+"/* | grep -q '^run:'") != 0
 		if not done:
 			time.sleep(0.1)
 			shutdown_runit_services()
@@ -705,7 +705,7 @@ def run_multiple_process_container(args):
 	background_process_pid=None
 
 	try:
-		runit_command=["/usr/bin/runsvdir", "-P", RUN_PROCESS_DIR]
+		runit_command=["/sbin/runsvdir", "-P", RUN_PROCESS_DIR]
 		background_process_pid, background_process_exited, exit_status = run_process(args, "runit daemon", runit_command)
 
 		sys.exit(exit_status)
