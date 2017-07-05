@@ -39,7 +39,7 @@ dpkg-divert --local --rename --add /usr/bin/ischroot
 ln -sf /bin/true /usr/bin/ischroot
 
 ## Install apt-utils.
-$MINIMAL_APT_GET_INSTALL apt-utils python locales
+$MINIMAL_APT_GET_INSTALL apt-utils python-minimal locales python-yaml
 
 ## Upgrade all packages.
 apt-get dist-upgrade -y --no-install-recommends -o Dpkg::Options::="--force-confold"
@@ -52,12 +52,6 @@ update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
 echo -n en_US.UTF-8 > /container/environment/LANG
 echo -n en_US.UTF-8 > /container/environment/LANGUAGE
 echo -n en_US.UTF-8 > /container/environment/LC_CTYPE
-
-# install PyYAML
-tar -C /container/file/ -xvf /container/file/PyYAML-3.11.tar.gz
-cd /container/file/PyYAML-3.11/
-python setup.py install
-cd -
 
 apt-get clean
 rm -rf /tmp/* /var/tmp/*
