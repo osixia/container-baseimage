@@ -1,6 +1,6 @@
 # Changelog
 
-# 1.1.0-dev
+# 1.1.0
   - Use debian stretch-slim as baseimage
 
 ## 1.0.0
