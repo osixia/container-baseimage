@@ -39,7 +39,7 @@ dpkg-divert --local --rename --add /usr/bin/ischroot
 ln -sf /bin/true /usr/bin/ischroot
 
 ## Install apt-utils.
-$MINIMAL_APT_GET_INSTALL apt-utils locales procps python-minimal python-yaml
+$MINIMAL_APT_GET_INSTALL apt-utils locales procps dirmngr gnupg python-minimal python-yaml 
 
 ## Upgrade all packages.
 apt-get dist-upgrade -y --no-install-recommends -o Dpkg::Options::="--force-confold"
