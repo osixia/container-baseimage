@@ -685,7 +685,7 @@ def run_foreground_process(command):
 
 def shutdown_runit_services():
 	debug("Begin shutting down runit services...")
-	os.system("/usr/bin/sv -w %d down "+RUN_PROCESS_DIR+"/* > /dev/null" % KILL_PROCESS_TIMEOUT)
+	os.system("/usr/bin/sv -w %d down %s/* > /dev/null" % (KILL_PROCESS_TIMEOUT, RUN_PROCESS_DIR))
 
 def wait_for_runit_services():
 	debug("Waiting for runit services to exit...")
