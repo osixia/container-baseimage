@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.4
+  - Fix log-helper with piped input
+
 ## 0.1.3
   - Alpine 3.6
 
