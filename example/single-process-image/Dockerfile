@@ -1,6 +1,6 @@
 # Use osixia/light-baseimage
 # https://github.com/osixia/docker-light-baseimage
-FROM osixia/light-baseimage:0.2.7
+FROM osixia/light-baseimage:1.0.0
 MAINTAINER Your Name <your@name.com>
 
 # Download nginx from apt-get and clean apt-get files
