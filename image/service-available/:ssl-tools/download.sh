@@ -12,11 +12,15 @@ fi
 
 apk add openssl jq
 
+echo "Download cfssl ..."
 curl -o /usr/sbin/cfssl -SL https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
 chmod 700 /usr/sbin/cfssl
 
+echo "Download cfssljson ..."
 curl -o /usr/sbin/cfssljson -SL https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
 chmod 700 /usr/sbin/cfssljson
+
+echo "Project sources: https://github.com/cloudflare/cfssl"
 
 # remove tools installed to download cfssl
 if [ -n "$to_install" ]; then

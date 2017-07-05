@@ -14,8 +14,8 @@ A linux Alpine 3.6 based docker image to build reliable image quickly. This imag
 The aims of this image is to be used as a base for your own Docker images. It's base on the awesome work of: [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
 
 Other base distribution are available:
-- [Debian Jessie](https://github.com/osixia/docker-light-baseimage)  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) |  [![](https://images.microbadger.com/badges/image/osixia/light-baseimage.svg)](http://microbadger.com/images/osixia/light-baseimage "Get your own image badge on microbadger.com")
-- [Ubuntu 14:04](https://github.com/osixia/docker-light-baseimage/tree/ubuntu) | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/) |  [![](https://images.microbadger.com/badges/image/osixia/ubuntu-light-baseimage.svg)](http://microbadger.com/images/osixia/ubuntu-light-baseimage "Get your own image badge on microbadger.com")
+- [Debian Stretch](https://github.com/osixia/docker-light-baseimage)  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) |  [![](https://images.microbadger.com/badges/image/osixia/light-baseimage.svg)](http://microbadger.com/images/osixia/light-baseimage "Get your own image badge on microbadger.com")
+- [Ubuntu 16:04](https://github.com/osixia/docker-light-baseimage/tree/ubuntu) | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/) |  [![](https://images.microbadger.com/badges/image/osixia/ubuntu-light-baseimage.svg)](http://microbadger.com/images/osixia/ubuntu-light-baseimage "Get your own image badge on microbadger.com")
 
 Table of Contents
 - [Contributing](#contributing)

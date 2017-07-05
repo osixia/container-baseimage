@@ -107,11 +107,10 @@ def xstr(s):
 def set_env_hostname_to_etc_hosts():
 	try:
 		if "HOSTNAME" in os.environ:
-			with open('/etc/hostname', 'r') as f:
-				etc_hostname = f.readline().rstrip()
+			socket_hostname = socket.gethostname()
 
-			if os.environ["HOSTNAME"] != etc_hostname:
-				ip_address = socket.gethostbyname(etc_hostname)
+			if os.environ["HOSTNAME"] != socket_hostname:
+				ip_address = socket.gethostbyname(socket_hostname)
 				with open("/etc/hosts", "a") as myfile:
 					myfile.write(ip_address+" "+os.environ["HOSTNAME"]+"\n")
 	except:
@@ -685,7 +684,7 @@ def run_foreground_process(command):
 
 def shutdown_runit_services():
 	debug("Begin shutting down runit services...")
-	os.system("/sbin/sv -w %d down "+RUN_PROCESS_DIR+"/* > /dev/null" % KILL_PROCESS_TIMEOUT)
+	os.system("/sbin/sv -w %d down %s/* > /dev/null" % (KILL_PROCESS_TIMEOUT, RUN_PROCESS_DIR))
 
 def wait_for_runit_services():
 	debug("Waiting for runit services to exit...")
