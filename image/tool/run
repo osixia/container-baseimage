@@ -641,7 +641,7 @@ def run_process(args, background_process_name, background_process_command):
 def run_background_process(name, command):
 	info("Running "+ name +"...")
 	pid = os.spawnvp(os.P_NOWAIT, command[0], command)
-	debug(name + " started as PID %d" % pid)
+	debug("%s started as PID %d" % (name, pid))
 	return pid
 
 def wait_background_process(name, pid):
@@ -656,7 +656,7 @@ def wait_background_process(name, pid):
 			exit_status = 1
 		else:
 			exit_status = os.WEXITSTATUS(exit_code)
-			info(name + " exited with status %d" % exit_status)
+			info("%s exited with status %d" % (name, exit_status))
 	return (process_exited, exit_status)
 
 def run_foreground_process(command):
