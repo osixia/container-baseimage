@@ -13,7 +13,6 @@ groupadd -g 8377 docker_env
 cp /container/file/dpkg_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
 cp /container/file/dpkg_nolocales /etc/dpkg/dpkg.cfg.d/01_nolocales
 
-# General config
 export LC_ALL=C
 export DEBIAN_FRONTEND=noninteractive
 minimal_apt_get_install='apt-get install -y --no-install-recommends'
@@ -24,7 +23,8 @@ minimal_apt_get_install='apt-get install -y --no-install-recommends'
 export INITRD=no
 echo -n no > /container/environment/INITRD
 
-## Enable Ubuntu Universe and Multiverse.
+## Enable Ubuntu Universe, Multiverse, and deb-src for main.
+sed -i 's/^#\s*\(deb.*main restricted\)$/\1/g' /etc/apt/sources.list
 sed -i 's/^#\s*\(deb.*universe\)$/\1/g' /etc/apt/sources.list
 sed -i 's/^#\s*\(deb.*multiverse\)$/\1/g' /etc/apt/sources.list
 apt-get update
@@ -41,6 +41,9 @@ ln -sf /bin/true /sbin/initctl
 dpkg-divert --local --rename --add /usr/bin/ischroot
 ln -sf /bin/true /usr/bin/ischroot
 
+# apt-utils fix for Ubuntu 16.04
+$minimal_apt_get_install apt-utils
+
 ## Install HTTPS support for APT.
 $minimal_apt_get_install apt-transport-https ca-certificates
 
@@ -48,22 +51,18 @@ $minimal_apt_get_install apt-transport-https ca-certificates
 $minimal_apt_get_install software-properties-common
 
 ## Upgrade all packages.
-apt-get dist-upgrade -y --no-install-recommends
+apt-get dist-upgrade -y --no-install-recommends -o Dpkg::Options::="--force-confold"
 
-# fix locale
+## Fix locale.
 $minimal_apt_get_install language-pack-en
 locale-gen en_US
 update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
-
 echo -n en_US.UTF-8 > /container/environment/LANG
 echo -n en_US.UTF-8 > /container/environment/LANGUAGE
 echo -n en_US.UTF-8 > /container/environment/LC_CTYPE
 
-# install PyYAML
-tar -C /container/file/ -xvf /container/file/PyYAML-3.11.tar.gz
-cd /container/file/PyYAML-3.11/
-python3 setup.py install
-cd -
+## Add python-yaml
+$minimal_apt_get_install python-yaml
 
 apt-get clean
 rm -rf /tmp/* /var/tmp/*

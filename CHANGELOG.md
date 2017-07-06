@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.0
+  - Use Ubuntu 16:04 as baseimage
+
 ## 0.1.8
   - Add to the 'run' tool option --dont-touch-etc-hosts Don't add in /etc/hosts a line with the container ip and $HOSTNAME environment variable value.
   - Fix wait-process script
