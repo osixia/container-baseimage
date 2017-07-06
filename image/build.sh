@@ -62,7 +62,7 @@ echo -n en_US.UTF-8 > /container/environment/LANGUAGE
 echo -n en_US.UTF-8 > /container/environment/LC_CTYPE
 
 ## Add python-yaml
-$minimal_apt_get_install python-yaml
+$minimal_apt_get_install python3-yaml
 
 apt-get clean
 rm -rf /tmp/* /var/tmp/*

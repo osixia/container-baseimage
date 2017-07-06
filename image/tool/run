@@ -50,7 +50,7 @@ class AlarmException(Exception):
 	pass
 
 def error(message):
-  	if log_level >= LOG_LEVEL_ERROR:
+	if log_level >= LOG_LEVEL_ERROR:
 		sys.stderr.write("*** %s\n" % message)
 
 def warning(message):
