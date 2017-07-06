@@ -1,8 +1,10 @@
 #!/usr/bin/python3 -u
 import os, os.path, sys, stat, signal, errno, argparse, time, re, json, yaml, ast, socket, shutil, pwd, grp
 
-KILL_PROCESS_TIMEOUT = 5
-KILL_ALL_PROCESSES_TIMEOUT = 10
+import os, os.path, sys, stat, signal, errno, argparse, time, json, re, yaml, ast, socket, shutil, pwd, grp
+
+KILL_PROCESS_TIMEOUT = int(os.environ.get('KILL_PROCESS_TIMEOUT', 5))
+KILL_ALL_PROCESSES_TIMEOUT = int(os.environ.get('KILL_ALL_PROCESSES_TIMEOUT', 5))
 
 LOG_LEVEL_NONE = 0
 LOG_LEVEL_ERROR = 1
@@ -48,7 +50,7 @@ class AlarmException(Exception):
 	pass
 
 def error(message):
-	if log_level >= LOG_LEVEL_ERROR:
+  	if log_level >= LOG_LEVEL_ERROR:
 		sys.stderr.write("*** %s\n" % message)
 
 def warning(message):
@@ -105,11 +107,10 @@ def xstr(s):
 def set_env_hostname_to_etc_hosts():
 	try:
 		if "HOSTNAME" in os.environ:
-			with open('/etc/hostname', 'r') as f:
-				etc_hostname = f.readline().rstrip()
+			socket_hostname = socket.gethostname()
 
-			if os.environ["HOSTNAME"] != etc_hostname:
-				ip_address = socket.gethostbyname(etc_hostname)
+			if os.environ["HOSTNAME"] != socket_hostname:
+				ip_address = socket.gethostbyname(socket_hostname)
 				with open("/etc/hosts", "a") as myfile:
 					myfile.write(ip_address+" "+os.environ["HOSTNAME"]+"\n")
 	except:
@@ -198,7 +199,7 @@ def generic_import_envvars(path, override_existing_environment):
 			trace("import " + name + " from " + filePath + " --- ")
 
 	for name, value in new_env.items():
-		if override_existing_environment or not name in os.environ:
+		if override_existing_environment or name not in os.environ:
 			os.environ[name] = value
 			trace("set : " + name + " = "+ os.environ[name])
 		else:
@@ -231,12 +232,12 @@ def export_run_envvars(to_dir = True):
 	trace("export "+RUN_ENVIRONMENT_FILE_EXPORT+" --- ")
 
 def create_run_envvars():
-		set_dir_env()
-		set_log_level_env()
-		import_envvars()
-		import_env_files()
-		decode_envvars()
-		export_run_envvars()
+	set_dir_env()
+	set_log_level_env()
+	import_envvars()
+	import_env_files()
+	decode_envvars()
+	export_run_envvars()
 
 def clear_run_envvars():
 	try:
@@ -557,7 +558,7 @@ def run_command_killable(command):
 	pid = os.spawnvp(os.P_NOWAIT, command[0], command)
 	try:
 		status = waitpid_reap_other_children(pid)
-	except BaseException as s:
+	except BaseException:
 		warning("An error occurred. Aborting.")
 		stop_child_process(command[0], pid)
 		raise
@@ -639,7 +640,7 @@ def run_process(args, background_process_name, background_process_command):
 def run_background_process(name, command):
 	info("Running "+ name +"...")
 	pid = os.spawnvp(os.P_NOWAIT, command[0], command)
-	debug(name + " started as PID %d" % pid)
+	debug("%s started as PID %d" % (name, pid))
 	return pid
 
 def wait_background_process(name, pid):
@@ -654,7 +655,7 @@ def wait_background_process(name, pid):
 			exit_status = 1
 		else:
 			exit_status = os.WEXITSTATUS(exit_code)
-			info(name + " exited with status %d" % exit_status)
+			info("%s exited with status %d" % (name, exit_status))
 	return (process_exited, exit_status)
 
 def run_foreground_process(command):
@@ -674,7 +675,7 @@ def run_foreground_process(command):
 	except KeyboardInterrupt:
 		stop_child_process(command[0], pid)
 		raise
-	except BaseException as s:
+	except BaseException:
 		warning("An error occurred. Aborting.")
 		stop_child_process(command[0], pid)
 		raise
@@ -683,7 +684,7 @@ def run_foreground_process(command):
 
 def shutdown_runit_services():
 	debug("Begin shutting down runit services...")
-	os.system("/usr/bin/sv down "+RUN_PROCESS_DIR+"/*")
+	os.system("/usr/bin/sv -w %d down %s/* > /dev/null" % (KILL_PROCESS_TIMEOUT, RUN_PROCESS_DIR))
 
 def wait_for_runit_services():
 	debug("Waiting for runit services to exit...")
