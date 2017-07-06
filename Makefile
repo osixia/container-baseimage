@@ -24,5 +24,5 @@ push-latest:
 release: build test tag_latest push push_latest
 
 git-tag-version: release
-	git tag -a v$(VERSION) -m "v$(VERSION)"
-	git push origin v$(VERSION)
+	git tag -a alpine-v$(VERSION) -m "v$(VERSION)"
+	git push origin alpine-v$(VERSION)
