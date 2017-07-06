@@ -1,8 +1,6 @@
 NAME = example/single-process
 
-.PHONY: all build build-nocache
-
-all: build
+.PHONY: build build-nocache
 
 build:
 	docker build -t $(NAME) --rm .

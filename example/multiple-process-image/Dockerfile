@@ -3,13 +3,13 @@
 FROM osixia/alpine-light-baseimage:0.1.4
 MAINTAINER Your Name <your@name.com>
 
-# Install multiple process stack, nginx and php5-fpm and clean apk files
+# Install multiple process stack, nginx and php7.0-fpm and clean apt-get files
 # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
 RUN apk update \
     && /container/tool/add-multiple-process-stack \
     && apk add \
        nginx \
-       php5-fpm \
+       php7-fpm \
     && rm -rf /var/cache/apk/*
 
 # Add service directory to /container/service
