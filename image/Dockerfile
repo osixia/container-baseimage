@@ -1,4 +1,4 @@
-FROM debian:stretch-slim
+FROM debian:jessie-slim
 MAINTAINER Bertrand Gouny <bertrand.gouny@osixia.net>
 
 COPY . /container

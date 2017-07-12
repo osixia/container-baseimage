@@ -39,10 +39,14 @@ dpkg-divert --local --rename --add /usr/bin/ischroot
 ln -sf /bin/true /usr/bin/ischroot
 
 ## Install apt-utils.
-$MINIMAL_APT_GET_INSTALL apt-utils apt-transport-https ca-certificates locales procps dirmngr gnupg python-minimal python-yaml
+$MINIMAL_APT_GET_INSTALL apt-utils apt-transport-https ca-certificates locales procps dirmngr gnupg python-minimal python-yaml wget
 
 ## Upgrade all packages.
 apt-get dist-upgrade -y --no-install-recommends -o Dpkg::Options::="--force-confold"
+
+# add Dotdeb depot (for php7.0)
+echo "deb http://packages.dotdeb.org jessie all" > /etc/apt/sources.list.d/dotdeb.list
+wget -O- https://www.dotdeb.org/dotdeb.gpg | apt-key add -
 
 # fix locale
 echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
