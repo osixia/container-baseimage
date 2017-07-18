@@ -104,13 +104,13 @@ function level() {
   if [ -z "$loglevel_str" ]; then
     echo "Error: No log level provided"
     echo "Allowed log level are: none, error, warning, info, debug, trace"
-    echo "usage example: log-helper level is eq info"
+    echo "usage example: log-helper level eq info"
     exit 1
   fi
 
   local log_level_var=LOG_LEVEL_$loglevel_str
 
-  if [ ${!log_level_var} -$operator $log_level ]; then
+  if [ $log_level -$operator ${!log_level_var} ]; then
     exit 0
   else
     exit 1
