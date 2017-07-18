@@ -6,7 +6,7 @@
 
 [hub]: https://hub.docker.com/r/osixia/light-baseimage/
 
-Latest release: 1.1.0 (debian stretch) - 1.0.0 (debian jessie) [Changelog](CHANGELOG.md)
+Latest release: 1.1.0 (debian stretch) - 1.0.1 (debian jessie) [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
 
 A Debian 9 (Stretch) based docker image to build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
