@@ -33,7 +33,6 @@ function error() {
   getEchoParams $@
 
   if [ $log_level -ge 1 ]; then
-    [[ -z "$echo_msg" ]] && getMsgFromStdin
     echo $echo_param  "$echo_msg"
   fi
 }
@@ -42,7 +41,6 @@ function warning() {
   getEchoParams $@
 
   if [ $log_level -ge 2 ]; then
-    [[ -z "$echo_msg" ]] && getMsgFromStdin
     echo $echo_param  "$echo_msg"
   fi
 }
@@ -51,7 +49,6 @@ function info() {
   getEchoParams $@
 
   if [ $log_level -ge 3 ]; then
-    [[ -z "$echo_msg" ]] && getMsgFromStdin
     echo $echo_param "$echo_msg"
   fi
 }
@@ -60,7 +57,6 @@ function debug() {
   getEchoParams $@
 
   if [ $log_level -ge 4 ]; then
-    [[ -z "$echo_msg" ]] && getMsgFromStdin
     echo $echo_param "$echo_msg"
   fi
 }
@@ -69,14 +65,13 @@ function trace() {
   getEchoParams $@
 
   if [ $log_level -ge 5 ]; then
-    [[ -z "$echo_msg" ]] && getMsgFromStdin
     echo $echo_param "$echo_msg"
   fi
 }
 
 function getMsgFromStdin() {
   if [ -z "$2" ]; then
-    read -r echo_msg || true
+    echo_msg=$(cat)
   fi
 }
 
@@ -88,6 +83,9 @@ function getEchoParams() {
     echo_param=$1
     echo_msg=${echo_msg#$1 }
   fi
+
+  # read from pipe if echo_msg is empty
+  [[ -n "$echo_msg" ]] || getMsgFromStdin
 }
 
 function level() {
@@ -106,13 +104,13 @@ function level() {
   if [ -z "$loglevel_str" ]; then
     echo "Error: No log level provided"
     echo "Allowed log level are: none, error, warning, info, debug, trace"
-    echo "usage example: log-helper level is eq info"
+    echo "usage example: log-helper level eq info"
     exit 1
   fi
 
   local log_level_var=LOG_LEVEL_$loglevel_str
 
-  if [ ${!log_level_var} -$operator $log_level ]; then
+  if [ $log_level -$operator ${!log_level_var} ]; then
     exit 0
   else
     exit 1

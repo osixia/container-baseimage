@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.1.0
+  - Use debian stretch-slim as baseimage
+
 ## 1.0.0
   - run tool now use 2 environmen variable KILL_PROCESS_TIMEOUT and KILL_ALL_PROCESSES_TIMEOUT
   - change default local to en_US.UTF-8

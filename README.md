@@ -6,16 +6,16 @@
 
 [hub]: https://hub.docker.com/r/osixia/light-baseimage/
 
-Latest release: 1.0.0 -  [Changelog](CHANGELOG.md)
+Latest release: 1.1.0 (debian stretch) - 1.0.1 (debian jessie) [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
 
-A Debian Jessie based docker image to build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
+A Debian 9 (Stretch) based docker image to build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
 
 The aims of this image is to be used as a base for your own Docker images. It's base on the awesome work of: [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
 
 Other base distribution are available:
-- [Alpine 3.4](https://github.com/osixia/docker-light-baseimage/tree/feature-linux-alpine) | Beta | [Docker Hub](https://hub.docker.com/r/osixia/alpine-light-baseimage/) | [![](https://images.microbadger.com/badges/image/osixia/alpine-light-baseimage.svg)](http://microbadger.com/images/osixia/alpine-light-baseimage "Get your own image badge on microbadger.com")
-- [Ubuntu 14:04](https://github.com/osixia/docker-light-baseimage/tree/ubuntu) | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/) | [![](https://images.microbadger.com/badges/image/osixia/ubuntu-light-baseimage.svg)](http://microbadger.com/images/osixia/ubuntu-light-baseimage "Get your own image badge on microbadger.com")
+- [Alpine 3.6](https://github.com/osixia/docker-light-baseimage/tree/feature-linux-alpine) | Beta | [Docker Hub](https://hub.docker.com/r/osixia/alpine-light-baseimage/) | [![](https://images.microbadger.com/badges/image/osixia/alpine-light-baseimage.svg)](http://microbadger.com/images/osixia/alpine-light-baseimage "Get your own image badge on microbadger.com")
+- [Ubuntu 16:04](https://github.com/osixia/docker-light-baseimage/tree/ubuntu) | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/) | [![](https://images.microbadger.com/badges/image/osixia/ubuntu-light-baseimage.svg)](http://microbadger.com/images/osixia/ubuntu-light-baseimage "Get your own image badge on microbadger.com")
 
 Table of Contents
 - [Contributing](#contributing)
@@ -143,7 +143,7 @@ In the Dockerfile we are going to:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:1.0.0
+        FROM osixia/light-baseimage:1.1.0
         MAINTAINER Your Name <your@name.com>
 
         # Download nginx from apt-get and clean apt-get files
@@ -346,7 +346,7 @@ Refresh [http://localhost:8080/](http://localhost:8080/) and you should see:
 
 #### Overview
 
-This example takes back the single process image example and add php5-fpm to run php scripts.
+This example takes back the single process image example and add php7.0-fpm to run php scripts.
 
 See complete example in: [example/multiple-process-image](example/multiple-process-image)
 
@@ -355,95 +355,99 @@ Note: it would have been  ♪ ~~harder~~, faster, better, stronger ♪ to extend
 So here the image directory structure:
 
  - **multiple-process-image**: root directory
- - **multiple-process-image/service**: directory to store the nginx and php5-fpm service.
+ - **multiple-process-image/service**: directory to store the nginx and php7.0-fpm service.
  - **multiple-process-image/environment**: environment files directory.
  - **multiple-process-image/Dockerfile**: the Dockerfile to build this image.
 
 **service** and **environment** directories name are arbitrary and can be changed but make sure to adapt their name in the Dockerfile.
 
-Let's now create the nginx and php5-fpm directories:
+Let's now create the nginx and php directories:
 
  - **multiple-process-image/service/nginx**: nginx root directory
  - **multiple-process-image/service/nginx/install.sh**: service installation script.
  - **multiple-process-image/service/nginx/startup.sh**:  startup script to setup the service when the container start.
  - **multiple-process-image/service/nginx/process.sh**: process to run.
 
- - **multiple-process-image/service/php5-fpm**: php5-fpm root directory
- - **multiple-process-image/service/php5-fpm/install.sh**: service installation script.
- - **multiple-process-image/service/php5-fpm/process.sh**: process to run.
- - **multiple-process-image/service/php5-fpm/config/default**: default nginx server config with
+ - **multiple-process-image/service/php**: php root directory
+ - **multiple-process-image/service/php/install.sh**: service installation script.
+ - **multiple-process-image/service/php/process.sh**: process to run.
+ - **multiple-process-image/service/php/config/default**: default nginx server config with
 
 #### Dockerfile
 
 In the Dockerfile we are going to:
   - Add the multiple process stack
-  - Download nginx and php5-fpm from apt-get.
+  - Download nginx and php7.0-fpm from apt-get.
   - Add the service directory to the image.
   - Install service and clean up.
   - Add the environment directory to the image.
   - Define ports exposed and volumes if needed.
 
 
-        # Use osixia/light-baseimage
-        # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:1.0.0
-        MAINTAINER Your Name <your@name.com>
+      # Use osixia/light-baseimage
+      # https://github.com/osixia/docker-light-baseimage
+      FROM osixia/light-baseimage:1.1.0
+      MAINTAINER Your Name <your@name.com>
 
-        # Install multiple process stack, nginx and php5-fpm and clean apt-get files
-        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
-        RUN apt-get -y update \
-            && /container/tool/add-multiple-process-stack \
-            && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-               nginx \
-               php5-fpm \
-            && apt-get clean \
-            && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+      # Install multiple process stack, nginx and php7.0-fpm and clean apt-get files
+      # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
+      RUN apt-get -y update \
+          && /container/tool/add-multiple-process-stack \
+          && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+             nginx \
+             php7.0-fpm \
+          && apt-get clean \
+          && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-        # Add service directory to /container/service
-        ADD service /container/service
+      # Add service directory to /container/service
+      ADD service /container/service
 
-        # Use baseimage install-service script
-        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
-        RUN /container/tool/install-service
+      # Use baseimage install-service script
+      # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
+      RUN /container/tool/install-service
 
-        # Add default env directory
-        ADD environment /container/environment/99-default
+      # Add default env directory
+      ADD environment /container/environment/99-default
 
-        # Set /var/www/ in a data volume
-        VOLUME /var/www/
+      # Set /var/www/ in a data volume
+      VOLUME /var/www/
 
-        # Expose default http and https ports
-        EXPOSE 80 443
+      # Expose default http and https ports
+      EXPOSE 80 443
 
 
-The Dockerfile contains directives to download nginx and php5-fpm from apt-get but all the initial setup will take place in install.sh file (called by /container/tool/install-service tool) for a better build experience. The time consuming download task is decoupled from the initial setup to make great use of docker build cache. If an install.sh file is changed the builder will not have to download again nginx and php5-fpm add will just run install scripts.
+The Dockerfile contains directives to download nginx and php7.0-fpm from apt-get but all the initial setup will take place in install.sh file (called by /container/tool/install-service tool) for a better build experience. The time consuming download task is decoupled from the initial setup to make great use of docker build cache. If an install.sh file is changed the builder will not have to download again nginx and php7.0-fpm add will just run install scripts.
 
 Maybe you already read that in the previous example ?Sorry.
 
 #### Service files
 
-Please refer to [single process image](#create-a-single-process-image) for the nginx service files description. Here just php5-fpm files are described.
+Please refer to [single process image](#create-a-single-process-image) for the nginx service files description. Here just php service files are described.
 
 ##### install.sh
 
 This file must only contains directives for the service initial setup. Files download and apt-get command takes place in the Dockerfile for a better image building experience (see [Dockerfile](#dockerfile-1) ).
 
-In this example, for the initial setup we set some php5-fpm default configuration, replace the default nginx server config and add phpinfo.php file:
+In this example, for the initial setup we set some php default configuration, replace the default nginx server config and add phpinfo.php file:
 
     #!/bin/bash -e
     # this script is run during the image build
 
     # config
-    sed -i -e "s/expose_php = On/expose_php = Off/g" /etc/php5/fpm/php.ini
-    sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini
-    sed -i -e "s/;listen.owner = www-data/listen.owner = www-data/g" /etc/php5/fpm/pool.d/www.conf
-    sed -i -e "s/;listen.group = www-data/listen.group = www-data/g" /etc/php5/fpm/pool.d/www.conf
+    sed -i -e "s/expose_php = On/expose_php = Off/g" /etc/php/7.0/fpm/php.ini
+    sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php/7.0/fpm/php.ini
+    sed -i -e "s/;listen.owner = www-data/listen.owner = www-data/g" /etc/php/7.0/fpm/php.ini
+    sed -i -e "s/;listen.group = www-data/listen.group = www-data/g" /etc/php/7.0/fpm/php.ini
 
-    # replace default website with php5-fpm default website
-    cp -f /container/service/php5-fpm/config/default /etc/nginx/sites-available/default
+    # create php socket directory
+    mkdir -p /run/php
+
+    # replace default website with php service default website
+    cp -f /container/service/php/config/default /etc/nginx/sites-available/default
 
     # create phpinfo.php
     echo "<?php phpinfo(); " > /var/www/html/phpinfo.php
+
 
 
 Make sure install.sh can be executed (chmod +x install.sh).
@@ -453,45 +457,45 @@ Make sure install.sh can be executed (chmod +x install.sh).
 This file define the command to run:
 
     #!/bin/bash -e
-    exec /usr/sbin/php5-fpm --nodaemonize
+    exec /usr/sbin/php-fpm7.0 --nodaemonize
 
 Make sure process.sh can be executed (chmod +x process.sh).
 
-*Caution: The command executed must start a foreground process otherwise runit (use to supervise mutlple process images) will  keep restarting php5-fpm.*
+*Caution: The command executed must start a foreground process otherwise runit (use to supervise multiple process images) will  keep restarting php-fpm7.0.*
 
-That why we run php5-fpm with `--nodaemonize"`
+That why we run php  with `--nodaemonize"`
 
 ##### config/default
 nginx server configuration:
 
-      server {
-      	listen 80 default_server;
-      	listen [::]:80 default_server;
+    server {
+      listen 80 default_server;
+      listen [::]:80 default_server;
 
-      	root /var/www/html;
+      root /var/www/html;
 
-      	# Add index.php to the list if you are using PHP
-      	index index.html index.htm index.nginx-debian.html;
+      # Add index.php to the list if you are using PHP
+      index index.html index.htm index.nginx-debian.html;
 
-      	server_name _;
+      server_name _;
 
-      	location / {
-      		# First attempt to serve request as file, then
-      		# as directory, then fall back to displaying a 404.
-      		try_files $uri $uri/ =404;
-      	}
-
-      	location ~ \.php$ {
-      		fastcgi_split_path_info ^(.+\.php)(/.+)$;
-      		# With php5-fpm:
-      		fastcgi_pass unix:/var/run/php5-fpm.sock;
-      		fastcgi_index index.php;
-      		include fastcgi_params;
-      		include fastcgi.conf;
-      	}
+      location / {
+        # First attempt to serve request as file, then
+        # as directory, then fall back to displaying a 404.
+        try_files $uri $uri/ =404;
       }
 
-That's it we have a multiple process image that run nginx and php5-fpm!
+      location ~ \.php$ {
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        # With php fpm:
+        fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi_params;
+        include fastcgi.conf;
+      }
+    }
+
+That's it we have a multiple process image that run nginx and php!
 
 #### Build and test
 
@@ -584,7 +588,7 @@ Here simple Dockerfile example how to add a service-available to an image:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:1.0.0
+        FROM osixia/light-baseimage:1.1.0
         MAINTAINER Your Name <your@name.com>
 
         # Add cfssl and cron service-available
@@ -595,7 +599,7 @@ Here simple Dockerfile example how to add a service-available to an image:
             && /container/tool/add-service-available :ssl-tools :cron \
             && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
                nginx \
-               php5-fpm
+               php7.0-fpm
         ...
 
 
@@ -608,17 +612,17 @@ For example a simple image example that add service-available to this baseimage:
 
 ### Fix docker mounted file problems
 
-For some reasons you will probably have to mount custom files to your container. For example in the *mutliple process image example* you can customise the nginx config by mounting your custom config to "/container/service/php5-fpm/config/default" :
+For some reasons you will probably have to mount custom files to your container. For example in the *mutliple process image example* you can customise the nginx config by mounting your custom config to "/container/service/php/config/default" :
 
-    docker run -v /data/my-nginx-config:/container/service/php5-fpm/config/default example/multiple-process
+    docker run -v /data/my-nginx-config:/container/service/php/config/default example/multiple-process
 
 In this case every thing should work fine, but if the startup script makes some `sed` replacement or change file owner and permissions this can results in "Device or resource busy" error. See [Docker documentation](https://docs.docker.com/v1.4/userguide/dockervolumes/#mount-a-host-file-as-a-data-volume).
 
-    sed -i "s|listen 80|listen 8080|g" /container/service/php5-fpm/config/default
+    sed -i "s|listen 80|listen 8080|g" /container/service/php/config/default
 
 To prevent that king of error light-baseimage provide *--copy-service* command argument :
 
-    docker run -v /data/my-nginx-config:/container/service/php5-fpm/config/default example/multiple-process --copy-service
+    docker run -v /data/my-nginx-config:/container/service/php/config/default example/multiple-process --copy-service
 
 On startup this will copy all /container/service directory to /container/run/service.
 
@@ -628,7 +632,7 @@ If *--copy-service* is used *CONTAINER_SERVICE_DIR=/container/run/service* other
 
 So to always apply sed on the correct file in the startup script the command becomes :
 
-    sed -i "s|listen 80|listen 8080|g" ${CONTAINER_SERVICE_DIR}/php5-fpm/config/default
+    sed -i "s|listen 80|listen 8080|g" ${CONTAINER_SERVICE_DIR}/php/config/default
 
 
 ### Distribution packages documentation and locales
@@ -654,7 +658,7 @@ What it does:
 
 *Run tool* takes several options, to list them:
 
-    docker run osixia/light-baseimage:1.0.0 --help
+    docker run osixia/light-baseimage:1.1.0 --help
     usage: run [-h] [-e] [-s] [-p] [-f] [-o {startup,process,finish}]
                [-c COMMAND [WHEN={startup,process,finish} ...]] [-k]
                [--wait-state FILENAME] [--wait-first-startup] [--keep-startup-env]
@@ -765,7 +769,7 @@ If a main command is set for example:
 If a main command is set *run tool* launch it otherwise bash is launched.
 Example:
 
-    docker run -it osixia/light-baseimage:1.0.0
+    docker run -it osixia/light-baseimage:1.1.0
 
 
 ##### Extra environment variables
@@ -841,8 +845,8 @@ Note this yaml definition:
 
 Can also be set by command line converted in python or json:
 
-    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:1.0.0 printenv
-    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:1.0.0 printenv
+    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:1.1.0 printenv
+    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:1.1.0 printenv
 
 ### Tests
 
