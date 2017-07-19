@@ -24,5 +24,5 @@ push-latest:
 release: build test tag-latest push push-latest
 
 git-tag-version: release
-	git tag -a v$(VERSION) -m "v$(VERSION)"
-	git push origin v$(VERSION)
+	git tag -a jessie-v$(VERSION) -m "jessie-v$(VERSION)"
+	git push origin jessie-v$(VERSION)
