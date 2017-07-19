@@ -21,7 +21,7 @@ push:
 push-latest:
 	docker push $(NAME):latest
 
-release: build test tag_latest push push_latest
+release: build test tag-latest push push_latest
 
 git-tag-version: release
 	git tag -a alpine-v$(VERSION) -m "v$(VERSION)"
