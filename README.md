@@ -6,7 +6,7 @@
 
 [hub]: https://hub.docker.com/r/osixia/ubuntu-light-baseimage/
 
-Latest release: 0.2.0 -  [Changelog](CHANGELOG.md)
+Latest release: 0.2.1 -  [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/) 
 
 A Ubuntu 16:04 (Xenial) based docker image to build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
@@ -143,7 +143,7 @@ In the Dockerfile we are going to:
 
        # Use osixia/ubuntu-light-baseimage
        # https://github.com/osixia/docker-light-baseimage
-       FROM osixia/ubuntu-light-baseimage:0.2.0
+       FROM osixia/ubuntu-light-baseimage:0.2.1
        MAINTAINER Your Name <your@name.com>
 
         # Download nginx from apt-get and clean apt-get files
@@ -386,7 +386,7 @@ In the Dockerfile we are going to:
 
        # Use osixia/ubuntu-light-baseimage
        # https://github.com/osixia/docker-light-baseimage
-       FROM osixia/ubuntu-light-baseimage:0.2.0
+       FROM osixia/ubuntu-light-baseimage:0.2.1
        MAINTAINER Your Name <your@name.com>
 
       # Install multiple process stack, nginx and php7.0-fpm and clean apt-get files
@@ -588,7 +588,7 @@ Here simple Dockerfile example how to add a service-available to an image:
 
        # Use osixia/ubuntu-light-baseimage
        # https://github.com/osixia/docker-light-baseimage
-       FROM osixia/ubuntu-light-baseimage:0.2.0
+       FROM osixia/ubuntu-light-baseimage:0.2.1
        MAINTAINER Your Name <your@name.com>
 
         # Add cfssl and cron service-available

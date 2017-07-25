@@ -1,5 +1,5 @@
 NAME = osixia/ubuntu-light-baseimage
-VERSION = 0.2.0
+VERSION = 0.2.1
 
 .PHONY: build build-nocache test tag-latest push push-latest release git-tag-version
 
