@@ -6,7 +6,7 @@
 
 [hub]: https://hub.docker.com/r/osixia/light-baseimage/
 
-Latest release: 1.1.0 (debian stretch) - 1.0.1 (debian jessie) [Changelog](CHANGELOG.md)
+Latest release: 1.1.1 (debian stretch) - 1.0.1 (debian jessie) [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
 
 A Debian 9 (Stretch) based docker image to build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
@@ -143,7 +143,7 @@ In the Dockerfile we are going to:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:1.1.0
+        FROM osixia/light-baseimage:1.1.1
         MAINTAINER Your Name <your@name.com>
 
         # Download nginx from apt-get and clean apt-get files
@@ -386,7 +386,7 @@ In the Dockerfile we are going to:
 
       # Use osixia/light-baseimage
       # https://github.com/osixia/docker-light-baseimage
-      FROM osixia/light-baseimage:1.1.0
+      FROM osixia/light-baseimage:1.1.1
       MAINTAINER Your Name <your@name.com>
 
       # Install multiple process stack, nginx and php7.0-fpm and clean apt-get files
@@ -588,7 +588,7 @@ Here simple Dockerfile example how to add a service-available to an image:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:1.1.0
+        FROM osixia/light-baseimage:1.1.1
         MAINTAINER Your Name <your@name.com>
 
         # Add cfssl and cron service-available
@@ -658,7 +658,7 @@ What it does:
 
 *Run tool* takes several options, to list them:
 
-    docker run osixia/light-baseimage:1.1.0 --help
+    docker run osixia/light-baseimage:1.1.1 --help
     usage: run [-h] [-e] [-s] [-p] [-f] [-o {startup,process,finish}]
                [-c COMMAND [WHEN={startup,process,finish} ...]] [-k]
                [--wait-state FILENAME] [--wait-first-startup] [--keep-startup-env]
@@ -769,7 +769,7 @@ If a main command is set for example:
 If a main command is set *run tool* launch it otherwise bash is launched.
 Example:
 
-    docker run -it osixia/light-baseimage:1.1.0
+    docker run -it osixia/light-baseimage:1.1.1
 
 
 ##### Extra environment variables
@@ -845,8 +845,8 @@ Note this yaml definition:
 
 Can also be set by command line converted in python or json:
 
-    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:1.1.0 printenv
-    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:1.1.0 printenv
+    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:1.1.1 printenv
+    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:1.1.1 printenv
 
 ### Tests
 
