@@ -1,5 +1,9 @@
 # Changelog
 
+# 0.1.5
+  - chmod 444 logrotate config files
+  - fix jsonssl-helper get traefik ca certificate
+
 ## 0.1.4
   - Fix log-helper with piped input
 
