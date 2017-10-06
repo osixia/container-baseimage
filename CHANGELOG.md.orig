@@ -1,20 +1,26 @@
 # Changelog
 
-# 1.0.2
+<<<<<<< HEAD
+## 0.2.0
+  - Use Ubuntu 16:04 as baseimage
+=======
+# 1.1.1
   - chmod 444 logrotate config files
   - fix jsonssl-helper get traefik ca certificate on alpine
 
-# 1.0.1
+# 1.1.0
+  - Use debian stretch-slim as baseimage
 
 ## 1.0.0
   - run tool now use 2 environmen variable KILL_PROCESS_TIMEOUT and KILL_ALL_PROCESSES_TIMEOUT
   - change default local to en_US.UTF-8
+>>>>>>> release-1.1.1
 
-## 0.2.6
+## 0.1.8
   - Add to the 'run' tool option --dont-touch-etc-hosts Don't add in /etc/hosts a line with the container ip and $HOSTNAME environment variable value.
   - Fix wait-process script
 
-## 0.2.5
+## 0.1.7
   - Fix is_runit_installed check /usr/bin/sv instead of /sbin/runit #6
   - Upgrade cfssl 1.2.0
   - Add ssl-helper that allow certificate auto-renew and let choose
@@ -27,18 +33,15 @@
   - Change .yaml.startup and .json.startup files to .startup.yaml and .startup.json
   - Fix logrotate config
 
-## 0.2.4
-  - Periodic update of debian baseimage and packages
+## 0.1.6
+  - Periodic update of ubuntu baseimage and packages
 
-## 0.2.3
-  - Periodic update of debian baseimage and packages
-
-## 0.2.2
+## 0.1.5
   - Fix --copy-service error if /container/run/service already exists
   - Fix /container/run/startup.sh file detection if no other startup files exists
   - Fix set_env_hostname_to_etc_hosts() on container restart
 
-## 0.2.1
+## 0.1.4
   - Add cfssl as available service to generate ssl certs
     Warning: ssl-helper ssl-helper-openssl and ssl-helper-gnutls
              have been removed
@@ -61,18 +64,6 @@
   - Rename install-multiple-process-stack to add-multiple-process-stack
   - Rename install-service-available to add-service-available
 
-## 0.2.0
-  - Allow more easy image inheritance
-  - Fix cron NUMBER OF HARD LINKS > 1
-  - Makefile with build no cache
-
-## 0.1.5
-  - Fix bug with host network
-
-## 0.1.4
-  - Add run cmd arguments when it's a single process image
-  - Remove bash from command when it's a single process image
-
 ## 0.1.3
   - Add hostname env variable to /etc/hosts
     to make the image more friendly with kubernetes again :)
@@ -82,10 +73,7 @@
     to make the image more friendly with kubernetes secrets :)
 
 ## 0.1.1
-  - Fix remove-service #1
-  - Add python and PyYAML
-  - Fix locales
-  - Fix my_init
+  - Fix bug with host network
 
 ## 0.1.0
   - Initial release
