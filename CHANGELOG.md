@@ -1,5 +1,9 @@
 # Changelog
 
+# 0.2.1
+  - chmod 444 logrotate config files
+  - fix jsonssl-helper get traefik ca certificate
+
 ## 0.2.0
   - Use Ubuntu 16:04 as baseimage
 
