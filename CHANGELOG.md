@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.1.1
+  - chmod 444 logrotate config files
+  - fix jsonssl-helper get traefik ca certificate on alpine
+
 # 1.1.0
   - Use debian stretch-slim as baseimage
 

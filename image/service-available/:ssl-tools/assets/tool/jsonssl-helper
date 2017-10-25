@@ -61,7 +61,7 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
   if [ "${JSONSSL_PROFILE,,}" = "traefik" ]; then
     # Let's Encrypt CA certificate is in cert file after the domain certificate.
     # So we took what's after the first cert.
-    JSONSSL_GET_CA_CERT_CMD="cat $CERT_FILE | sed '0,/END CERTIFICATE/d'"
+    JSONSSL_GET_CA_CERT_CMD="awk '{if(found) print} /END CERTIFICATE/{found=1}' $CERT_FILE"
 
     JSONSSL_GET_CERT_CMD="cat $JSONSSL_FILE | jq -r '[.[\"DomainsCertificate\"].Certs[].Certificate] | map(select(.Domain == \"$JSONSSL_HOSTNAME\")) | .[0].Certificate' | base64 -d"
     JSONSSL_GET_KEY_CMD="cat $JSONSSL_FILE | jq -r '[.[\"DomainsCertificate\"].Certs[].Certificate] | map(select(.Domain == \"$JSONSSL_HOSTNAME\")) | .[0].PrivateKey' | base64 -d"
