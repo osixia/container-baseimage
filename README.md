@@ -174,7 +174,7 @@ The Dockerfile contains directives to download nginx from apt-get but all the in
 
 #### Service files
 
-##### install.sh
+##### install.sh
 
 This file must only contain directives for the service initial setup. Files download and apt-get command takes place in the Dockerfile for a better image building experience (see [Dockerfile](#dockerfile)).
 
@@ -383,15 +383,14 @@ In the Dockerfile we are going to:
   - Add the environment directory to the image.
   - Define ports exposed and volumes if needed.
 
+        # Use osixia/light-baseimage
+        # https://github.com/osixia/docker-light-baseimage
+        FROM osixia/light-baseimage:1.1.1
+        MAINTAINER Your Name <your@name.com>
 
-      # Use osixia/light-baseimage
-      # https://github.com/osixia/docker-light-baseimage
-      FROM osixia/light-baseimage:1.1.1
-      MAINTAINER Your Name <your@name.com>
-
-      # Install multiple process stack, nginx and php7.0-fpm and clean apt-get files
-      # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
-      RUN apt-get -y update \
+        # Install multiple process stack, nginx and php7.0-fpm and clean apt-get files
+        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
+        RUN apt-get -y update \
           && /container/tool/add-multiple-process-stack \
           && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
              nginx \
@@ -399,21 +398,21 @@ In the Dockerfile we are going to:
           && apt-get clean \
           && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-      # Add service directory to /container/service
-      ADD service /container/service
+        # Add service directory to /container/service
+        ADD service /container/service
 
-      # Use baseimage install-service script
-      # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
-      RUN /container/tool/install-service
+        # Use baseimage install-service script
+        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
+        RUN /container/tool/install-service
 
-      # Add default env directory
-      ADD environment /container/environment/99-default
+        # Add default env directory
+        ADD environment /container/environment/99-default
 
-      # Set /var/www/ in a data volume
-      VOLUME /var/www/
+        # Set /var/www/ in a data volume
+        VOLUME /var/www/
 
-      # Expose default http and https ports
-      EXPOSE 80 443
+        # Expose default http and https ports
+        EXPOSE 80 443
 
 
 The Dockerfile contains directives to download nginx and php7.0-fpm from apt-get but all the initial setup will take place in install.sh file (called by /container/tool/install-service tool) for a better build experience. The time consuming download task is decoupled from the initial setup to make great use of docker build cache. If an install.sh file is changed the builder will not have to download again nginx and php7.0-fpm add will just run install scripts.
@@ -465,7 +464,7 @@ Make sure process.sh can be executed (chmod +x process.sh).
 
 That why we run php  with `--nodaemonize"`
 
-##### config/default
+##### config/default
 nginx server configuration:
 
     server {
@@ -738,7 +737,7 @@ After each time *run tool* runs a startup script, it resets its own environment 
 
 After all startup script *run tool* run /container/run/startup.sh if exists.
 
-##### Process environment setup
+##### Process environment setup
 *Run tool* delete all .startup.yaml and .startup.json in /container/environment/* and clear the previous run environment (/container/run/environment is removed)
 Then it takes all remaining file in /container/environment/* and import the variables values to the container environment.
 The container environment is then exported to /container/run/environment and in /container/run/environment.sh
