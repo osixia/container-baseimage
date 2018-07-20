@@ -63,6 +63,13 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
     # So we took what's after the first cert.
     JSONSSL_GET_CA_CERT_CMD="awk '{if(found) print} /END CERTIFICATE/{found=1}' $CERT_FILE"
 
+    JSONSSL_GET_CERT_CMD="cat $JSONSSL_FILE | jq -r '[.Certificates[]] | map(select(.Domain.Main == \"$JSONSSL_HOSTNAME\")) | .[0].Certificate' | base64 -d"
+    JSONSSL_GET_KEY_CMD="cat $JSONSSL_FILE | jq -r '[.Certificates[]] | map(select(.Domain.Main == \"$JSONSSL_HOSTNAME\")) | .[0].Key' | base64 -d"
+  elif [ "${JSONSSL_PROFILE,,}" = "traefik_up_to_v1_6" ]; then
+    # Let's Encrypt CA certificate is in cert file after the domain certificate.
+    # So we took what's after the first cert.
+    JSONSSL_GET_CA_CERT_CMD="awk '{if(found) print} /END CERTIFICATE/{found=1}' $CERT_FILE"
+
     JSONSSL_GET_CERT_CMD="cat $JSONSSL_FILE | jq -r '[.[\"DomainsCertificate\"].Certs[].Certificate] | map(select(.Domain == \"$JSONSSL_HOSTNAME\")) | .[0].Certificate' | base64 -d"
     JSONSSL_GET_KEY_CMD="cat $JSONSSL_FILE | jq -r '[.[\"DomainsCertificate\"].Certs[].Certificate] | map(select(.Domain == \"$JSONSSL_HOSTNAME\")) | .[0].PrivateKey' | base64 -d"
   fi
