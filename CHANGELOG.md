@@ -1,5 +1,8 @@
 # Changelog
 
+# 0.1.6
+  - 
+
 # 0.1.5
   - chmod 444 logrotate config files
   - fix jsonssl-helper get traefik ca certificate

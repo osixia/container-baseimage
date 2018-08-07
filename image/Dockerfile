@@ -1,5 +1,4 @@
-FROM alpine:3.6
-MAINTAINER Bertrand Gouny <bertrand.gouny@osixia.net>
+FROM alpine:3.8
 
 COPY . /container
 RUN /container/build.sh

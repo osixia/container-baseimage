@@ -13,7 +13,7 @@ LOG_LEVEL_INFO  = 3
 LOG_LEVEL_DEBUG = 4
 LOG_LEVEL_TRACE = 5
 
-SHENV_NAME_WHITELIST_REGEX = re.compile('[^\w\-_\.]')
+SHENV_NAME_WHITELIST_REGEX = re.compile('\W')
 
 log_level = None
 
@@ -622,8 +622,6 @@ def wait_for_process_or_interrupt(pid):
 	try:
 		status = waitpid_reap_other_children(pid)
 		return (True, status)
-	except KeyboardInterrupt:
-		return (False, None)
 
 def run_process(args, background_process_name, background_process_command):
 	background_process_pid = run_background_process(background_process_name,background_process_command)

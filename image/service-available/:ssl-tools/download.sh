@@ -13,11 +13,11 @@ fi
 apk add openssl jq
 
 echo "Download cfssl ..."
-curl -o /usr/sbin/cfssl -SL https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+curl -o /usr/sbin/cfssl -SL https://github.com/osixia/cfssl/releases/download/1.3.2/cfssl_linux-amd64
 chmod 700 /usr/sbin/cfssl
 
 echo "Download cfssljson ..."
-curl -o /usr/sbin/cfssljson -SL https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+curl -o /usr/sbin/cfssljson -SL https://github.com/osixia/cfssl/releases/download/1.3.2/cfssljson_linux-amd64
 chmod 700 /usr/sbin/cfssljson
 
 echo "Project sources: https://github.com/cloudflare/cfssl"
