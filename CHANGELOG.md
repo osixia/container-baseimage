@@ -11,7 +11,7 @@
 
 ### Fixed
   - my_init exits with 0 on SIGINT after runit is started
-  - better sanitize_shenvname 
+  - better sanitize_shenvname
 
 ## [1.1.1] - 2017-10-25
 ### Changed
