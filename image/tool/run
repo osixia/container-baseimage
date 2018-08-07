@@ -883,10 +883,13 @@ signal.signal(signal.SIGTERM, lambda signum, frame: ignore_signals_and_raise_key
 signal.signal(signal.SIGINT, lambda signum, frame: ignore_signals_and_raise_keyboard_interrupt('SIGINT'))
 signal.signal(signal.SIGALRM, lambda signum, frame: raise_alarm_exception())
 
+exit_code = 0
+
 try:
 	main(args)
 
 except SystemExit as err:
+	exit_code = err.code
 	if args.keepalive and err.code == 0:
 		try:
 			info("All process have exited without error, keep container alive...")
@@ -919,3 +922,5 @@ finally:
 
 	if args.kill_all_on_exit:
 		kill_all_processes(KILL_ALL_PROCESSES_TIMEOUT)
+
+	exit(exit_code)
