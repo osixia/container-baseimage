@@ -134,8 +134,29 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
     fi
 
   else
-    [[ -n "$CFSSL_CA_CERT" ]] && CA_CERT_PARAM="-ca $CFSSL_CA_CERT"
-    [[ -n "$CFSSL_CA_KEY" ]] && CA_KEY_PARAM="-ca-key $CFSSL_CA_KEY"
+
+    # files path with : may cause issue with cfssl tools due to :
+    # ReadBytes - https://github.com/cloudflare/cfssl/blob/master/helpers/helpers.go#L573
+    # : is used to split env from file path
+    # so we copy ca cert and key to tmp
+    if [ -n "$CFSSL_CA_CERT" ]; then
+
+      CFSSL_CA_CERT_FILE="/tmp/ca-cert-file"
+      cp -f $CFSSL_CA_CERT $CFSSL_CA_CERT_FILE
+      chmod 644 $CFSSL_CA_CERT_FILE
+
+      CA_CERT_PARAM="-ca $CFSSL_CA_CERT_FILE"
+    fi
+
+    if [ -n "$CFSSL_CA_KEY" ]; then
+
+      CFSSL_CA_KEY_FILE="/tmp/ca-key-file"
+      cp -f $CFSSL_CA_KEY $CFSSL_CA_KEY_FILE
+      chmod 600 $CFSSL_CA_CERT_FILE
+
+      CA_KEY_PARAM="-ca-key $CFSSL_CA_KEY_FILE"
+    fi
+
   fi
 
   if [ -n "$CFSSL_CONFIG_JSON" ]; then
@@ -155,8 +176,8 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
 
   retry=0
   while [  $retry -lt $CFSSL_RETRY ]; do
-    log-helper debug "cfssl $LOG_LEVEL_PARAM gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME"
-    cfssl $LOG_LEVEL_PARAM gencert $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME && break
+    log-helper debug "cfssl gencert $LOG_LEVEL_PARAM $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME"
+    cfssl gencert $LOG_LEVEL_PARAM $REMOTE_PARAM $CA_CERT_PARAM $CA_KEY_PARAM $CONFIG_PARAM $HOSTNAME_PARAM $PROFILE_PARAM $LABEL_PARAM $CSR_FILE | cfssljson -bare /tmp/$CERT_NAME && break
     sleep $CFSSL_RETRY_DELAY
     ((retry++))
   done
@@ -174,11 +195,11 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
 
     if [ -n "$CFSSL_REMOTE" ]; then
       log-helper debug "Get CA certificate from $CFSSL_REMOTE"
-      log-helper debug "cfssl $LOG_LEVEL_PARAM info $REMOTE_PARAM $CONFIG_PARAM $PROFILE_PARAM $LABEL_PARAM"
+      log-helper debug "cfssl info $LOG_LEVEL_PARAM $REMOTE_PARAM $CONFIG_PARAM $PROFILE_PARAM $LABEL_PARAM"
 
       retry=0
       while [  $retry -lt $CFSSL_RETRY ]; do
-        cfssl $LOG_LEVEL_PARAM info $REMOTE_PARAM $CONFIG_PARAM $PROFILE_PARAM $LABEL_PARAM | sed -e "s/.*certificate\":\"\(.*-----\)\".*/\1/g" | sed 's/\\n/\n/g' > $CA_FILE && break
+        cfssl info $LOG_LEVEL_PARAM $REMOTE_PARAM $CONFIG_PARAM $PROFILE_PARAM $LABEL_PARAM | sed -e "s/.*certificate\":\"\(.*-----\)\".*/\1/g" | sed 's/\\n/\n/g' > $CA_FILE && break
         sleep $CFSSL_RETRY_DELAY
         log-helper debug "CA certificate returned save as $CA_FILE"
         ((retry++))
@@ -195,6 +216,8 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
 
   # delete tmp files
   rm -f /tmp/$CERT_NAME.csr $CONFIG_FILE $CSR_FILE
+  [[ -e "$CFSSL_CA_CERT_FILE" ]] && rm $CFSSL_CA_CERT_FILE
+  [[ -e "$CFSSL_CA_KEY_FILE" ]] && rm $CFSSL_CA_KEY_FILE
 
   log-helper debug "done :)"
 
