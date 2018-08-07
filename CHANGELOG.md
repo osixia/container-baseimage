@@ -9,6 +9,10 @@
   - "traefik" JSONSSL_PROFILE is now for traefik >= v1.6 acme.json file
   - Upgrade CFSSL version to 1.3.2
 
+### Fixed
+  - my_init exits with 0 on SIGINT after runit is started
+  - better sanitize_shenvname 
+
 ## [1.1.1] - 2017-10-25
 ### Changed
   - chmod 444 logrotate config files
