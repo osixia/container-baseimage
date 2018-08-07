@@ -619,9 +619,8 @@ def run_startup_files(args):
 		run_command_killable_and_import_run_envvars([RUN_STARTUP_FINAL_FILE])
 
 def wait_for_process_or_interrupt(pid):
-	try:
-		status = waitpid_reap_other_children(pid)
-		return (True, status)
+	status = waitpid_reap_other_children(pid)
+	return (True, status)
 
 def run_process(args, background_process_name, background_process_command):
 	background_process_pid = run_background_process(background_process_name,background_process_command)
