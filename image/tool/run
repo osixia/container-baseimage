@@ -439,7 +439,11 @@ def copy_service_to_run_dir():
 
 	info("Copy "+IMPORT_SERVICE_DIR+" to "+RUN_SERVICE_DIR)
 
-	shutil.copytree(IMPORT_SERVICE_DIR, RUN_SERVICE_DIR)
+	try:
+		shutil.copytree(IMPORT_SERVICE_DIR, RUN_SERVICE_DIR)
+	except shutil.Error as e:
+		warning(e)
+
 	state_set_service_copied_to_run_dir()
 
 def state_set_service_copied_to_run_dir():
