@@ -5,12 +5,13 @@
   - jsonssl add support for traefik >= v1.6 acme.json file
 
 ### Changed
-  - run: catch copy-service errors
-
-### Changed
   - "traefik" JSONSSL_PROFILE be becomes "traefik_up_to_v1_6"
   - "traefik" JSONSSL_PROFILE is now for traefik >= v1.6 acme.json file
   - Upgrade CFSSL version to 1.3.2
+  - run: catch copy-service errors
+  - KILL_PROCESS_TIMEOUT and KILL_ALL_PROCESSES_TIMEOUT to 30 seconds
+  - make ssl-helper cron log to /proc/self/fd/1 and /proc/self/fd/2
+  - syslog-ng config
 
 ### Fixed
   - my_init exits with 0 on SIGINT after runit is started
