@@ -91,7 +91,7 @@ if [ "${SSL_HELPER_AUTO_RENEW,,}" = "true" ]; then
   fi
 
   # add cron job
-  echo "$SSL_HELPER_AUTO_RENEW_CRON_EXP root /usr/sbin/ssl-auto-renew ${SSL_HELPER_TOOL,,} $PREFIX $CERT_FILE $KEY_FILE $CA_FILE \"$SSL_HELPER_AUTO_RENEW_SERVICES_IMPACTED\" \"$JSONSSL_FILE\" \"$SSL_HELPER_AUTO_RENEW_FROM_FILES\" \"$SSL_HELPER_AUTO_RENEW_CERT_FROM_FILE\" \"$SSL_HELPER_AUTO_RENEW_KEY_FROM_FILE\" \"$SSL_HELPER_AUTO_RENEW_CA_CERT_FROM_FILE\" > /proc/self/fd/1 2>/proc/self/fd/2" > /etc/cron.d/$PREFIX
+  echo "$SSL_HELPER_AUTO_RENEW_CRON_EXP root /usr/sbin/ssl-auto-renew ${SSL_HELPER_TOOL,,} $PREFIX $CERT_FILE $KEY_FILE $CA_FILE \"$SSL_HELPER_AUTO_RENEW_SERVICES_IMPACTED\" \"$JSONSSL_FILE\" \"$SSL_HELPER_AUTO_RENEW_FROM_FILES\" \"$SSL_HELPER_AUTO_RENEW_CERT_FROM_FILE\" \"$SSL_HELPER_AUTO_RENEW_KEY_FROM_FILE\" \"$SSL_HELPER_AUTO_RENEW_CA_CERT_FROM_FILE\" 2>&1 | /usr/bin/logger -t cron_ssl_auto_renew" > /etc/cron.d/$PREFIX
   chmod 600 /etc/cron.d/$PREFIX
 
 # disable auto-renew if it was added

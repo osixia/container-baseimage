@@ -10,7 +10,7 @@
   - Upgrade CFSSL version to 1.3.2
   - run: catch copy-service errors
   - KILL_PROCESS_TIMEOUT and KILL_ALL_PROCESSES_TIMEOUT to 30 seconds
-  - make ssl-helper cron log to /proc/self/fd/1 and /proc/self/fd/2
+  - make ssl-auto-renew cron log with /usr/bin/logger -t cron_ssl_auto_renew
   - syslog-ng config
 
 ### Fixed
