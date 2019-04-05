@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.1.2] - Unreleased
+## [1.1.2] - 2019-04-05
 ### Added
   - jsonssl add support for traefik >= v1.6 acme.json file
 
