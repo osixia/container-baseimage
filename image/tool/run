@@ -3,8 +3,8 @@
 
 import os, os.path, sys, stat, signal, errno, argparse, time, json, re, yaml, ast, socket, shutil, pwd, grp
 
-KILL_PROCESS_TIMEOUT = int(os.environ.get('KILL_PROCESS_TIMEOUT', 5))
-KILL_ALL_PROCESSES_TIMEOUT = int(os.environ.get('KILL_ALL_PROCESSES_TIMEOUT', 5))
+KILL_PROCESS_TIMEOUT = int(os.environ.get('KILL_PROCESS_TIMEOUT', 30))
+KILL_ALL_PROCESSES_TIMEOUT = int(os.environ.get('KILL_ALL_PROCESSES_TIMEOUT', 30))
 
 LOG_LEVEL_NONE = 0
 LOG_LEVEL_ERROR = 1
@@ -13,7 +13,7 @@ LOG_LEVEL_INFO  = 3
 LOG_LEVEL_DEBUG = 4
 LOG_LEVEL_TRACE = 5
 
-SHENV_NAME_WHITELIST_REGEX = re.compile('[^\w\-_\.]')
+SHENV_NAME_WHITELIST_REGEX = re.compile('\W')
 
 log_level = None
 
@@ -439,7 +439,11 @@ def copy_service_to_run_dir():
 
 	info("Copy "+IMPORT_SERVICE_DIR+" to "+RUN_SERVICE_DIR)
 
-	shutil.copytree(IMPORT_SERVICE_DIR, RUN_SERVICE_DIR)
+	try:
+		shutil.copytree(IMPORT_SERVICE_DIR, RUN_SERVICE_DIR)
+	except shutil.Error as e:
+		warning(e)
+
 	state_set_service_copied_to_run_dir()
 
 def state_set_service_copied_to_run_dir():
@@ -619,11 +623,8 @@ def run_startup_files(args):
 		run_command_killable_and_import_run_envvars([RUN_STARTUP_FINAL_FILE])
 
 def wait_for_process_or_interrupt(pid):
-	try:
-		status = waitpid_reap_other_children(pid)
-		return (True, status)
-	except KeyboardInterrupt:
-		return (False, None)
+	status = waitpid_reap_other_children(pid)
+	return (True, status)
 
 def run_process(args, background_process_name, background_process_command):
 	background_process_pid = run_background_process(background_process_name,background_process_command)
@@ -886,10 +887,13 @@ signal.signal(signal.SIGTERM, lambda signum, frame: ignore_signals_and_raise_key
 signal.signal(signal.SIGINT, lambda signum, frame: ignore_signals_and_raise_keyboard_interrupt('SIGINT'))
 signal.signal(signal.SIGALRM, lambda signum, frame: raise_alarm_exception())
 
+exit_code = 0
+
 try:
 	main(args)
 
 except SystemExit as err:
+	exit_code = err.code
 	if args.keepalive and err.code == 0:
 		try:
 			info("All process have exited without error, keep container alive...")
@@ -922,3 +926,5 @@ finally:
 
 	if args.kill_all_on_exit:
 		kill_all_processes(KILL_ALL_PROCESSES_TIMEOUT)
+
+	exit(exit_code)
