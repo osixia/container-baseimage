@@ -5,9 +5,14 @@
   - jsonssl add support for traefik >= v1.6 acme.json file
 
 ### Changed
-  - Alpine 3.8
+  - Alpine 3.9
   - "traefik" JSONSSL_PROFILE be becomes "traefik_up_to_v1_6"
   - "traefik" JSONSSL_PROFILE is now for traefik >= v1.6 acme.json file
+  - Upgrade CFSSL version to 1.3.2
+  - run: catch copy-service errors
+  - KILL_PROCESS_TIMEOUT and KILL_ALL_PROCESSES_TIMEOUT to 30 seconds
+  - make ssl-auto-renew cron log with /usr/bin/logger -t cron_ssl_auto_renew
+  - syslog-ng config
 
 ### Fixed
   - my_init exits with 0 on SIGINT after runit is started

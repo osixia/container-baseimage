@@ -3,8 +3,8 @@
 
 import os, os.path, sys, stat, signal, errno, argparse, time, json, re, yaml, ast, socket, shutil, pwd, grp
 
-KILL_PROCESS_TIMEOUT = int(os.environ.get('KILL_PROCESS_TIMEOUT', 5))
-KILL_ALL_PROCESSES_TIMEOUT = int(os.environ.get('KILL_ALL_PROCESSES_TIMEOUT', 5))
+KILL_PROCESS_TIMEOUT = int(os.environ.get('KILL_PROCESS_TIMEOUT', 30))
+KILL_ALL_PROCESSES_TIMEOUT = int(os.environ.get('KILL_ALL_PROCESSES_TIMEOUT', 30))
 
 LOG_LEVEL_NONE = 0
 LOG_LEVEL_ERROR = 1
@@ -439,7 +439,11 @@ def copy_service_to_run_dir():
 
 	info("Copy "+IMPORT_SERVICE_DIR+" to "+RUN_SERVICE_DIR)
 
-	shutil.copytree(IMPORT_SERVICE_DIR, RUN_SERVICE_DIR)
+	try:
+		shutil.copytree(IMPORT_SERVICE_DIR, RUN_SERVICE_DIR)
+	except shutil.Error as e:
+		warning(e)
+
 	state_set_service_copied_to_run_dir()
 
 def state_set_service_copied_to_run_dir():
