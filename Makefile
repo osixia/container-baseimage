@@ -1,10 +1,11 @@
-NAME = osixia/light-baseimage
+NAME = ndanyluk/light-baseimage
 VERSION = 1.1.2
+ARCH = amd64
 
 .PHONY: build build-nocache test tag-latest push push-latest release git-tag-version
 
 build:
-	docker build -t $(NAME):$(VERSION) --rm image
+	docker build -f Dockerfile.$(ARCH) -t $(NAME):$(VERSION) --rm image
 
 build-nocache:
 	docker build -t $(NAME):$(VERSION) --no-cache --rm image
