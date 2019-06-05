@@ -38,9 +38,9 @@ install:
   - make build ARCH=${target_arch}
 
 script:
-  - docker run ndanyluk/light-baseimage-${target_arch}:${target_version} /bin/sh
+  - docker run -d --name test_image ndanyluk/light-baseimage-${target_arch}:${target_version}
   - sleep 5
-  - sudo docker ps | grep ndanyluk/light-baseimage-${target_arch}:${target_version}
+  - sudo docker ps | grep -q test_image
 
 after_success:
   - if [ -z "$DOCKER_USER" ]; then
