@@ -11,16 +11,16 @@ build-nocache:
 	docker build -f image/Dockerfile.$(ARCH) -t $(NAME)-$(ARCH):$(VERSION) --no-cache --rm image
 
 test:
-	env NAME=$(NAME) VERSION=$(VERSION) bats test/test.bats
+	env NAME=$(NAME)-$(ARCH) VERSION=$(VERSION) bats test/test.bats
 
 tag-latest:
-	docker tag $(NAME):$(VERSION) $(NAME):latest
+	docker tag $(NAME)-$(ARCH):$(VERSION) $(NAME)-$(ARCH):latest
 
 push:
-	docker push $(NAME):$(VERSION)
+	docker push $(NAME)-$(ARCH):$(VERSION)
 
 push-latest:
-	docker push $(NAME):latest
+	docker push $(NAME)-$(ARCH):latest
 
 release: build test tag-latest push push-latest
 

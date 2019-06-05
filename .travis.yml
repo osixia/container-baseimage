@@ -11,7 +11,7 @@ env:
   matrix:
     - target_arch=amd64 qemu_arch=x86_64
     - target_arch=armv7 qemu_arch=arm
-#    - target_arch=armv6 qemu_arch=arm
+#    - target_arch=armv6 qemu_arch=arm <------ NOT SUPPORTED BY DEBIAN STRETCH BASE IMAGE
     - target_arch=arm64 qemu_arch=aarch64
 
 before_install:
@@ -26,13 +26,13 @@ before_install:
   - sudo service docker restart
   - git clone https://github.com/sstephenson/bats.git
   - cd bats
-  - sudo ./install.sh
+  - sudo ./install.sh /usr/local
 
 install:
   - docker run --rm --privileged multiarch/qemu-user-static:register
   - curl -sLO https://github.com/multiarch/qemu-user-static/releases/download/v${qemu_version}/qemu-${qemu_arch}-static.tar.gz;
   - tar -xzvf qemu-${qemu_arch}-static.tar.gz;
-  - make build ARCH=${target_arch}
+  - make build ARCH="${target_arch}"
 
 script:
   - make test
