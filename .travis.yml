@@ -37,7 +37,7 @@ install:
   - make build ARCH=${target_arch}
 
 script:
-  - make test
+  - make test ARCH=${target_arch}
 
 after_success:
   - if [ -z "$DOCKER_USER" ]; then
@@ -46,5 +46,5 @@ after_success:
       echo "Branch build, skipping Docker Hub push";
     else
       docker login -u "$DOCKER_USER" -p "$DOCKER_PASS";
-      make tag-latest push push-latest
+      make tag-latest push push-latest ARCH=${target_arch}
     fi
