@@ -33,6 +33,7 @@ install:
   - docker run --rm --privileged multiarch/qemu-user-static:register
   - curl -sLO https://github.com/multiarch/qemu-user-static/releases/download/v${qemu_version}/qemu-${qemu_arch}-static.tar.gz;
   - tar -xzvf qemu-${qemu_arch}-static.tar.gz;
+  - mv qemu-${qemu_arch}-static image/
   - make build ARCH=${target_arch}
 
 script:
