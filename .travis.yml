@@ -1,0 +1,45 @@
+sudo: required
+
+language: generic
+
+services:
+  - docker
+
+env:
+  global:
+    - qemu_version=4.0.0
+  matrix:
+    - target_arch=amd64 qemu_arch=x86_64
+    - target_arch=armv7 qemu_arch=arm
+#    - target_arch=armv6 qemu_arch=arm
+    - target_arch=arm64 qemu_arch=aarch64
+
+before_install:
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - sudo apt-get update
+  - sudo apt-get -y install docker-ce
+  - mkdir $HOME/.docker
+  - 'echo "{" > $HOME/.docker/config.json'
+  - 'echo "  \"experimental\": \"enabled\"" >> $HOME/.docker/config.json'
+  - 'echo "}" >> $HOME/.docker/config.json'
+  - sudo service docker restart
+
+install:
+  - docker run --rm --privileged multiarch/qemu-user-static:register
+  - curl -sLO https://github.com/multiarch/qemu-user-static/releases/download/v${qemu_version}/qemu-${qemu_arch}-static.tar.gz;
+  - tar -xzvf qemu-${qemu_arch}-static.tar.gz;
+  - make build ARCH=${target_arch}
+
+script:
+  - make test
+
+after_success:
+  - if [ -z "$DOCKER_USER" ]; then
+      echo "PR build, skipping Docker Hub push";
+    elif [ "$TRAVIS_BRANCH" != "master" ]; then
+      echo "Branch build, skipping Docker Hub push";
+    else
+      docker login -u "$DOCKER_USER" -p "$DOCKER_PASS";
+      make tag-latest push push-latest
+    fi
