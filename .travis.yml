@@ -8,6 +8,7 @@ services:
 env:
   global:
     - qemu_version=4.0.0
+    - target_version=1.1.2
   matrix:
     - target_arch=amd64 qemu_arch=x86_64
     - target_arch=armv7 qemu_arch=arm
@@ -37,16 +38,30 @@ install:
   - make build ARCH=${target_arch}
 
 script:
-  - docker run ndanyluk/docker-light-baseimage-${target_arch}:1.1.2
+  - docker run ndanyluk/light-baseimage-${target_arch}:${target_version}
   - sleep 5
-  - sudo docker ps | grep docker-light-baseimage-${target_arch}
+  - sudo docker ps | grep ndanyluk/light-baseimage-${target_arch}:${target_version}
 
 after_success:
   - if [ -z "$DOCKER_USER" ]; then
       echo "PR build, skipping Docker Hub push";
-    elif [ "$TRAVIS_BRANCH" != "master" ]; then
-      echo "Branch build, skipping Docker Hub push";
     else
       docker login -u "$DOCKER_USER" -p "$DOCKER_PASS";
       make tag-latest push push-latest ARCH=${target_arch}
     fi
+
+jobs:
+  include:
+    - stage: deploy
+      install: skip
+      script: skip
+      after_success:
+        - if [ -z "$DOCKER_USER" ]; then
+            echo "PR build, skipping Docker Hub push";
+          else
+            docker login -u "$DOCKER_USER" -p "$DOCKER_PASS";
+            docker manifest create ndanyluk/light-baseimage:${target_version} ndanyluk/light-baseimage-armv7:${target_version} ndanyluk/light-baseimage-arm64:${target_version} ndanyluk/light-baseimage-amd64:${target_version};
+            docker manifest create ndanyluk/light-baseimage:latest ndanyluk/light-baseimage-armv7:latest ndanyluk/light-baseimage-amd64:latest ndanyluk/light-baseimage-arm64:latest;
+            docker manifest push ndanyluk/light-baseimage:${target_version};
+            docker manifest push ndanyluk/light-baseimage:latest;
+          fi
