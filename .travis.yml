@@ -24,6 +24,9 @@ before_install:
   - 'echo "  \"experimental\": \"enabled\"" >> $HOME/.docker/config.json'
   - 'echo "}" >> $HOME/.docker/config.json'
   - sudo service docker restart
+  - git clone https://github.com/sstephenson/bats.git
+  - cd bats
+  - sudo ./install.sh
 
 install:
   - docker run --rm --privileged multiarch/qemu-user-static:register
