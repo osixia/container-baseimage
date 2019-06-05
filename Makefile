@@ -5,10 +5,10 @@ ARCH = amd64
 .PHONY: build build-nocache test tag-latest push push-latest release git-tag-version
 
 build:
-	docker build -f Dockerfile.$(ARCH) -t $(NAME):$(VERSION) --rm image
+	docker build -f Dockerfile.$(ARCH) -t $(NAME)-$(ARCH):$(VERSION) --rm image
 
 build-nocache:
-	docker build -t $(NAME):$(VERSION) --no-cache --rm image
+	docker build -f Dockerfile.$(ARCH) -t $(NAME)-$(ARCH):$(VERSION) --no-cache --rm image
 
 test:
 	env NAME=$(NAME) VERSION=$(VERSION) bats test/test.bats
