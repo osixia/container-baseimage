@@ -27,6 +27,7 @@ before_install:
   - git clone https://github.com/sstephenson/bats.git
   - cd bats
   - sudo ./install.sh /usr/local
+  - cd ..
 
 install:
   - docker run --rm --privileged multiarch/qemu-user-static:register
