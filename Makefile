@@ -1,4 +1,4 @@
-NAME = ndanyluk/light-baseimage
+NAME = osixia/light-baseimage
 VERSION = 1.1.2
 ARCH = amd64
 
