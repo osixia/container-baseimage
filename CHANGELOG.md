@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.0] - Unreleased
+### Added
+  - Add multiarch support. Thanks to @ndanyluk !
+
 ## [1.1.2] - 2019-04-05
 ### Added
   - jsonssl add support for traefik >= v1.6 acme.json file
