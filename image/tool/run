@@ -1,4 +1,4 @@
-#!/usr/bin/python -u
+#!/usr/bin/python3 -u
 # -*- coding: utf-8 -*-
 
 import os, os.path, sys, stat, signal, errno, argparse, time, json, re, yaml, ast, socket, shutil, pwd, grp
@@ -50,7 +50,7 @@ class AlarmException(Exception):
 	pass
 
 def error(message):
-  	if log_level >= LOG_LEVEL_ERROR:
+	if log_level >= LOG_LEVEL_ERROR:
 		sys.stderr.write("*** %s\n" % message)
 
 def warning(message):
@@ -463,9 +463,9 @@ def state_set_startup_done():
 
 def state_reset_startup_done():
 	try:
-	    os.remove(RUN_STATE_DIR+"/startup-done")
+		os.remove(RUN_STATE_DIR+"/startup-done")
 	except OSError:
-	    pass
+		pass
 
 def is_multiple_process_container():
 	return len(listdir(RUN_PROCESS_DIR)) > 1
