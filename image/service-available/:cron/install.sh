@@ -12,5 +12,3 @@ rm -f /etc/cron.daily/upstart
 rm -f /etc/cron.daily/dpkg
 rm -f /etc/cron.daily/password
 rm -f /etc/cron.weekly/fstrim
-
-exit 0

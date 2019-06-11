@@ -22,7 +22,7 @@ MINIMAL_APT_GET_INSTALL='apt-get install -y --no-install-recommends'
 ## https://journal.paul.querna.org/articles/2013/10/15/docker-ubuntu-on-rackspace/
 ## http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=594189
 export INITRD=no
-echo -n no > /container/environment/INITRD
+printf no > /container/environment/INITRD
 
 apt-get update
 
@@ -49,9 +49,9 @@ echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen en_US
 update-locale LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8
 
-echo -n en_US.UTF-8 > /container/environment/LANG
-echo -n en_US.UTF-8 > /container/environment/LANGUAGE
-echo -n en_US.UTF-8 > /container/environment/LC_CTYPE
+printf en_US.UTF-8 > /container/environment/LANG
+printf en_US.UTF-8 > /container/environment/LANGUAGE
+printf en_US.UTF-8 > /container/environment/LC_CTYPE
 
 apt-get clean
 rm -rf /tmp/* /var/tmp/*

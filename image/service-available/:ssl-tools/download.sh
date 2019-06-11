@@ -1,18 +1,18 @@
-#!/bin/sh -e
+#!/bin/bash -e
 
 # download curl and ca-certificate from apt-get if needed
-to_install=""
+to_install=()
 
-if [ $(dpkg-query -W -f='${Status}' curl 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-  to_install="curl"
+if [ "$(dpkg-query -W -f='${Status}' curl 2>/dev/null | grep -c "ok installed")" -eq 0 ]; then
+    to_install+=("curl")
 fi
 
-if [ $(dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-  to_install="$to_install ca-certificates"
+if [ "$(dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed")" -eq 0 ]; then
+    to_install+=("ca-certificates")
 fi
 
-if [ -n "$to_install" ]; then
-  LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $to_install
+if [ ${#to_install[@]} -ne 0 ]; then
+    LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${to_install[@]}"
 fi
 
 LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends openssl jq
@@ -28,8 +28,6 @@ chmod 700 /usr/sbin/cfssljson
 echo "Project sources: https://github.com/cloudflare/cfssl"
 
 # remove tools installed to download cfssl
-if [ -n "$to_install" ]; then
-  apt-get remove -y --purge --auto-remove $to_install
+if [ ${#to_install[@]} -ne 0 ]; then
+    apt-get remove -y --purge --auto-remove "${to_install[@]}"
 fi
-
-exit 0
