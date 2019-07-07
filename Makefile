@@ -1,5 +1,5 @@
-NAME = anagno/light-baseimage
-VERSION = 1.2.0
+NAME = osixia/light-baseimage
+VERSION = latest
 
 .PHONY: build build-nocache test tag-latest push push-latest release git-tag-version
 
