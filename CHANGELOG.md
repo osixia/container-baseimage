@@ -4,6 +4,13 @@
 ### Added
   - Add multiarch support. Thanks to @ndanyluk and @anagno !
 
+### Changed 
+  - Upgrade python script to python3
+  - Upgrade CFSSL version to 1.3.3
+
+### Fixed
+  - Fix shellcheck errors and warnings on all scripts
+
 ## [1.1.2] - 2019-04-05
 ### Added
   - jsonssl add support for traefik >= v1.6 acme.json file
