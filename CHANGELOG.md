@@ -2,7 +2,7 @@
 
 ## [1.2.0] - Unreleased
 ### Added
-  - Add multiarch support. Thanks to @ndanyluk !
+  - Add multiarch support. Thanks to @ndanyluk and @anagno !
 
 ## [1.1.2] - 2019-04-05
 ### Added
