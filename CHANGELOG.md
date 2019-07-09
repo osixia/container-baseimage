@@ -5,6 +5,7 @@
   - Add multiarch support. Thanks to @ndanyluk and @anagno !
 
 ### Changed 
+  - Use debian buster-slim as baseimage
   - Upgrade python script to python3
   - Upgrade CFSSL version to 1.3.3
 
