@@ -1,4 +1,4 @@
-#!/usr/bin/python -u
+#!/usr/bin/python3 -u
 # -*- coding: utf-8 -*-
 
 import os, os.path, sys, stat, signal, errno, argparse, time, json, re, yaml, ast, socket, shutil, pwd, grp
@@ -50,7 +50,7 @@ class AlarmException(Exception):
 	pass
 
 def error(message):
-  	if log_level >= LOG_LEVEL_ERROR:
+	if log_level >= LOG_LEVEL_ERROR:
 		sys.stderr.write("*** %s\n" % message)
 
 def warning(message):
@@ -71,7 +71,7 @@ def trace(message):
 
 def debug_env_dump():
 	debug("------------ Environment dump ------------")
-	for name, value in os.environ.items():
+	for name, value in list(os.environ.items()):
 		debug(name + " = " +  value)
 	debug("------------------------------------------")
 
@@ -159,14 +159,14 @@ def python_to_bash_envvar(name, value):
 
 def decode_python_envvars():
 	_environ = dict(os.environ)
-	for name, value in _environ.items():
+	for name, value in list(_environ.items()):
 		if value.startswith("#PYTHON2BASH:") :
 			value = value.replace("#PYTHON2BASH:","",1)
 			python_to_bash_envvar(name, value)
 
 def decode_json_envvars():
 	_environ = dict(os.environ)
-	for name, value in _environ.items():
+	for name, value in list(_environ.items()):
 		if value.startswith("#JSON2BASH:") :
 			value = value.replace("#JSON2BASH:","",1)
 			try:
@@ -198,7 +198,7 @@ def generic_import_envvars(path, override_existing_environment):
 			new_env[name] = value
 			trace("import " + name + " from " + filePath + " --- ")
 
-	for name, value in new_env.items():
+	for name, value in list(new_env.items()):
 		if override_existing_environment or name not in os.environ:
 			os.environ[name] = value
 			trace("set : " + name + " = "+ os.environ[name])
@@ -218,7 +218,7 @@ def export_run_envvars(to_dir = True):
 		warning("export_run_envvars: "+RUN_ENVIRONMENT_DIR+" don't exists")
 		return
 	shell_dump = ""
-	for name, value in os.environ.items():
+	for name, value in list(os.environ.items()):
 		if name in ['USER', 'GROUP', 'UID', 'GID', 'SHELL']:
 			continue
 		if to_dir:
@@ -296,7 +296,7 @@ def import_env_files():
 						elif file.endswith(ENV_FILES_JSON_EXTENSIONS):
 							env_vars = json.load(f)
 
-						for name, value in env_vars.items():
+						for name, value in list(env_vars.items()):
 							if not name in os.environ:
 								if isinstance(value, list) or isinstance(value, dict):
 									os.environ[name] = '#PYTHON2BASH:' + xstr(value)
@@ -463,9 +463,9 @@ def state_set_startup_done():
 
 def state_reset_startup_done():
 	try:
-	    os.remove(RUN_STATE_DIR+"/startup-done")
+		os.remove(RUN_STATE_DIR+"/startup-done")
 	except OSError:
-	    pass
+		pass
 
 def is_multiple_process_container():
 	return len(listdir(RUN_PROCESS_DIR)) > 1

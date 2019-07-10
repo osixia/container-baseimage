@@ -2,5 +2,3 @@
 
 # download syslog-ng-core from apt-get
 apk add syslog-ng
-
-exit 0

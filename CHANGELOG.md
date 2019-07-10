@@ -3,12 +3,14 @@
 # [0.1.6] - Unreleased
 ### Added
   - jsonssl add support for traefik >= v1.6 acme.json file
+  - Add multiarch support. Thanks to @ndanyluk and @anagno !
 
 ### Changed
-  - Alpine 3.10
+  - Use alpine:3.10 as baseimage
+  - Upgrade python script to python3
+  - Upgrade CFSSL version to 1.3.3
   - "traefik" JSONSSL_PROFILE be becomes "traefik_up_to_v1_6"
   - "traefik" JSONSSL_PROFILE is now for traefik >= v1.6 acme.json file
-  - Upgrade CFSSL version to 1.3.2
   - run: catch copy-service errors
   - KILL_PROCESS_TIMEOUT and KILL_ALL_PROCESSES_TIMEOUT to 30 seconds
   - make ssl-auto-renew cron log with /usr/bin/logger -t cron_ssl_auto_renew
@@ -18,6 +20,7 @@
   - my_init exits with 0 on SIGINT after runit is started
   - better sanitize_shenvname
   - exit status
+  - Fix shellcheck errors and warnings on all scripts
 
 # [0.1.5] - 2017-10-25
 ### Changed

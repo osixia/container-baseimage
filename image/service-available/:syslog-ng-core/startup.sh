@@ -1,8 +1,8 @@
 #!/bin/sh -e
 log-helper level eq trace && set -x
 
-ln -sf ${CONTAINER_SERVICE_DIR}/:syslog-ng-core/assets/config/syslog_ng_default /etc/syslog-ng/syslog-ng
-ln -sf ${CONTAINER_SERVICE_DIR}/:syslog-ng-core/assets/config/syslog-ng.conf /etc/syslog-ng/syslog-ng.conf
+ln -sf "${CONTAINER_SERVICE_DIR}/:syslog-ng-core/assets/config/syslog_ng_default" /etc/syslog-ng/syslog-ng
+ln -sf "${CONTAINER_SERVICE_DIR}/:syslog-ng-core/assets/config/syslog-ng.conf" /etc/syslog-ng/syslog-ng.conf
 
 # If /dev/log is either a named pipe or it was placed there accidentally,
 # e.g. because of the issue documented at https://github.com/phusion/baseimage-docker/pull/25,
@@ -20,5 +20,3 @@ fi
 # If /var/log is writable by another user logrotate will fail
 /bin/chown root:root /var/log
 /bin/chmod 0755 /var/log
-
-exit 0

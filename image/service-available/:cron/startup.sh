@@ -11,5 +11,3 @@ find /etc/periodic/hourly/ -exec touch {} \;
 find /etc/periodic/daily/ -exec touch {} \;
 find /etc/periodic/weekly/ -exec touch {} \;
 find /etc/periodic/monthly/ -exec touch {} \;
-
-exit 0

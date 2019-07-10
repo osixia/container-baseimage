@@ -19,10 +19,10 @@ log_level=${CONTAINER_LOG_LEVEL:-${LOG_LEVEL_INFO}}
 
 call=$1 # function to call (error, warning, info, debug, trace, level)
 if [[ ! "$call" =~ ^(error|warning|info|debug|trace|level)$ ]]; then
-  echo "Error: Function $call not found"
-  echo "Allowed functions are: error, warning, info, debug, trace, level"
-  echo "usage example: log-helper info hello !"
-  exit 1
+    echo "Error: Function $call not found"
+    echo "Allowed functions are: error, warning, info, debug, trace, level"
+    echo "usage example: log-helper info hello !"
+    exit 1
 fi
 
 
@@ -30,94 +30,92 @@ echo_msg="" # message to print if required log level is set
 echo_param="" # echo command parameters
 
 function error() {
-  getEchoParams $@
-
-  if [ $log_level -ge 1 ]; then
-    echo $echo_param  "$echo_msg"
-  fi
+    getEchoParams $@
+    
+    if [ $log_level -ge 1 ]; then
+        echo $echo_param  "$echo_msg"
+    fi
 }
 
 function warning() {
-  getEchoParams $@
-
-  if [ $log_level -ge 2 ]; then
-    echo $echo_param  "$echo_msg"
-  fi
+    getEchoParams $@
+    
+    if [ $log_level -ge 2 ]; then
+        echo $echo_param  "$echo_msg"
+    fi
 }
 
 function info() {
-  getEchoParams $@
-
-  if [ $log_level -ge 3 ]; then
-    echo $echo_param "$echo_msg"
-  fi
+    getEchoParams $@
+    
+    if [ $log_level -ge 3 ]; then
+        echo $echo_param "$echo_msg"
+    fi
 }
 
 function debug() {
-  getEchoParams $@
-
-  if [ $log_level -ge 4 ]; then
-    echo $echo_param "$echo_msg"
-  fi
+    getEchoParams $@
+    
+    if [ $log_level -ge 4 ]; then
+        echo $echo_param "$echo_msg"
+    fi
 }
 
 function trace() {
-  getEchoParams $@
-
-  if [ $log_level -ge 5 ]; then
-    echo $echo_param "$echo_msg"
-  fi
+    getEchoParams $@
+    
+    if [ $log_level -ge 5 ]; then
+        echo $echo_param "$echo_msg"
+    fi
 }
 
 function getMsgFromStdin() {
-  if [ -z "$2" ]; then
-    echo_msg=$(cat)
-  fi
+    if [ -z "$2" ]; then
+        echo_msg=$(cat)
+    fi
 }
 
 function getEchoParams() {
-
-  echo_msg="$@"
-
-  if [[ "$1" =~ ^(-e|-n|-E)$ ]]; then
-    echo_param=$1
-    echo_msg=${echo_msg#$1 }
-  fi
-
-  # read from pipe if echo_msg is empty
-  [[ -n "$echo_msg" ]] || getMsgFromStdin
+    
+    echo_msg="$@"
+    
+    if [[ "$1" =~ ^(-e|-n|-E)$ ]]; then
+        echo_param=$1
+        echo_msg=${echo_msg#$1 }
+    fi
+    
+    # read from pipe if echo_msg is empty
+    [[ -n "$echo_msg" ]] || getMsgFromStdin
 }
 
 function level() {
-
-  local operator=$1
-  local loglevel_str=$2
-  local loglevel_str=${loglevel_str^^} # uppercase
-
-  if [[ ! "$operator" =~ ^(eq|ne|gt|ge|lt|le)$ ]]; then
-    echo "Error: Operator $operator not allowed"
-    echo "Allowed operators are: eq, ne, gt, ge, lt, le"
-    echo "Help: http://www.tldp.org/LDP/abs/html/comparison-ops.html"
-    exit 1
-  fi
-
-  if [ -z "$loglevel_str" ]; then
-    echo "Error: No log level provided"
-    echo "Allowed log level are: none, error, warning, info, debug, trace"
-    echo "usage example: log-helper level eq info"
-    exit 1
-  fi
-
-  local log_level_var=LOG_LEVEL_$loglevel_str
-
-  if [ $log_level -$operator ${!log_level_var} ]; then
-    exit 0
-  else
-    exit 1
-  fi
+    
+    local operator=$1
+    local loglevel_str=$2
+    local loglevel_str=${loglevel_str^^} # uppercase
+    
+    if [[ ! "$operator" =~ ^(eq|ne|gt|ge|lt|le)$ ]]; then
+        echo "Error: Operator $operator not allowed"
+        echo "Allowed operators are: eq, ne, gt, ge, lt, le"
+        echo "Help: http://www.tldp.org/LDP/abs/html/comparison-ops.html"
+        exit 1
+    fi
+    
+    if [ -z "$loglevel_str" ]; then
+        echo "Error: No log level provided"
+        echo "Allowed log level are: none, error, warning, info, debug, trace"
+        echo "usage example: log-helper level eq info"
+        exit 1
+    fi
+    
+    local log_level_var=LOG_LEVEL_$loglevel_str
+    
+    if [ $log_level -$operator ${!log_level_var} ]; then
+        exit 0
+    else
+        exit 1
+    fi
 }
 
 shift
 $call "$@"
-
-exit 0
