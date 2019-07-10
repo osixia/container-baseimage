@@ -14,7 +14,7 @@ A **Debian 10 (Buster)** based docker image to build reliable image quickly. Thi
 The aims of this image is to be used as a base for your own Docker images. It's base on the awesome work of: [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
 
 Other base distribution are available:
-- [Alpine](https://github.com/osixia/docker-light-baseimage/tree/feature-linux-alpine) | [Docker Hub](https://hub.docker.com/r/osixia/alpine-light-baseimage/) | [![](https://images.microbadger.com/badges/image/osixia/alpine-light-baseimage.svg)](http://microbadger.com/images/osixia/alpine-light-baseimage "Get your own image badge on microbadger.com")
+- [Alpine](https://github.com/osixia/docker-light-baseimage/tree/alpine) | [Docker Hub](https://hub.docker.com/r/osixia/alpine-light-baseimage/) | [![](https://images.microbadger.com/badges/image/osixia/alpine-light-baseimage.svg)](http://microbadger.com/images/osixia/alpine-light-baseimage "Get your own image badge on microbadger.com")
 
 Table of Contents
 - [osixia/light-baseimage](#osixialight-baseimage)
