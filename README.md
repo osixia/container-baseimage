@@ -149,7 +149,6 @@ In the Dockerfile we are going to:
 	    # Use osixia/alpine-light-baseimage
 	    # https://github.com/osixia/docker-light-baseimage
 	    FROM osixia/alpine-light-baseimage:0.1.6
-	    MAINTAINER Your Name <your@name.com>
 
 	    # Download nginx from apk and clean apk files
 	    RUN apk update \
@@ -394,7 +393,6 @@ In the Dockerfile we are going to:
         # Use osixia/alpine-light-baseimage
         # https://github.com/osixia/docker-light-baseimage
         FROM osixia/alpine-light-baseimage:0.1.6
-        MAINTAINER Your Name <your@name.com>
 
         # Install multiple process stack, nginx and php7.0-fpm and clean apt-get files
         # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
@@ -614,7 +612,6 @@ Here simple Dockerfile example how to add a service-available to an image:
         # Use osixia/alpine-light-baseimage
         # https://github.com/osixia/docker-light-baseimage
         FROM osixia/alpine-light-baseimage:0.1.6
-        MAINTAINER Your Name <your@name.com>
 
         # Add cfssl and cron service-available
         # https://github.com/osixia/docker-light-baseimage/blob/alpine/image/tool/add-service-available
