@@ -5,7 +5,7 @@
   - jsonssl add support for traefik >= v1.6 acme.json file
 
 ### Changed
-  - Alpine 3.9
+  - Alpine 3.10
   - "traefik" JSONSSL_PROFILE be becomes "traefik_up_to_v1_6"
   - "traefik" JSONSSL_PROFILE is now for traefik >= v1.6 acme.json file
   - Upgrade CFSSL version to 1.3.2
