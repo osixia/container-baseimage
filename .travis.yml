@@ -59,7 +59,7 @@ before_script:
   # If this is a tag then change the VERSION variable to only have the
   # tag name and not also the commit hash.
   - if [ -n "$TRAVIS_TAG" ]; then
-      VERSION="${TRAVIS_TAG}";
+      VERSION=$(echo "${TRAVIS_TAG}" | sed -e 's/\(.*\)[-v]\(.*\)/\1\2/g');
     fi
 
 script:
