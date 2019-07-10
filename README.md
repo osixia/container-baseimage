@@ -150,7 +150,6 @@ In the Dockerfile we are going to:
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
         FROM osixia/light-baseimage:1.2.0
-        MAINTAINER Your Name <your@name.com>
 
         # Download nginx from apt-get and clean apt-get files
         RUN apt-get -y update \
@@ -393,7 +392,6 @@ In the Dockerfile we are going to:
       # Use osixia/light-baseimage
       # https://github.com/osixia/docker-light-baseimage
       FROM osixia/light-baseimage:1.2.0
-      MAINTAINER Your Name <your@name.com>
 
       # Install multiple process stack, nginx and php7.0-fpm and clean apt-get files
       # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
@@ -595,7 +593,6 @@ Here simple Dockerfile example how to add a service-available to an image:
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
         FROM osixia/light-baseimage:1.2.0
-        MAINTAINER Your Name <your@name.com>
 
         # Add cfssl and cron service-available
         # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-service-available
