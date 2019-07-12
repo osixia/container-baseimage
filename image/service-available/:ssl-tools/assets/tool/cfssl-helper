@@ -177,7 +177,7 @@ if [ ! -e "${CERT_FILE}" ] && [ ! -e "${KEY_FILE}" ]; then
     retry=0
     while [  $retry -lt "${CFSSL_RETRY}" ]; do
         log-helper debug "cfssl gencert ${LOG_LEVEL_PARAM} ${REMOTE_PARAM} ${CA_CERT_PARAM} ${CA_KEY_PARAM} ${CONFIG_PARAM} ${HOSTNAME_PARAM} ${PROFILE_PARAM} ${LABEL_PARAM} ${CSR_FILE} | cfssljson -bare /tmp/${CERT_NAME}"
-        cfssl gencert "${LOG_LEVEL_PARAM}" "${REMOTE_PARAM}" "${CA_CERT_PARAM}" "${CA_KEY_PARAM}" "${CONFIG_PARAM}" "${HOSTNAME_PARAM}" "${PROFILE_PARAM}" "${LABEL_PARAM}" "${CSR_FILE}" | cfssljson -bare "/tmp/${CERT_NAME}" && break
+        cfssl gencert ${LOG_LEVEL_PARAM} ${REMOTE_PARAM} ${CA_CERT_PARAM} ${CA_KEY_PARAM} ${CONFIG_PARAM} ${HOSTNAME_PARAM} ${PROFILE_PARAM} ${LABEL_PARAM} ${CSR_FILE} | cfssljson -bare /tmp/${CERT_NAME} && break
         sleep "${CFSSL_RETRY_DELAY}"
         ((retry++))
     done
