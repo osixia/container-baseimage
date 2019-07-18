@@ -7,7 +7,7 @@
 ### Changed 
   - Use debian buster-slim as baseimage
   - Upgrade python script to python3
-  - Upgrade CFSSL version to 1.3.3
+  - Upgrade CFSSL version to 1.3.4
 
 ### Fixed
   - Fix shellcheck errors and warnings on all scripts
