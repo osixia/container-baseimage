@@ -64,9 +64,10 @@ before_script:
 
 script:
   - make build-nocache NAME=${NAME} VERSION=${VERSION}-${TARGET_ARCH}
-
-after_success:
+  # Run the test and if the test fails mark the build as failed.
   - make test NAME=${NAME} VERSION=${VERSION}-${TARGET_ARCH}
+
+before_deploy:
   - docker run -d --name test_image ${NAME}:${VERSION}-${TARGET_ARCH} sleep 10
   - sleep 5
   - sudo docker ps | grep -q test_image
@@ -74,28 +75,49 @@ after_success:
   # use `travis env set`.
   - docker login -u "$DOCKER_USER" -p "$DOCKER_PASS";
   - make tag NAME=${NAME} VERSION=${VERSION}-${TARGET_ARCH}
-  - make push NAME=${NAME} VERSION=${VERSION}-${TARGET_ARCH}
+
+deploy:
+  provider: script
+  on:
+    repo: osixia/docker-light-baseimage
+    all_branches: true
+  script: make push NAME=${NAME} VERSION=${VERSION}-${TARGET_ARCH}
 
 jobs:
   include:
-    - stage: deploy
+    - stage: Manifest creation
       install: skip
       script: skip
-      after_success:
+      after_deploy:
         - docker login -u "$DOCKER_USER" -p "$DOCKER_PASS";
-        - docker manifest create ${NAME}:${VERSION} ${NAME}:${VERSION}-amd64 ${NAME}:${VERSION}-i386 ${NAME}:${VERSION}-arm32v7 ${NAME}:${VERSION}-arm64v8;
-          docker manifest annotate ${NAME}:${VERSION} ${NAME}:${VERSION}-amd64 --os linux --arch amd64;
-          docker manifest annotate ${NAME}:${VERSION} ${NAME}:${VERSION}-i386 --os linux --arch 386;
-          docker manifest annotate ${NAME}:${VERSION} ${NAME}:${VERSION}-arm32v7 --os linux --arch arm --variant v7;
-          docker manifest annotate ${NAME}:${VERSION} ${NAME}:${VERSION}-arm64v8 --os linux --arch arm64 --variant v8;
+        - docker manifest create ${NAME}:${VERSION} 
+            ${NAME}:${VERSION}-amd64 ${NAME}:${VERSION}-i386 
+            ${NAME}:${VERSION}-arm32v7 
+            ${NAME}:${VERSION}-arm64v8;
+          docker manifest annotate ${NAME}:${VERSION} 
+            ${NAME}:${VERSION}-amd64 --os linux --arch amd64;
+          docker manifest annotate ${NAME}:${VERSION} 
+            ${NAME}:${VERSION}-i386 --os linux --arch 386;
+          docker manifest annotate ${NAME}:${VERSION} 
+            ${NAME}:${VERSION}-arm32v7 --os linux --arch arm --variant v7;
+          docker manifest annotate ${NAME}:${VERSION} 
+            ${NAME}:${VERSION}-arm64v8 --os linux --arch arm64 --variant v8;
 
         # The latest tag is coming from the stable branch of the repo
         - if [ "${TRAVIS_BRANCH}" == 'stable' ]; then
-            docker manifest create ${NAME}:latest ${NAME}:${VERSION}-amd64 ${NAME}:${VERSION}-i386 ${NAME}:${VERSION}-arm32v7 ${NAME}:${VERSION}-arm64v8;
-            docker manifest annotate ${NAME}:latest ${NAME}:${VERSION}-amd64 --os linux --arch amd64;
-            docker manifest annotate ${NAME}:latest ${NAME}:${VERSION}-i386 --os linux --arch 386;
-            docker manifest annotate ${NAME}:latest ${NAME}:${VERSION}-arm32v7 --os linux --arch arm --variant v7;
-            docker manifest annotate ${NAME}:latest ${NAME}:${VERSION}-arm64v8 --os linux --arch arm64 --variant v8;
+            docker manifest create ${NAME}:latest 
+              ${NAME}:${VERSION}-amd64 
+              ${NAME}:${VERSION}-i386 
+              ${NAME}:${VERSION}-arm32v7 
+              ${NAME}:${VERSION}-arm64v8;
+            docker manifest annotate ${NAME}:latest 
+              ${NAME}:${VERSION}-amd64 --os linux --arch amd64;
+            docker manifest annotate ${NAME}:latest 
+              ${NAME}:${VERSION}-i386 --os linux --arch 386;
+            docker manifest annotate ${NAME}:latest 
+              ${NAME}:${VERSION}-arm32v7 --os linux --arch arm --variant v7;
+            docker manifest annotate ${NAME}:latest 
+              ${NAME}:${VERSION}-arm64v8 --os linux --arch arm64 --variant v8;
           fi
 
         - docker manifest push ${NAME}:${VERSION};
