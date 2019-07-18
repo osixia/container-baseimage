@@ -1,0 +1,8 @@
+.git
+.gitignore
+.gitattributes
+.travis.yml
+Makefile
+LICENSE
+CHANGELOG.md
+README.md
