@@ -31,12 +31,10 @@ to_install=()
 
 if [ "$(dpkg-query -W -f='${Status}' curl 2>/dev/null | grep -c "ok installed")" -eq 0 ]; then
     to_install+=("curl")
-    echo "Installing curl."
 fi
 
 if [ "$(dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed")" -eq 0 ]; then
     to_install+=("ca-certificates")
-    echo "Installing ca-certificates."
 fi
 
 if [ ${#to_install[@]} -ne 0 ]; then
@@ -44,6 +42,11 @@ if [ ${#to_install[@]} -ne 0 ]; then
 fi
 
 LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends openssl jq
+
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=923479
+if [[ "${HOST_ARCH}" == 'arm' ]]; then
+    LC_ALL=C DEBIAN_FRONTEND=noninteractive c_rehash
+fi
 
 echo "Download cfssl ..."
 echo "curl -o /usr/sbin/cfssl -SL https://github.com/osixia/cfssl/releases/download/1.3.4/cfssl_linux-${HOST_ARCH}"
