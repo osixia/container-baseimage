@@ -79,7 +79,6 @@ before_deploy:
 deploy:
   provider: script
   on:
-    repo: osixia/docker-light-baseimage
     all_branches: true
   script: make push NAME=${NAME} VERSION=${VERSION}-${TARGET_ARCH}
 
