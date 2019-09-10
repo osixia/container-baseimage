@@ -9,11 +9,11 @@ case "${UARCH}" in
         HOST_ARCH="amd64"
     ;;
     
-    "aarch64")
+    "arm64" | "aarch64")
         HOST_ARCH="arm64"
     ;;
     
-    "armv7l")
+    "armv7l" | "armv6l" | "armhf" )
         HOST_ARCH="arm"
     ;;
     
