@@ -13,7 +13,7 @@ case "${UARCH}" in
         HOST_ARCH="arm64"
     ;;
     
-    "armv7l" | "armv6l" | "armhf" )
+    "armv7l" | "armv6l" | "armhf")
         HOST_ARCH="arm"
     ;;
     
