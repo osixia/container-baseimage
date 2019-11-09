@@ -177,7 +177,7 @@ if [ ! -e "${CERT_FILE}" ] && [ ! -e "${KEY_FILE}" ]; then
     retry=0
     while [  $retry -lt "${CFSSL_RETRY}" ]; do
         log-helper debug "cfssl gencert ${LOG_LEVEL_PARAM} ${REMOTE_PARAM} ${CA_CERT_PARAM} ${CA_KEY_PARAM} ${CONFIG_PARAM} ${HOSTNAME_PARAM} ${PROFILE_PARAM} ${LABEL_PARAM} ${CSR_FILE} | cfssljson -bare /tmp/${CERT_NAME}"
-        cfssl gencert "${LOG_LEVEL_PARAM}" "${REMOTE_PARAM}" "${CA_CERT_PARAM}" "${CA_KEY_PARAM}" "${CONFIG_PARAM}" "${HOSTNAME_PARAM}" "${PROFILE_PARAM}" "${LABEL_PARAM}" "${CSR_FILE}" | cfssljson -bare "/tmp/${CERT_NAME}" && break
+        eval cfssl gencert "${LOG_LEVEL_PARAM}" "${REMOTE_PARAM}" "${CA_CERT_PARAM}" "${CA_KEY_PARAM}" "${CONFIG_PARAM}" "${HOSTNAME_PARAM}" "${PROFILE_PARAM}" "${LABEL_PARAM}" "${CSR_FILE}" | cfssljson -bare "/tmp/${CERT_NAME}" && break
         sleep "${CFSSL_RETRY_DELAY}"
         ((retry++))
     done
@@ -195,13 +195,12 @@ if [ ! -e "${CERT_FILE}" ] && [ ! -e "${KEY_FILE}" ]; then
         
         if [ -n "${CFSSL_REMOTE}" ]; then
             log-helper debug "Get CA certificate from ${CFSSL_REMOTE}"
-            log-helper debug "cfssl info ${LOG_LEVEL_PARAM} ${REMOTE_PARAM} ${CONFIG_PARAM} ${PROFILE_PARAM} ${LABEL_PARAM}"
             
             retry=0
             while [  $retry -lt "${CFSSL_RETRY}" ]; do
-                cfssl info "${LOG_LEVEL_PARAM}" "${REMOTE_PARAM}" "${CONFIG_PARAM}" "${PROFILE_PARAM}" "${LABEL_PARAM}" | sed -e "s/.*certificate\":\"\(.*-----\)\".*/\1/g" | sed 's/\\n/\n/g' > "${CA_FILE}" && break
+                log-helper debug "cfssl info ${LOG_LEVEL_PARAM} ${REMOTE_PARAM} ${CONFIG_PARAM} ${PROFILE_PARAM} ${LABEL_PARAM}"
+                eval cfssl info "${LOG_LEVEL_PARAM}" "${REMOTE_PARAM}" "${CONFIG_PARAM}" "${PROFILE_PARAM}" "${LABEL_PARAM}" | sed -e "s/.*certificate\":\"\(.*-----\)\".*/\1/g" | sed 's/\\n/\n/g' > "${CA_FILE}" && log-helper debug "CA certificate returned save as ${CA_FILE}" && break
                 sleep "${CFSSL_RETRY_DELAY}"
-                log-helper debug "CA certificate returned save as ${CA_FILE}"
                 ((retry++))
             done
             

@@ -8,7 +8,7 @@
 ### Changed
   - Use alpine:3.10 as baseimage
   - Upgrade python script to python3
-  - Upgrade CFSSL version to 1.3.3
+  - Upgrade CFSSL version to 1.4.0
   - "traefik" JSONSSL_PROFILE be becomes "traefik_up_to_v1_6"
   - "traefik" JSONSSL_PROFILE is now for traefik >= v1.6 acme.json file
   - run: catch copy-service errors
