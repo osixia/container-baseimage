@@ -36,15 +36,10 @@ apk info | grep -q curl || to_install+=("curl")
 apk info | grep -q ca-certificates || to_install+=("ca-certificates")
 
 if [ ${#to_install[@]} -ne 0 ]; then
-  apk add $to_install
+    apk add $to_install
 fi
 
 apk add openssl jq
-
-# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=923479
-if [[ "${HOST_ARCH}" == 'arm' ]]; then
-    LC_ALL=C DEBIAN_FRONTEND=noninteractive c_rehash
-fi
 
 echo "Download cfssl ..."
 echo "curl -o /usr/sbin/cfssl -SL https://github.com/osixia/cfssl/releases/download/1.4.0/cfssl_linux-${HOST_ARCH}"
@@ -60,5 +55,5 @@ echo "Project sources: https://github.com/cloudflare/cfssl"
 
 # remove tools installed to download cfssl
 if [ ${#to_install[@]} -ne 0 ]; then
-  apk del --purge $to_install
+    apk del --purge $to_install
 fi

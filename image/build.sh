@@ -22,7 +22,7 @@ echo -n C.UTF-8 > /container/environment/LANGUAGE
 echo -n C.UTF-8 > /container/environment/LC_CTYPE
 
 ## Install bash and python apt-utils.
-apk add --update bash python py-yaml
+apk add --update bash python3 py-yaml
 
 rm -rf /var/cache/apk/*
 rm -rf /tmp/* /var/tmp/*
