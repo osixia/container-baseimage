@@ -170,6 +170,11 @@ if [ ! -e "$CERT_FILE" ] && [ ! -e "$KEY_FILE" ]; then
       CONFIG_PARAM="-config $CONFIG_FILE"
   fi
 
+  if [ -n "$ADDITIONAL_HOSTNAMES" ]; then
+    log-helper debug "additional hostnames found"
+    CFSSL_HOSTNAME="${CFSSL_HOSTNAME},${ADDITIONAL_HOSTNAMES}"
+  fi
+
   [[ -n "$CFSSL_HOSTNAME" ]] && HOSTNAME_PARAM="-hostname $CFSSL_HOSTNAME"
   [[ -n "$CFSSL_PROFILE" ]] && PROFILE_PARAM="-profile $CFSSL_PROFILE"
   [[ -n "$CFSSL_LABEL" ]] && LABEL_PARAM="-label $CFSSL_LABEL"
