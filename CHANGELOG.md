@@ -1,8 +1,9 @@
 # Changelog
 
-## [1.2.0] - Unreleased
+## [1.2.0] - 2020-06-15
 ### Added
   - Add multiarch support. Thanks to @ndanyluk and @anagno !
+  - Allow usage of additional hostnames in self signed certificate #19. Thanks to @Bobonium
 
 ### Changed 
   - Use debian buster-slim as baseimage
@@ -158,6 +159,7 @@
 ## 0.1.0 - 2015-07-23
 Initial release
 
+[1.2.0]: https://github.com/osixia/docker-light-baseimage/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/osixia/docker-light-baseimage/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/osixia/docker-light-baseimage/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/osixia/docker-light-baseimage/compare/v1.0.0...v1.1.0
