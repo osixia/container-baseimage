@@ -6,16 +6,15 @@
 
 [hub]: https://hub.docker.com/r/osixia/light-baseimage/
 
-Latest release: 1.1.2 (debian stretch) - 1.0.2 (debian jessie) [Changelog](CHANGELOG.md)
+Latest release: 1.2.0 [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
 
-A Debian 9 (Stretch) based docker image to build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
+A **Debian 10 (Buster)** based docker image to build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
 
 The aims of this image is to be used as a base for your own Docker images. It's base on the awesome work of: [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
 
 Other base distribution are available:
-- [Alpine 3.6](https://github.com/osixia/docker-light-baseimage/tree/feature-linux-alpine) | Beta | [Docker Hub](https://hub.docker.com/r/osixia/alpine-light-baseimage/) | [![](https://images.microbadger.com/badges/image/osixia/alpine-light-baseimage.svg)](http://microbadger.com/images/osixia/alpine-light-baseimage "Get your own image badge on microbadger.com")
-- [Ubuntu 16:04](https://github.com/osixia/docker-light-baseimage/tree/ubuntu) | [Docker Hub](https://hub.docker.com/r/osixia/ubuntu-light-baseimage/) | [![](https://images.microbadger.com/badges/image/osixia/ubuntu-light-baseimage.svg)](http://microbadger.com/images/osixia/ubuntu-light-baseimage "Get your own image badge on microbadger.com")
+- [Alpine](https://github.com/osixia/docker-light-baseimage/tree/alpine) | [Docker Hub](https://hub.docker.com/r/osixia/alpine-light-baseimage/) | [![](https://images.microbadger.com/badges/image/osixia/alpine-light-baseimage.svg)](http://microbadger.com/images/osixia/alpine-light-baseimage "Get your own image badge on microbadger.com")
 
 Table of Contents
 - [osixia/light-baseimage](#osixialight-baseimage)
@@ -150,8 +149,7 @@ In the Dockerfile we are going to:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:1.1.2
-        MAINTAINER Your Name <your@name.com>
+        FROM osixia/light-baseimage:1.2.0
 
         # Download nginx from apt-get and clean apt-get files
         RUN apt-get -y update \
@@ -393,8 +391,7 @@ In the Dockerfile we are going to:
 
       # Use osixia/light-baseimage
       # https://github.com/osixia/docker-light-baseimage
-      FROM osixia/light-baseimage:1.1.2
-      MAINTAINER Your Name <your@name.com>
+      FROM osixia/light-baseimage:1.2.0
 
       # Install multiple process stack, nginx and php7.0-fpm and clean apt-get files
       # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
@@ -595,8 +592,7 @@ Here simple Dockerfile example how to add a service-available to an image:
 
         # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/light-baseimage:1.1.2
-        MAINTAINER Your Name <your@name.com>
+        FROM osixia/light-baseimage:1.2.0
 
         # Add cfssl and cron service-available
         # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-service-available
@@ -665,7 +661,7 @@ What it does:
 
 *Run tool* takes several options, to list them:
 
-    docker run osixia/light-baseimage:1.1.2 --help
+    docker run osixia/light-baseimage:1.2.0 --help
     usage: run [-h] [-e] [-s] [-p] [-f] [-o {startup,process,finish}]
                [-c COMMAND [WHEN={startup,process,finish} ...]] [-k]
                [--wait-state FILENAME] [--wait-first-startup] [--keep-startup-env]
@@ -758,7 +754,7 @@ The container environment is then exported to /container/run/environment and in 
 
 If a main command is set for example:
 
-    docker run -it osixia/openldap:1.1.0 bash
+    docker run -it osixia/openldap:1.4.0 bash
 
 *Run tool* will execute the single process and the main command. If the main command exits the container exits. This is useful to debug or image development purpose.
 
@@ -768,7 +764,7 @@ In a multiple process image *run tool* execute runit witch supervise /container/
 
 If a main command is set for example:
 
-    docker run -it osixia/phpldapadmin:0.6.7 bash
+    docker run -it osixia/phpldapadmin:0.9.0 bash
 
 *run tool* will execute runit and the main command. If the main command exits the container exits. This is still useful to debug or image development purpose.
 
@@ -776,7 +772,7 @@ If a main command is set for example:
 If a main command is set *run tool* launch it otherwise bash is launched.
 Example:
 
-    docker run -it osixia/light-baseimage:1.1.2
+    docker run -it osixia/light-baseimage:1.2.0
 
 
 ##### Extra environment variables
@@ -852,14 +848,14 @@ Note this yaml definition:
 
 Can also be set by command line converted in python or json:
 
-    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:1.1.2 printenv
-    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:1.1.2 printenv
+    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:1.2.0 printenv
+    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:1.2.0 printenv
 
 ### Tests
 
 We use **Bats** (Bash Automated Testing System) to test this image:
 
-> [https://github.com/sstephenson/bats](https://github.com/sstephenson/bats)
+> [https://github.com/bats-core/bats-core](https://github.com/bats-core/bats-core)
 
 Install Bats, and in this project directory run:
 

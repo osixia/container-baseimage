@@ -10,5 +10,3 @@ find /etc/cron.daily/ -exec touch {} \;
 find /etc/cron.hourly/ -exec touch {} \;
 find /etc/cron.monthly/ -exec touch {} \;
 find /etc/cron.weekly/ -exec touch {} \;
-
-exit 0
