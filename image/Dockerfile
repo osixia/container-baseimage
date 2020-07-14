@@ -1,4 +1,5 @@
-FROM debian:buster-slim
+ARG ARCH=
+FROM ${ARCH}debian:buster-slim
 
 COPY . /container
 RUN /container/build.sh
