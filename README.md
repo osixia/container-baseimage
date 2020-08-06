@@ -27,6 +27,7 @@ Table of Contents
       - [Overview](#overview-1)
       - [Dockerfile](#dockerfile)
       - [Service files](#service-files)
+        - [install.sh](#installsh)
         - [startup.sh](#startupsh)
         - [process.sh](#processsh)
       - [Environment files](#environment-files)
@@ -179,7 +180,7 @@ The Dockerfile contains directives to download nginx from apt-get but all the in
 
 #### Service files
 
-##### install.sh
+##### install.sh
 
 This file must only contain directives for the service initial setup. Files download and apt-get command takes place in the Dockerfile for a better image building experience (see [Dockerfile](#dockerfile)).
 
