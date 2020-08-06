@@ -390,35 +390,35 @@ In the Dockerfile we are going to:
   - Define ports exposed and volumes if needed.
 
 
-      # Use osixia/light-baseimage
-      # https://github.com/osixia/docker-light-baseimage
-      FROM osixia/light-baseimage:1.2.0
+        # Use osixia/light-baseimage
+        # https://github.com/osixia/docker-light-baseimage
+        FROM osixia/light-baseimage:1.2.0
 
-      # Install multiple process stack, nginx and php7.0-fpm and clean apt-get files
-      # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
-      RUN apt-get -y update \
-          && /container/tool/add-multiple-process-stack \
-          && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-             nginx \
-             php7.0-fpm \
-          && apt-get clean \
-          && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+        # Install multiple process stack, nginx and php7.0-fpm and clean apt-get files
+        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
+        RUN apt-get -y update \
+            && /container/tool/add-multiple-process-stack \
+            && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+                nginx \
+                php7.0-fpm \
+            && apt-get clean \
+            && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-      # Add service directory to /container/service
-      ADD service /container/service
+        # Add service directory to /container/service
+        ADD service /container/service
 
-      # Use baseimage install-service script
-      # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
-      RUN /container/tool/install-service
+        # Use baseimage install-service script
+        # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/install-service
+        RUN /container/tool/install-service
 
-      # Add default env directory
-      ADD environment /container/environment/99-default
+        # Add default env directory
+        ADD environment /container/environment/99-default
 
-      # Set /var/www/ in a data volume
-      VOLUME /var/www/
+        # Set /var/www/ in a data volume
+        VOLUME /var/www/
 
-      # Expose default http and https ports
-      EXPOSE 80 443
+        # Expose default http and https ports
+        EXPOSE 80 443
 
 
 The Dockerfile contains directives to download nginx and php7.0-fpm from apt-get but all the initial setup will take place in install.sh file (called by /container/tool/install-service tool) for a better build experience. The time consuming download task is decoupled from the initial setup to make great use of docker build cache. If an install.sh file is changed the builder will not have to download again nginx and php7.0-fpm add will just run install scripts.
