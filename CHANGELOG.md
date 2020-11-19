@@ -6,7 +6,7 @@
   - Add multiarch support. Thanks to @ndanyluk and @anagno !
 
 ### Changed
-  - Use alpine:3.10 as baseimage
+  - Use alpine:3.12 as baseimage
   - Upgrade python script to python3
   - Upgrade CFSSL version to 1.4.1
   - "traefik" JSONSSL_PROFILE be becomes "traefik_up_to_v1_6"

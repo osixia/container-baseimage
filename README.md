@@ -9,7 +9,7 @@
 Latest release: 0.1.6 [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/alpine-light-baseimage/) 
 
-An **Alpine 3.10** based docker image to build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
+An **Alpine 3.12** based docker image to build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
 
 The aims of this image is to be used as a base for your own Docker images. It's base on the awesome work of: [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
 
