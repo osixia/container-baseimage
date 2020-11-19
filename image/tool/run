@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os, os.path, sys, stat, signal, errno, argparse, time, json, re, yaml, ast, socket, shutil, pwd, grp
+from datetime import datetime
 
 KILL_PROCESS_TIMEOUT = int(os.environ.get('KILL_PROCESS_TIMEOUT', 30))
 KILL_ALL_PROCESSES_TIMEOUT = int(os.environ.get('KILL_ALL_PROCESSES_TIMEOUT', 30))
@@ -49,25 +50,29 @@ ENVIRONMENT_STATE_DIR_KEY = 'CONTAINER_STATE_DIR'
 class AlarmException(Exception):
 	pass
 
+def write_log(level, message):
+	now = datetime.now()
+	sys.stderr.write("*** %s / %s / %s\n" % (level, now.strftime("%Y-%m-%d %H:%M:%S"), message))
+
 def error(message):
 	if log_level >= LOG_LEVEL_ERROR:
-		sys.stderr.write("*** %s\n" % message)
+		write_log("ERROR", message)
 
 def warning(message):
 	if log_level >= LOG_LEVEL_WARNING:
-		sys.stderr.write("*** %s\n" % message)
+		write_log("WARNING", message)
 
 def info(message):
 	if log_level >= LOG_LEVEL_INFO:
-		sys.stderr.write("*** %s\n" % message)
+		write_log("INFO", message)
 
 def debug(message):
 	if log_level >= LOG_LEVEL_DEBUG:
-		sys.stderr.write("*** %s\n" % message)
+		write_log("DEBUG", message)
 
 def trace(message):
 	if log_level >= LOG_LEVEL_TRACE:
-		sys.stderr.write("*** %s\n" % message)
+		write_log("TRACE", message)
 
 def debug_env_dump():
 	debug("------------ Environment dump ------------")
@@ -256,7 +261,7 @@ def print_env_files_order(file_extensions):
 	to_print = 'Caution: previously defined variables will not be overriden.\n'
 
 	file_found = False
-	for subdir, dirs, files in sorted(os.walk(IMPORT_ENVIRONMENT_DIR)):
+	for subdir, _, files in sorted(os.walk(IMPORT_ENVIRONMENT_DIR)):
 		for file in files:
 			filepath = subdir + os.sep + file
 			if filepath.endswith(file_extensions):
@@ -280,7 +285,7 @@ def import_env_files():
 	file_extensions = ENV_FILES_YAML_EXTENSIONS + ENV_FILES_JSON_EXTENSIONS
 	print_env_files_order(file_extensions)
 
-	for subdir, dirs, files in sorted(os.walk(IMPORT_ENVIRONMENT_DIR)):
+	for subdir, _, files in sorted(os.walk(IMPORT_ENVIRONMENT_DIR)):
 		for file in files:
 			if file.endswith(file_extensions):
 				filepath = subdir + os.sep + file
@@ -320,7 +325,7 @@ def remove_startup_env_files():
 		warning("remove_startup_env_files: "+IMPORT_ENVIRONMENT_DIR+" don't exists")
 		return
 
-	for subdir, dirs, files in sorted(os.walk(IMPORT_ENVIRONMENT_DIR)):
+	for subdir, _, files in sorted(os.walk(IMPORT_ENVIRONMENT_DIR)):
 		for file in files:
 			filepath = subdir + os.sep + file
 			if filepath.endswith(ENV_FILES_STARTUP_EXTENSIONS):
@@ -720,7 +725,7 @@ def run_single_process_container(args):
 	background_process_pid=None
 
 	try:
-		container_process=get_container_process();
+		container_process=get_container_process()
 		background_process_pid, background_process_exited, exit_status = run_process(args, container_process, [container_process])
 
 		sys.exit(exit_status)
