@@ -61,6 +61,8 @@ before_script:
   - if [ -n "$TRAVIS_TAG" ]; then
     VERSION=$(echo "${TRAVIS_TAG}" | sed -e 's/\(.*\)[-v]\(.*\)/\1\2/g');
     fi
+  # replace / with - in version
+  - VERSION=$(echo "${VERSION}" | sed 's|/|-|g');
 
 script:
   - make build-nocache NAME=${NAME} VERSION=${VERSION}-${TARGET_ARCH}
