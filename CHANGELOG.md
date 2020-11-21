@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.3.0] - Unreleased
+## [1.3.0] - 2020-11-21
 ### Changed
   - Add loglevel and datetime to log messages
   - Upgrade CFSSL version to 1.5.0
