@@ -1,6 +1,6 @@
 # Changelog
 
-# [0.1.6] - Unreleased
+# [0.1.6] - 2020-11-21
 ### Added
   - Add loglevel and datetime to log messages
   - jsonssl add support for traefik >= v1.6 acme.json file
