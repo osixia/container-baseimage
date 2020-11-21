@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os, os.path, sys, stat, signal, errno, argparse, time, json, re, yaml, ast, socket, shutil, pwd, grp
+from datetime import datetime
 
 KILL_PROCESS_TIMEOUT = int(os.environ.get('KILL_PROCESS_TIMEOUT', 30))
 KILL_ALL_PROCESSES_TIMEOUT = int(os.environ.get('KILL_ALL_PROCESSES_TIMEOUT', 30))
@@ -49,25 +50,29 @@ ENVIRONMENT_STATE_DIR_KEY = 'CONTAINER_STATE_DIR'
 class AlarmException(Exception):
 	pass
 
+def write_log(level, message):
+	now = datetime.now()
+	sys.stderr.write("*** %s | %s | %s\n" % (level, now.strftime("%Y-%m-%d %H:%M:%S"), message))
+
 def error(message):
 	if log_level >= LOG_LEVEL_ERROR:
-		sys.stderr.write("*** %s\n" % message)
+		write_log(" ERROR ", message)
 
 def warning(message):
 	if log_level >= LOG_LEVEL_WARNING:
-		sys.stderr.write("*** %s\n" % message)
+		write_log("WARNING", message)
 
 def info(message):
 	if log_level >= LOG_LEVEL_INFO:
-		sys.stderr.write("*** %s\n" % message)
+		write_log(" INFO  ", message)
 
 def debug(message):
 	if log_level >= LOG_LEVEL_DEBUG:
-		sys.stderr.write("*** %s\n" % message)
+		write_log(" DEBUG ", message)
 
 def trace(message):
 	if log_level >= LOG_LEVEL_TRACE:
-		sys.stderr.write("*** %s\n" % message)
+		write_log(" TRACE ", message)
 
 def debug_env_dump():
 	debug("------------ Environment dump ------------")
@@ -114,7 +119,7 @@ def set_env_hostname_to_etc_hosts():
 				with open("/etc/hosts", "a") as myfile:
 					myfile.write(ip_address+" "+os.environ["HOSTNAME"]+"\n")
 	except:
-		trace("set_env_hostname_to_etc_hosts: failed at some point...")
+		warning("set_env_hostname_to_etc_hosts: failed at some point...")
 
 def python_dict_to_bash_envvar(name, python_dict):
 
@@ -196,7 +201,7 @@ def generic_import_envvars(path, override_existing_environment):
 				# https://github.com/phusion/baseimage-docker/pull/49
 				value = re.sub('\n\Z', '', f.read())
 			new_env[name] = value
-			trace("import " + name + " from " + filePath + " --- ")
+			trace("import " + name + " from " + filePath)
 
 	for name, value in list(new_env.items()):
 		if override_existing_environment or name not in os.environ:
@@ -224,12 +229,12 @@ def export_run_envvars(to_dir = True):
 		if to_dir:
 			with open(RUN_ENVIRONMENT_DIR + os.sep + name, "w") as f:
 				f.write(value)
-			trace("export " + name + " to " + RUN_ENVIRONMENT_DIR + os.sep + name + " --- ")
+			trace("export " + name + " to " + RUN_ENVIRONMENT_DIR + os.sep + name)
 		shell_dump += "export " + sanitize_shenvname(name) + "=" + shquote(value) + "\n"
 
 	with open(RUN_ENVIRONMENT_FILE_EXPORT, "w") as f:
 		f.write(shell_dump)
-	trace("export "+RUN_ENVIRONMENT_FILE_EXPORT+" --- ")
+	trace("export "+RUN_ENVIRONMENT_FILE_EXPORT)
 
 def create_run_envvars():
 	set_dir_env()
@@ -256,7 +261,7 @@ def print_env_files_order(file_extensions):
 	to_print = 'Caution: previously defined variables will not be overriden.\n'
 
 	file_found = False
-	for subdir, dirs, files in sorted(os.walk(IMPORT_ENVIRONMENT_DIR)):
+	for subdir, _, files in sorted(os.walk(IMPORT_ENVIRONMENT_DIR)):
 		for file in files:
 			filepath = subdir + os.sep + file
 			if filepath.endswith(file_extensions):
@@ -280,7 +285,7 @@ def import_env_files():
 	file_extensions = ENV_FILES_YAML_EXTENSIONS + ENV_FILES_JSON_EXTENSIONS
 	print_env_files_order(file_extensions)
 
-	for subdir, dirs, files in sorted(os.walk(IMPORT_ENVIRONMENT_DIR)):
+	for subdir, _, files in sorted(os.walk(IMPORT_ENVIRONMENT_DIR)):
 		for file in files:
 			if file.endswith(file_extensions):
 				filepath = subdir + os.sep + file
@@ -288,7 +293,7 @@ def import_env_files():
 				try:
 					with open(filepath, "r") as f:
 
-						debug("--- process file : " + filepath+ " ---")
+						debug("process environment file : " + filepath)
 
 						if file.endswith(ENV_FILES_YAML_EXTENSIONS):
 							env_vars = yaml.load(f)
@@ -320,7 +325,7 @@ def remove_startup_env_files():
 		warning("remove_startup_env_files: "+IMPORT_ENVIRONMENT_DIR+" don't exists")
 		return
 
-	for subdir, dirs, files in sorted(os.walk(IMPORT_ENVIRONMENT_DIR)):
+	for subdir, _, files in sorted(os.walk(IMPORT_ENVIRONMENT_DIR)):
 		for file in files:
 			filepath = subdir + os.sep + file
 			if filepath.endswith(ENV_FILES_STARTUP_EXTENSIONS):
@@ -332,20 +337,20 @@ def remove_startup_env_files():
 
 def restore_environ():
 	clear_environ()
-	trace("--- Restore initial environment ---")
+	trace("Restore initial environment")
 	os.environ.update(environ_backup)
 
 def clear_environ():
-	trace("--- Clear existing environment ---")
+	trace("Clear existing environment")
 	os.environ.clear()
 
 def set_startup_scripts_env():
-	info("Set environment for startup files")
+	debug("Set environment for startup files")
 	clear_run_envvars() # clear previous environment
 	create_run_envvars() # create run envvars with all env files
 
 def set_process_env(keep_startup_env = False):
-	info("Set environment for container process")
+	debug("Set environment for container process")
 	if not keep_startup_env:
 		remove_startup_env_files()
 	clear_run_envvars()
@@ -677,7 +682,7 @@ def run_foreground_process(command):
 		stop_child_process(command[0], pid)
 		raise
 	except BaseException:
-		warning("An error occurred. Aborting.")
+		error("An error occurred. Aborting.")
 		stop_child_process(command[0], pid)
 		raise
 
@@ -720,7 +725,7 @@ def run_single_process_container(args):
 	background_process_pid=None
 
 	try:
-		container_process=get_container_process();
+		container_process=get_container_process()
 		background_process_pid, background_process_exited, exit_status = run_process(args, container_process, [container_process])
 
 		sys.exit(exit_status)
@@ -822,13 +827,13 @@ parser.add_argument('-o', '--run-only', type=str, choices=["startup","process","
 	help = 'Run only this file type and ignore others.')
 parser.add_argument('-c', '--cmd', metavar=('COMMAND', 'WHEN={startup,process,finish}'), dest = 'cmds', type = str,
 	action = 'append', default = [], nargs = "+",
-	help = 'Run this command before WHEN file(s). Default before startup file(s).')
+	help = 'Run COMMAND before WHEN file(s). Default before startup file(s).')
 parser.add_argument('-k', '--no-kill-all-on-exit', dest = 'kill_all_on_exit',
 	action = 'store_const', const = False, default = True,
 	help = 'Don\'t kill all processes on the system upon exiting.')
 parser.add_argument('--wait-state', metavar = 'FILENAME', dest = 'wait_states', type = str,
 	action = 'append', default=[],
-	help = 'Wait until the container state file exists in '+RUN_STATE_DIR+' directory before starting. Usefull when 2 containers share '+RUN_DIR+' directory via volume.')
+	help = 'Wait until the container FILENAME file exists in '+RUN_STATE_DIR+' directory before starting. Usefull when 2 containers share '+RUN_DIR+' directory via volume.')
 parser.add_argument('--wait-first-startup', dest = 'wait_first_startup',
 	action = 'store_const', const = True, default = False,
 	help = 'Wait until the first startup is done before starting. Usefull when 2 containers share '+RUN_DIR+' directory via volume.')
@@ -901,7 +906,7 @@ except SystemExit as err:
 				time.sleep(60)
 				pass
 		except:
-			info("Keep alive process ended.")
+			error("Keep alive process ended.")
 
 except KeyboardInterrupt:
 	warning("Init system aborted.")
@@ -922,7 +927,7 @@ finally:
 				time.sleep(60)
 				pass
 		except:
-			info("Keep alive process ended.")
+			error("Keep alive process ended.")
 
 	if args.kill_all_on_exit:
 		kill_all_processes(KILL_ALL_PROCESSES_TIMEOUT)

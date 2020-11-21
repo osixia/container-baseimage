@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.0] - Unreleased
+### Changed
+  - Add loglevel and datetime to log messages
+  - Upgrade CFSSL version to 1.5.0
+
 ## [1.2.0] - 2020-06-15
 ### Added
   - Add multiarch support. Thanks to @ndanyluk and @anagno !
@@ -159,6 +164,7 @@
 ## 0.1.0 - 2015-07-23
 Initial release
 
+[1.3.0]: https://github.com/osixia/docker-light-baseimage/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/osixia/docker-light-baseimage/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/osixia/docker-light-baseimage/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/osixia/docker-light-baseimage/compare/v1.1.0...v1.1.1
