@@ -42,13 +42,13 @@ fi
 apk add openssl jq
 
 echo "Download cfssl ..."
-echo "curl -o /usr/sbin/cfssl -SL https://github.com/osixia/cfssl/releases/download/1.4.1/cfssl_linux-${HOST_ARCH}"
-curl -o /usr/sbin/cfssl -SL "https://github.com/osixia/cfssl/releases/download/1.4.1/cfssl_linux-${HOST_ARCH}"
+echo "curl -o /usr/sbin/cfssl -SL https://github.com/osixia/cfssl/releases/download/1.5.0/cfssl_linux-${HOST_ARCH}"
+curl -o /usr/sbin/cfssl -SL "https://github.com/osixia/cfssl/releases/download/1.5.0/cfssl_linux-${HOST_ARCH}"
 chmod 700 /usr/sbin/cfssl
 
 echo "Download cfssljson ..."
-echo "curl -o /usr/sbin/cfssljson -SL https://github.com/osixia/cfssl/releases/download/1.4.1/cfssljson_linux-${HOST_ARCH}"
-curl -o /usr/sbin/cfssljson -SL "https://github.com/osixia/cfssl/releases/download/1.4.1/cfssljson_linux-${HOST_ARCH}"
+echo "curl -o /usr/sbin/cfssljson -SL https://github.com/osixia/cfssl/releases/download/1.5.0/cfssljson_linux-${HOST_ARCH}"
+curl -o /usr/sbin/cfssljson -SL "https://github.com/osixia/cfssl/releases/download/1.5.0/cfssljson_linux-${HOST_ARCH}"
 chmod 700 /usr/sbin/cfssljson
 
 echo "Project sources: https://github.com/cloudflare/cfssl"
