@@ -1,5 +1,10 @@
 # Changelog
 
+# [0.1.7] - 2021-01-24
+### Fixed
+  - Update expired default-ca #30 #29. Thanks to @heidemn
+  - ARM builds e.g. for keepalived #28. Thanks to @linkvt
+
 # [0.1.6] - 2020-11-21
 ### Added
   - Add loglevel and datetime to log messages
@@ -50,6 +55,7 @@
 ## 0.1.0
 Initial release
 
+[0.1.7]: https://github.com/osixia/docker-light-baseimage/compare/alpine-v0.1.6...alpine-v0.1.7
 [0.1.6]: https://github.com/osixia/docker-light-baseimage/compare/alpine-v0.1.5...alpine-v0.1.6
 [0.1.5]: https://github.com/osixia/docker-light-baseimage/compare/alpine-v0.1.4...alpine-v0.1.5
 [0.1.4]: https://github.com/osixia/docker-light-baseimage/compare/alpine-v0.1.3...alpine-v0.1.4

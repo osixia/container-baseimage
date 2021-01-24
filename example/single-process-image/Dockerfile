@@ -1,6 +1,6 @@
 # Use osixia/alpine-light-baseimage
 # https://github.com/osixia/docker-light-baseimage
-FROM osixia/alpine-light-baseimage:0.1.6
+FROM osixia/alpine-light-baseimage:0.1.7
 
 # Download nginx from apk and clean apk files
 RUN apk update \
