@@ -51,10 +51,10 @@ before_script:
   # In native builds this information and binaries are not necessary and that is why
   # we are injecting them in the build scripts and we do not include them in the Dockerfiles
   - if [[ "${TARGET_ARCH}" != 'amd64' ]]; then
-    sed -i "s/FROM debian/FROM ${TARGET_ARCH}\/debian/" image/Dockerfile;
+    sed -i "s/FROM alpine/FROM ${TARGET_ARCH}\/alpine/" image/Dockerfile;
     fi
   - if [[ "${TARGET_ARCH}" != 'amd64' ]]; then
-    sed -i "/${TARGET_ARCH}\/debian/a COPY \
+    sed -i "/${TARGET_ARCH}\/alpine/a COPY \
     --from=multiarch/qemu-user-static:x86_64-${QEMU_ARCH} \
     /usr/bin/qemu-${QEMU_ARCH}-static /usr/bin/" image/Dockerfile;
     fi
