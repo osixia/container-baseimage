@@ -1,28 +1,23 @@
 NAME = osixia/light-baseimage
-VERSION = alpine-0.1.7
+VERSION = 0.1.8
 
 .PHONY: build build-nocache test tag-latest push push-latest release git-tag-version
 
 build:
-	docker build -f image/Dockerfile -t $(NAME):$(VERSION) --rm image
+	docker build -f image/Dockerfile -t $(NAME):alpine-$(VERSION) --rm image
 
 build-nocache:
-	docker build -f image/Dockerfile -t $(NAME):$(VERSION) --no-cache --rm image
+	docker build -f image/Dockerfile -t $(NAME):alpine-$(VERSION) --no-cache --rm image
 
 test:
-	env NAME=$(NAME) VERSION=$(VERSION) bats test/test.bats
+	env NAME=$(NAME) VERSION=alpine-$(VERSION) bats test/test.bats
 
 tag:
-	docker tag $(NAME):$(VERSION) $(NAME):$(VERSION)
-
-tag-latest:
-	docker tag $(NAME):$(VERSION) $(NAME):latest
+	docker tag $(NAME):alpine-$(VERSION) $(NAME):$(VERSION)
 
 push:
-	docker push $(NAME):$(VERSION)
+	docker push $(NAME):alpine-$(VERSION)
 
-push-latest:
-	docker push $(NAME):latest
 
 release: build test tag-latest push push-latest
 

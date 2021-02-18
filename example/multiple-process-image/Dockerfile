@@ -1,6 +1,6 @@
 # Use osixia/alpine-light-baseimage
 # https://github.com/osixia/docker-light-baseimage
-FROM osixia/alpine-light-baseimage:0.1.7
+FROM osixia/alpine-light-baseimage:0.1.8
 
 # Install multiple process stack, nginx and php7.0-fpm and clean apt-get files
 # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack

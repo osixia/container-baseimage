@@ -1,5 +1,9 @@
 # Changelog
 
+# [0.1.8] - 2021-02-19
+### Fixed
+  - Remove -x bash flag on log-helper tool
+
 # [0.1.7] - 2021-01-24
 ### Fixed
   - Update expired default-ca #30 #29. Thanks to @heidemn
@@ -55,9 +59,11 @@
 ## 0.1.0
 Initial release
 
+[0.1.8]: https://github.com/osixia/docker-light-baseimage/compare/alpine-v0.1.7...alpine-v0.1.8
 [0.1.7]: https://github.com/osixia/docker-light-baseimage/compare/alpine-v0.1.6...alpine-v0.1.7
 [0.1.6]: https://github.com/osixia/docker-light-baseimage/compare/alpine-v0.1.5...alpine-v0.1.6
 [0.1.5]: https://github.com/osixia/docker-light-baseimage/compare/alpine-v0.1.4...alpine-v0.1.5
 [0.1.4]: https://github.com/osixia/docker-light-baseimage/compare/alpine-v0.1.3...alpine-v0.1.4
 [0.1.3]: https://github.com/osixia/docker-light-baseimage/compare/alpine-v0.1.2...alpine-v0.1.3
 [0.1.2]: https://github.com/osixia/docker-light-baseimage/compare/alpine-v0.1.1...alpine-v0.1.2
+[0.1.1]: https://github.com/osixia/docker-light-baseimage/compare/alpine-v0.1.0...alpine-v0.1.1
