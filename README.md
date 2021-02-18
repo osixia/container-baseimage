@@ -1,23 +1,23 @@
-# osixia/alpine-light-baseimage
+# osixia/light-baseimage:alpine
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/osixia/alpine-light-baseimage.svg)][hub]
-[![Docker Stars](https://img.shields.io/docker/stars/osixia/alpine-light-baseimage.svg)][hub]
-[![](https://images.microbadger.com/badges/image/osixia/alpine-light-baseimage.svg)](http://microbadger.com/images/osixia/alpine-light-baseimage "Get your own image badge on microbadger.com")
+[![Docker Pulls](https://img.shields.io/docker/pulls/osixia/light-baseimage.svg)][hub]
+[![Docker Stars](https://img.shields.io/docker/stars/osixia/light-baseimage.svg)][hub]
+[![](https://images.microbadger.com/badges/image/osixia/light-baseimage.svg)](https://microbadger.com/images/osixia/light-baseimage "Get your own image badge on microbadger.com")
 
-[hub]: https://hub.docker.com/r/osixia/alpine-light-baseimage/
+[hub]: https://hub.docker.com/r/osixia/light-baseimage/
 
 Latest release: 0.1.8 [Changelog](CHANGELOG.md)
- | [Docker Hub](https://hub.docker.com/r/osixia/alpine-light-baseimage/) 
+ | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
 
 An **Alpine 3.12** based docker image to build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
 
 The aims of this image is to be used as a base for your own Docker images. It's base on the awesome work of: [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
 
 Other base distribution are available:
-- [Debian](https://github.com/osixia/docker-light-baseimage)  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) |  [![](https://images.microbadger.com/badges/image/osixia/light-baseimage.svg)](http://microbadger.com/images/osixia/light-baseimage "Get your own image badge on microbadger.com")
+- [Debian](https://github.com/osixia/docker-light-baseimage)  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) |  [![](https://images.microbadger.com/badges/image/osixia/light-baseimage.svg)](https://microbadger.com/images/osixia/light-baseimage "Get your own image badge on microbadger.com")
 
 Table of Contents
-- [osixia/alpine-light-baseimage](#osixiaalpine-light-baseimage)
+- [osixia/light-baseimage](#osixialight-baseimagealpine)
   - [Contributing](#Contributing)
   - [Overview](#Overview)
   - [Quick Start](#Quick-Start)
@@ -146,9 +146,9 @@ In the Dockerfile we are going to:
   - Define ports exposed and volumes if needed.
 
 
-	    # Use osixia/alpine-light-baseimage
+	    # Use osixia/light-baseimage
 	    # https://github.com/osixia/docker-light-baseimage
-	    FROM osixia/alpine-light-baseimage:0.1.8
+	    FROM osixia/light-baseimage:alpine-0.1.8
 
 	    # Download nginx from apk and clean apk files
 	    RUN apk update \
@@ -390,9 +390,9 @@ In the Dockerfile we are going to:
   - Define ports exposed and volumes if needed.
 
 
-        # Use osixia/alpine-light-baseimage
+        # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/alpine-light-baseimage:0.1.8
+        FROM osixia/light-baseimage:alpine-0.1.8
 
         # Install multiple process stack, nginx and php7.0-fpm and clean apt-get files
         # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack
@@ -609,9 +609,9 @@ After that the service-available will be process like regular services.
 
 Here simple Dockerfile example how to add a service-available to an image:
 
-        # Use osixia/alpine-light-baseimage
+        # Use osixia/light-baseimage
         # https://github.com/osixia/docker-light-baseimage
-        FROM osixia/alpine-light-baseimage:0.1.8
+        FROM osixia/light-baseimage:alpine-0.1.8
 
         # Add cfssl and cron service-available
         # https://github.com/osixia/docker-light-baseimage/blob/alpine/image/tool/add-service-available
@@ -673,7 +673,7 @@ What it does:
 
 *Run tool* takes several options, to list them:
 
-    docker run osixia/alpine-light-baseimage:0.1.8 --help
+    docker run osixia/light-baseimage:alpine-0.1.8 --help
     usage: run [-h] [-e] [-s] [-p] [-f] [-o {startup,process,finish}]
                [-c COMMAND [WHEN={startup,process,finish} ...]] [-k]
                [--wait-state FILENAME] [--wait-first-startup] [--keep-startup-env]
@@ -784,7 +784,7 @@ If a main command is set for example:
 If a main command is set *run tool* launch it otherwise bash is launched.
 Example:
 
-    docker run -it osixia/alpine-light-baseimage:0.1.8
+    docker run -it osixia/light-baseimage:alpine-0.1.8
 
 
 ##### Extra environment variables
@@ -860,8 +860,8 @@ Note this yaml definition:
 
 Can also be set by command line converted in python or json:
 
-    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/alpine-light-baseimage:0.1.8 printenv
-    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/alpine-light-baseimage:0.1.8 printenv
+    docker run -it --env FRUITS="#PYTHON2BASH:['orange','apple']" osixia/light-baseimage:alpine-0.1.8 printenv
+    docker run -it --env FRUITS="#JSON2BASH:[\"orange\",\"apple\"]" osixia/light-baseimage:alpine-0.1.8 printenv
 
 ### Tests
 
