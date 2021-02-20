@@ -33,7 +33,12 @@ function print_log(){
     local level_txt=$1
     local message=$2
     local date=$(date +"%Y-%m-%d %T")
-    echo "*** ${level_txt} | ${date} | ${message}"
+
+    readarray -t messages <<<"$message"
+
+    for m in "${messages[@]}"; do
+        echo "*** ${level_txt} | ${date} | ${m}"
+    done
 }
 
 function error() {
