@@ -52,7 +52,8 @@ class AlarmException(Exception):
 
 def write_log(level, message):
 	now = datetime.now()
-	sys.stderr.write("*** %s | %s | %s\n" % (level, now.strftime("%Y-%m-%d %H:%M:%S"), message))
+	for line in message.splitlines():
+		sys.stderr.write("*** %s | %s | %s\n" % (level, now.strftime("%Y-%m-%d %H:%M:%S"), line))
 
 def error(message):
 	if log_level >= LOG_LEVEL_ERROR:
