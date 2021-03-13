@@ -4,6 +4,9 @@
 ### Changed
   - Multiple log line message are now split and log line by line for a nicest display.
 
+### Fixed
+- log-level broken pipe
+
 # [1.3.2] - 2021-02-18
 ### Fixed
   - Remove -x bash flag on log-helper tool

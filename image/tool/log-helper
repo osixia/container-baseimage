@@ -42,36 +42,51 @@ function print_log(){
 }
 
 function error() {
+
+    # getEchoParams no matter what level it is to not break pipes
+    getEchoParams $@
+
     if [ $log_level -ge 1 ]; then
-        getEchoParams $@
         echo $echo_param  "$(print_log " ERROR " "$echo_msg")"
     fi
 }
 
 function warning() {
+
+    # getEchoParams no matter what level it is to not break pipes
+    getEchoParams $@
+
     if [ $log_level -ge 2 ]; then
-        getEchoParams $@
         echo $echo_param  "$(print_log "WARNING" "$echo_msg")"
     fi
 }
 
 function info() {
+
+    # getEchoParams no matter what level it is to not break pipes
+    getEchoParams $@
+
     if [ $log_level -ge 3 ]; then
-        getEchoParams $@
         echo $echo_param "$(print_log " INFO  " "$echo_msg")"
     fi
 }
 
 function debug() {
+
+    # getEchoParams no matter what level it is to not break pipes
+    getEchoParams $@
+
     if [ $log_level -ge 4 ]; then
-        getEchoParams $@
         echo $echo_param "$(print_log " DEBUG " "$echo_msg")"
     fi
 }
 
 function trace() {
+
+    # getEchoParams no matter what level it is to not break pipes
+    getEchoParams $@
+
     if [ $log_level -ge 5 ]; then
-        getEchoParams $@
         echo $echo_param "$(print_log " TRACE " "$echo_msg")"
     fi
 }
