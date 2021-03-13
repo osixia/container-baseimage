@@ -1,13 +1,13 @@
 # Changelog
 
-# [1.3.3] - Unreleased
+## [1.3.3] - 2021-03-13
 ### Changed
   - Multiple log line message are now split and log line by line for a nicest display.
 
 ### Fixed
 - log-level broken pipe
 
-# [1.3.2] - 2021-02-18
+## [1.3.2] - 2021-02-18
 ### Fixed
   - Remove -x bash flag on log-helper tool
 
