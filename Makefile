@@ -1,5 +1,5 @@
 NAME = osixia/light-baseimage
-VERSION = alpine-0.1.8
+VERSION = alpine-0.1.9
 
 .PHONY: build build-nocache test tag-latest push push-latest release git-tag-version
 
