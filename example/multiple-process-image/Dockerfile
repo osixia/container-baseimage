@@ -1,6 +1,6 @@
 # Use osixia/light-baseimage
 # https://github.com/osixia/docker-light-baseimage
-FROM osixia/light-baseimage:1.3.2
+FROM osixia/light-baseimage:1.3.3
 
 # Install multiple process stack, nginx and php7.0-fpm and clean apt-get files
 # https://github.com/osixia/docker-light-baseimage/blob/stable/image/tool/add-multiple-process-stack

@@ -1,6 +1,6 @@
 # Changelog
 
-# [1.4.0] - Unreleased
+# [1.3.3] - Unreleased
 ### Changed
   - Multiple log line message are now split and log line by line for a nicest display.
 
@@ -176,7 +176,7 @@
 ## 0.1.0 - 2015-07-23
 Initial release
 
-[1.4.0]: https://github.com/osixia/docker-light-baseimage/compare/v1.3.2...v1.4.0
+[1.3.3]: https://github.com/osixia/docker-light-baseimage/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/osixia/docker-light-baseimage/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/osixia/docker-light-baseimage/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/osixia/docker-light-baseimage/compare/v1.2.0...v1.3.0
