@@ -249,7 +249,6 @@ def clear_run_envvars():
 	try:
 		shutil.rmtree(RUN_ENVIRONMENT_DIR)
 		os.makedirs(RUN_ENVIRONMENT_DIR)
-		os.chmod(RUN_ENVIRONMENT_DIR, 700)
 	except:
 		warning("clear_run_envvars: failed at some point...")
 
@@ -366,16 +365,8 @@ def setup_run_directories(args):
 		if not os.path.exists(directory):
 			os.makedirs(directory)
 
-			if directory == RUN_ENVIRONMENT_DIR:
-				os.chmod(directory, 700)
-
 	if not os.path.exists(RUN_ENVIRONMENT_FILE_EXPORT):
 		open(RUN_ENVIRONMENT_FILE_EXPORT, 'a').close()
-		os.chmod(RUN_ENVIRONMENT_FILE_EXPORT, 640)
-		uid = pwd.getpwnam("root").pw_uid
-		gid = grp.getgrnam("docker_env").gr_gid
-		os.chown(RUN_ENVIRONMENT_FILE_EXPORT, uid, gid)
-
 	if state_is_first_start():
 
 		if args.copy_service:
