@@ -1,0 +1,36 @@
+# Service Files
+The files outlined below are not mandatory.
+
+## install.sh
+This script should exclusively contain instructions for the initial setup of the service.
+
+For improved image construction, all package installations or file downloads should occur within the Dockerfile.
+
+By separating time-intensive download operations from the setup, the docker build cache is utilized effectively.
+Changes to the `install.sh` file will not necessitate re-downloading dependencies,
+as the Dockerfile builder will only execute the service installation script.
+
+Note: The `install.sh` script executes during the docker build, thus runtime environment variables cannot be used for setup customization.
+Such customizations are handled in the `startup.sh` file.
+
+## startup.sh
+This script prepares `process.sh` for execution and tailors the service setup to runtime environment variables.
+
+## process.sh
+This script specifies the command to be executed.
+
+In images designed for multiple processes, all `process.sh` scripts are launched simultaneously.
+The order defined in the service `.priority` file is irrelevant.
+
+## finish.sh
+This script is executed once `process.sh` has concluded.
+
+## .priority
+The .priority file establishes the sequence in which services `startup.sh` or `finish.sh` scripts are invoked.
+The higher the number, the greater the priority. The default is 500.
+
+## .optional
+This file indicates that the service is optional and can be incorporated later via the `container services require ${SERVICE_NAME}` command.
+
+## download.sh
+This script is called during container build to download optional service resources.
