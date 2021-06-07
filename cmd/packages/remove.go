@@ -1,0 +1,33 @@
+package packages
+
+import (
+	"github.com/spf13/cobra"
+
+	cmdlog "github.com/osixia/container-baseimage/cmd/log"
+	"github.com/osixia/container-baseimage/core"
+	"github.com/osixia/container-baseimage/helpers"
+	"github.com/osixia/container-baseimage/log"
+)
+
+var removeCmd = &cobra.Command{
+	Use:   "remove package [package]...",
+	Short: "Remove packages",
+
+	Aliases: []string{
+		"rm",
+	},
+
+	Args: cobra.MinimumNArgs(1),
+
+	Run: func(cmd *cobra.Command, args []string) {
+		log.Tracef("Run: %v called with args: %v", cmd.Use, args)
+
+		helpers.Must(core.Instance().Distribution().RemovePackages(cmd.Context(), args))
+	},
+}
+
+func init() {
+	// flags
+	removeCmd.Flags().SortFlags = false
+	cmdlog.AddFlags(removeCmd.Flags())
+}

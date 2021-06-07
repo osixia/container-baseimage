@@ -1,0 +1,102 @@
+# Service Files
+
+Every file is optional. Other files can be added to a service directory without changing its behavior.
+
+| File | Role |
+| --- | --- |
+| `download.sh` | build time: downloads the service resources |
+| `install.sh` | build time: installs the service |
+| `startup.sh` | container start: prepares the service from the runtime environment |
+| `process.sh` | process step: the long-running command |
+| `finish.sh` | finish step, after the process step has ended |
+| `.priority` | order of the download, install, startup and finish scripts |
+| `.stop-signal` | signal sent to stop `process.sh` |
+| `.optional` | service not prepared nor linked by default |
+| `.tags/` | tags used to select services and processes |
+
+## download.sh
+Downloads the resources a service needs. It runs at build time with `container services download`,
+which downloads all non-optional services when called with no argument.
+
+Prefer installing packages and downloading large resources directly in the `Dockerfile`, where Docker
+caches them. `download.sh` is mostly useful for [optional services](#optional) shipped by a base image.
+
+## install.sh
+Contains the initial setup of the service. It runs during the build, so runtime environment variables
+cannot customize it: use `startup.sh` for that.
+
+Keep package installations and downloads out of `install.sh` when possible: changing it then does not
+download the dependencies again.
+
+## startup.sh
+Prepares `process.sh` and adapts the service setup to runtime environment variables.
+
+## process.sh
+Starts the long-running command of the service.
+
+In a multi-process image, all `process.sh` scripts start at the same time: `.priority` does not
+order them.
+
+Start the command with `exec`: signals such as `SIGHUP` are forwarded to the `process.sh` main process
+only, and a shell that does not `exec` its command would not pass them on.
+
+## finish.sh
+Runs during the finish step, after the process step has ended. In a multi-process container, it does not
+run each time an individual process exits or restarts.
+
+## .priority
+Sets the order of the `download.sh`, `install.sh`, `startup.sh` and `finish.sh` scripts, which run one
+after the other. The smaller the number, the earlier the script runs; services with the same priority
+are sorted by name. The default is `500`.
+
+## .stop-signal
+Sets the signal sent to stop `process.sh`, for example `SIGQUIT` for a graceful nginx or php-fpm
+shutdown. The default is `SIGTERM`.
+
+The stop signal is sent to the whole process group; remaining processes are killed with `SIGKILL` after
+`--kill-all-timeout`. With `--kill-all-timeout 0`, shutdown uses `SIGKILL` immediately.
+
+Signal names are case-insensitive and the `SIG` prefix is optional: `SIGQUIT`, `QUIT` and `quit` are the
+same. An unknown name produces a warning and falls back to `SIGTERM`.
+
+`container generate bootstrap --stop-signal SIGQUIT` and
+`container generate services --stop-signal SIGQUIT` generate this file.
+
+## .optional
+Marks an optional service: by default, `container services download` and `link` skip it, and
+`container services install` only installs it once downloaded. A derived image enables it with
+`container services require`:
+
+```Dockerfile
+FROM my-base-image
+
+# Require and download optional services
+RUN container services require ${SERVICE_NAME} \
+    && container services download
+
+# Install and link services to the entrypoint
+RUN container services install \
+    && container services link
+```
+
+## .tags
+A service directory may contain a `.tags` directory: each file in it defines a tag named after the file.
+Services and processes commands accept `tag:name` to select every service with this tag:
+
+```bash
+container services status tag:web
+container processes stop tag:web
+```
+
+## Markers Written by the Container Command
+
+- `.downloaded` records a completed `download.sh`
+- `.installed` records a completed `install.sh`
+- `.entrypoint` selects the service for the entrypoint: `container services link` creates it and
+  `container services unlink` removes it (it is not a symbolic link)
+
+Prepare downloads and installations during the image build. At startup, the entrypoint still runs the
+missing downloads and installations of the selected services, before loading environment files. These
+operations need the Unix permissions of their scripts and marker files.
+
+See the [full documentation](https://opensource.osixia.net/projects/container-images/baseimage/how-it-works/).

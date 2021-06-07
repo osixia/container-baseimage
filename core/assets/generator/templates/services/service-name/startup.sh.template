@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# if container log level is trace:
+# print commands and their arguments as they are executed
+container log level eq trace && set -x
+
+echo "${SERVICE_NAME}: Doing some container start setup ..."
+echo "${SERVICE_NAME}: EXAMPLE_ENV_VAR=$${EXAMPLE_ENV_VAR} ..."
