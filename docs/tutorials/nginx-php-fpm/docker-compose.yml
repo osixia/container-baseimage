@@ -1,0 +1,27 @@
+services:
+  nginx:
+    image: osixia/nginx-php-fpm-example
+    command:
+      - --exec
+      - nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - run-container:/run/container
+    depends_on:
+      - php-fpm
+
+  php-fpm:
+    image: osixia/nginx-php-fpm-example
+    command:
+      - --exec
+      - php-fpm
+    volumes:
+      - run-container:/run/container
+
+volumes:
+  run-container:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
