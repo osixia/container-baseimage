@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+echo "${SERVICE_NAME}: Downloading package from distribution repository or any url ..."
