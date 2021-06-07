@@ -1,0 +1,19 @@
+FROM ${FROM_IMAGE}
+
+ARG IMAGE="${IMAGE}"
+ENV ${CONTAINER_IMAGE_ENV_KEY}=$${IMAGE}
+
+# Download service(s) required packages or resources
+# RUN container packages install --update --clean \
+#        [...]
+#     && curl -o resources.tar.gz https://[...].tar.gz \
+#     && tar -xzf resources.tar.gz \
+#     && rm resources.tar.gz
+
+COPY ${DOCKERFILE_SERVICES_DIR} ${CONTAINER_SERVICES_DIR}
+
+# Install and link service(s) to the entrypoint
+RUN container services install \
+    && container services link
+
+COPY ${DOCKERFILE_ENVIRONMENT_FILES_DIR} ${CONTAINER_ENVIRONMENT_FILES_DIR}
