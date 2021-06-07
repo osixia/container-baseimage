@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+# Usage:
+# add-multiprocess-stack
+
+container-logger level eq trace && set -x
+
+exec container-baseimage add-multiprocess-stack "$@"

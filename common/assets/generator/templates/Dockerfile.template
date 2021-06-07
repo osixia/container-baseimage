@@ -1,0 +1,19 @@
+FROM ${FROM_IMAGE}
+
+# Set container image name
+# use to log image version and by templates generator
+ARG IMAGE_NAME="osixia/example-baseimage"
+ARG IMAGE_TAG="latest"
+ENV ${CONTAINER_IMAGE_NAME_ENV_KEY}=$${IMAGE_NAME} \
+    ${CONTAINER_IMAGE_TAG_ENV_KEY}=$${IMAGE_TAG}
+
+# Download distribution packages and others images dependencies
+#RUN ${PACKAGES_INDEX_UPDATE_BIN} \
+#    && ${PACKAGES_INSTALL_CLEAN_BIN} \
+#       [...]
+
+COPY ${DOCKERFILE_SERVICES_DIR} ${CONTAINER_SERVICES_DIR}
+
+RUN ${INSTALL_SERVICES_BIN} && ${LINK_SERVICES_ENTRYPOINT_BIN}
+
+COPY ${DOCKERFILE_ENVIRONMENT_FILES_DIR} ${CONTAINER_ENVIRONMENT_FILES_DIR}

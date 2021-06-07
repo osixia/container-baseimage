@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+# Usage:
+# packages-install-clean [package]...
+
+container-logger level eq trace && set -x
+
+packages-install "$@"
+packages-index-clean

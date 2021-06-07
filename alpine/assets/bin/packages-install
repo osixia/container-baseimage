@@ -1,0 +1,12 @@
+#!/bin/bash -e
+container-logger level eq trace && set -x
+
+set -o pipefail
+
+# Usage:
+# packages-install [package 1] [package 2] ...
+
+ARGS="$*"
+
+container-logger info "Install packages: ${ARGS}"
+eval apk -q add "${ARGS}" 2>&1 | container-logger info

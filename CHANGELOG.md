@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.0.0] - Unreleased
+### Added
+  - light-baseimage can now be used by container with read-only filesystem
+  - light-baseimage containers can now be run with non root user
+  - envsubst-templates tool
+  - gettext-base package
+  - --pre-startup-cmd, --pre-process-cmd, --pre-finish-cmd and --pre-exit-cmd commands
+  - .env file support
+
+### Changed
+  - Use debian bullseye-slim as baseimage
+  - Rename environment variable KILL_PROCESS_TIMEOUT and KILL_ALL_PROCESSES_TIMEOUT to CONTAINER_KILL_PROCESS_TIMEOUT and CONTAINER_KILL_ALL_PROCESSES_TIMEOUT
+
+### Removed
+  - -c,--cmd command
+  - --wait-state and --wait-first-startup
+  - .yaml and .json environment file support in favor of .env files
+  - .startup.yaml and .startup.json environment files support (kubernetes initContainers can be used as replacement)
+  - complex-bash-env support and associated "#PYTHON2BASH:" and "#JSON2BASH:" tags for environment variables
+  - /container/run/environment directory and files, formally used to dump container environment
+  - ssl-tools and cfssl (a dedicated docker image can be used as replacement)
+
 ## [1.3.3] - 2021-03-13
 ### Changed
   - Multiple log line message are now split and log line by line for a nicest display.
@@ -9,7 +31,7 @@
 
 ## [1.3.2] - 2021-02-18
 ### Fixed
-  - Remove -x bash flag on log-helper tool
+  - Remove -x bash flag on container-logger tool
 
 # [1.3.1] - 2021-01-24
 ### Fixed
@@ -118,7 +140,7 @@
   - Rename my_init to run (delete previous run script)
   - Add run tool option --copy-service that copy /container/service to /container/run/service on startup
   - Add run tool option --loglevel (default : info) with possible values : none, error, warning, info, debug.
-  - Add bash log-helper
+  - Add bash container-logger
 
 ### Changed
   - Container environment config directory /etc/container_environment moved to /container/environment
@@ -129,7 +151,7 @@
   - Container startup script directory /etc/my_init.d/ moved to /container/run/startup
   - Container final startup script /etc/rc.local moved to /container/run/startup.sh
   - Rename install-multiple-process-stack to add-multiple-process-stack
-  - Rename install-service-available to add-service-available
+  - Rename install-services-available to add-service-available
 
 ### Removed
   - ssl-helper ssl-helper-openssl and ssl-helper-gnutls
@@ -179,24 +201,24 @@
 ## 0.1.0 - 2015-07-23
 Initial release
 
-[1.3.3]: https://github.com/osixia/docker-light-baseimage/compare/v1.3.2...v1.3.3
-[1.3.2]: https://github.com/osixia/docker-light-baseimage/compare/v1.3.1...v1.3.2
-[1.3.1]: https://github.com/osixia/docker-light-baseimage/compare/v1.3.0...v1.3.1
-[1.3.0]: https://github.com/osixia/docker-light-baseimage/compare/v1.2.0...v1.3.0
-[1.2.0]: https://github.com/osixia/docker-light-baseimage/compare/v1.1.2...v1.2.0
-[1.1.2]: https://github.com/osixia/docker-light-baseimage/compare/v1.1.1...v1.1.2
-[1.1.1]: https://github.com/osixia/docker-light-baseimage/compare/v1.1.0...v1.1.1
-[1.1.0]: https://github.com/osixia/docker-light-baseimage/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/osixia/docker-light-baseimage/compare/v0.2.2...v1.0.0
-[0.2.6]: https://github.com/osixia/docker-light-baseimage/compare/v0.2.5...v0.2.6
-[0.2.5]: https://github.com/osixia/docker-light-baseimage/compare/v0.2.4...v0.2.5
-[0.2.4]: https://github.com/osixia/docker-light-baseimage/compare/v0.2.3...v0.2.4
-[0.2.3]: https://github.com/osixia/docker-light-baseimage/compare/v0.2.2...v0.2.3
-[0.2.2]: https://github.com/osixia/docker-light-baseimage/compare/v0.2.1...v0.2.2
-[0.2.1]: https://github.com/osixia/docker-light-baseimage/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/osixia/docker-light-baseimage/compare/v0.1.5...v0.2.0
-[0.1.5]: https://github.com/osixia/docker-light-baseimage/compare/v0.1.4...v0.1.5
-[0.1.4]: https://github.com/osixia/docker-light-baseimage/compare/v0.1.3...v0.1.4
-[0.1.3]: https://github.com/osixia/docker-light-baseimage/compare/v0.1.2...v0.1.3
-[0.1.2]: https://github.com/osixia/docker-light-baseimage/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/osixia/docker-light-baseimage/compare/v0.1.0...v0.1.1
+[1.3.3]: https://github.com/osixia/container-baseimage/compare/v1.3.2...v1.3.3
+[1.3.2]: https://github.com/osixia/container-baseimage/compare/v1.3.1...v1.3.2
+[1.3.1]: https://github.com/osixia/container-baseimage/compare/v1.3.0...v1.3.1
+[1.3.0]: https://github.com/osixia/container-baseimage/compare/v1.2.0...v1.3.0
+[1.2.0]: https://github.com/osixia/container-baseimage/compare/v1.1.2...v1.2.0
+[1.1.2]: https://github.com/osixia/container-baseimage/compare/v1.1.1...v1.1.2
+[1.1.1]: https://github.com/osixia/container-baseimage/compare/v1.1.0...v1.1.1
+[1.1.0]: https://github.com/osixia/container-baseimage/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/osixia/container-baseimage/compare/v0.2.2...v1.0.0
+[0.2.6]: https://github.com/osixia/container-baseimage/compare/v0.2.5...v0.2.6
+[0.2.5]: https://github.com/osixia/container-baseimage/compare/v0.2.4...v0.2.5
+[0.2.4]: https://github.com/osixia/container-baseimage/compare/v0.2.3...v0.2.4
+[0.2.3]: https://github.com/osixia/container-baseimage/compare/v0.2.2...v0.2.3
+[0.2.2]: https://github.com/osixia/container-baseimage/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/osixia/container-baseimage/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/osixia/container-baseimage/compare/v0.1.5...v0.2.0
+[0.1.5]: https://github.com/osixia/container-baseimage/compare/v0.1.4...v0.1.5
+[0.1.4]: https://github.com/osixia/container-baseimage/compare/v0.1.3...v0.1.4
+[0.1.3]: https://github.com/osixia/container-baseimage/compare/v0.1.2...v0.1.3
+[0.1.2]: https://github.com/osixia/container-baseimage/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/osixia/container-baseimage/compare/v0.1.0...v0.1.1

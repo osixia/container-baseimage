@@ -1,0 +1,9 @@
+/.git
+/.github
+/bin
+/ci
+/docs
+/*.md
+.dockerignore
+.gitignore
+Dockerfile

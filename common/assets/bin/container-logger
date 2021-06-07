@@ -1,0 +1,7 @@
+#!/bin/bash -e
+
+# Usage:
+# container-logger error|warning|info|debug|trace [message]
+# container-logger level eq|ne|gt|ge|lt|le none|error|warning|info|debug|trace
+
+exec container-baseimage logger "$@"

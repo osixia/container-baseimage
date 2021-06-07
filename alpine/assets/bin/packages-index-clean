@@ -1,0 +1,10 @@
+#!/bin/bash -e
+container-logger level eq trace && set -x
+
+set -o pipefail
+
+# Usage:
+# packages-index-clean
+
+container-logger info "Clean packages index"
+rm -rf /var/cache/apk/* | container-logger debug

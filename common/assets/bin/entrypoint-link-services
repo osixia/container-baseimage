@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+# Usage:
+# entrypoint-link-services
+
+container-logger level eq trace && set -x
+
+exec container-baseimage entrypoint link-services "$@"

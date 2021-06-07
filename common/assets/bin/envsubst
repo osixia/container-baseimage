@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+# Usage:
+# envsubst input [output=input]
+
+container-logger level eq trace && set -x
+
+exec container-baseimage envsubst "$@"

@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+# Usage:
+# install-debug-packages [extra_package]...
+
+container-logger level eq trace && set -x
+
+exec container-baseimage install-debug-packages "$@"

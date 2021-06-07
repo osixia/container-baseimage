@@ -1,0 +1,16 @@
+#!/bin/bash -e
+
+# if container log level is trace:
+# print commands and their arguments as they are executed
+container-logger level eq trace && set -x
+
+FIRST_START_DONE="${CONTAINER_RUN_ROOT_DIR}/${SERVICE_NAME}-first-start-done"
+
+if [ ! -e "$${FIRST_START_DONE}" ]; then
+    echo "${SERVICE_NAME}: Doing some container first start setup ..."
+
+    touch "$${FIRST_START_DONE}"
+fi
+
+echo "${SERVICE_NAME}: Doing some others container start setup ..."
+echo "${SERVICE_NAME}: EXAMPLE_ENV_VAR=$${EXAMPLE_ENV_VAR} ..."

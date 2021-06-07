@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+# Usage:
+# services-require [service]...
+
+container-logger level eq trace && set -x
+
+exec container-baseimage services require "$@"

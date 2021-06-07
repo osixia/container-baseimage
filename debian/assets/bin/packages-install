@@ -1,0 +1,22 @@
+#!/bin/bash -e
+
+# Usage:
+# packages-install [package 1] [package 2] ...
+
+container-logger level eq trace && set -x
+
+set -o pipefail
+
+export LC_ALL=C
+export DEBIAN_FRONTEND=noninteractive
+
+ARGS="$*"
+NO_RECOMMENDS="--no-install-recommends"
+RECOMMENDS="--install-recommends"
+if [[ ${ARGS} =~ ${RECOMMENDS} ]]; then
+    NO_RECOMMENDS=""
+    ARGS=${ARGS//${RECOMMENDS}/}
+fi
+
+container-logger info "Install packages: ${ARGS}"
+eval apt install -qy "${NO_RECOMMENDS}" "${ARGS}" 2>&1 | container-logger info

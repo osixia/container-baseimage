@@ -1,0 +1,12 @@
+#!/bin/bash -e
+
+# Usage:
+# packages-remove [package 1] [package 2] ...
+
+container-logger level eq trace && set -x
+
+set -o pipefail
+
+container-logger info "Remove packages: $*"
+apt remove -qy --purge "$@" 2>&1 | container-logger debug
+apt -qy autoremove 2>&1 | container-logger debug

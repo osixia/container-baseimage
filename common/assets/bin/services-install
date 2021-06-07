@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+# Usage:
+# services-install
+
+container-logger level eq trace && set -x
+
+exec container-baseimage services install "$@"

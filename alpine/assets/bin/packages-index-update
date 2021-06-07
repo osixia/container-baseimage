@@ -1,0 +1,10 @@
+#!/bin/bash -e
+container-logger level eq trace && set -x
+
+set -o pipefail
+
+# Usage:
+# packages-index-update
+
+container-logger info "Update packages index"
+apk update -q 2>&1 | container-logger info

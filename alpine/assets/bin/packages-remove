@@ -1,0 +1,10 @@
+#!/bin/bash -e
+container-logger level eq trace && set -x
+
+set -o pipefail
+
+# Usage:
+# packages-remove [package 1] [package 2] ...
+
+container-logger info "Remove packages: $*"
+apk del --purge "$@" 2>&1 | container-logger debug

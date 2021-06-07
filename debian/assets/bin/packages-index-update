@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+# Usage:
+# packages-index-update
+
+container-logger level eq trace && set -x
+
+set -o pipefail
+
+container-logger info "Update packages index"
+apt -qy update 2>&1 | container-logger info

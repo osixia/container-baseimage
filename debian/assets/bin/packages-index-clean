@@ -1,0 +1,13 @@
+#!/bin/bash -e
+
+# Usage:
+# packages-index-clean
+
+container-logger level eq trace && set -x
+
+set -o pipefail
+
+container-logger info "Clean packages index"
+apt -qy autoremove 2>&1 | container-logger debug
+apt clean 2>&1 | container-logger debug
+rm -rf /var/lib/apt/lists/*

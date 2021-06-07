@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+# Usage:
+# envsubst-templates templates_dir [output_dir=templates_dir] [templates_files_suffix=.template]
+
+container-logger level eq trace && set -x
+
+exec container-baseimage envsubst-templates "$@"
