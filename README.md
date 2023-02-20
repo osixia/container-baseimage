@@ -9,7 +9,7 @@
 Latest release: 1.3.3 [Changelog](CHANGELOG.md)
  | [Docker Hub](https://hub.docker.com/r/osixia/light-baseimage/) 
 
-A **Debian 10 (Buster)** based docker image to build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
+A **Debian 11 (Bullseye)** based docker image to build reliable image quickly. This image provide a simple opinionated solution to build multiple or single process image with minimum of layers and an optimized build.
 
 The aims of this image is to be used as a base for your own Docker images. It's base on the awesome work of: [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
 
@@ -558,25 +558,25 @@ Send me a message to add your image in this list.
 All container tools are available in `/container/tool` directory and are linked in `/sbin/` so they belong to the container PATH.
 
 
-| Filename        | Description |
-| ---------------- | ------------------- |
-| run | The run tool is defined as the image ENTRYPOINT (see [Dockerfile](image/Dockerfile)). It set environment and run  startup scripts and images process. More information in the [Advanced User Guide](#run). |
-| setuser | A tool for running a command as another user. Easier to use than su, has a smaller attack vector than sudo, and unlike chpst this tool sets $HOME correctly.|
-| log-helper | A simple bash tool to print message base on the log level. |
-|  add-service-available | A tool to download and add services in service-available directory to the regular service directory. |
-| add-multiple-process-stack | A tool to add the multiple process stack: runit, cron syslog-ng-core and logrotate. |
-| install-service | A tool that execute /container/service/install.sh and /container/service/\*/install.sh scripts. |
-|  complex-bash-env | A tool to iterate trough complex bash environment variables created by the run tool when a table or a list was set in environment files or in environment command line argument. |
+| Filename                   | Description                                                                                                                                                                                                |
+|:---------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| run                        | The run tool is defined as the image ENTRYPOINT (see [Dockerfile](image/Dockerfile)). It set environment and run  startup scripts and images process. More information in the [Advanced User Guide](#run). |
+| setuser                    | A tool for running a command as another user. Easier to use than su, has a smaller attack vector than sudo, and unlike chpst this tool sets $HOME correctly.                                               |
+| log-helper                 | A simple bash tool to print message base on the log level.                                                                                                                                                 |
+| add-service-available      | A tool to download and add services in service-available directory to the regular service directory.                                                                                                       |
+| add-multiple-process-stack | A tool to add the multiple process stack: runit, cron syslog-ng-core and logrotate.                                                                                                                        |
+| install-service            | A tool that execute /container/service/install.sh and /container/service/\*/install.sh scripts.                                                                                                            |
+| complex-bash-env           | A tool to iterate trough complex bash environment variables created by the run tool when a table or a list was set in environment files or in environment command line argument.                           |
 
 ### Services available
 
-| Name        | Description |
-| ---------------- | ------------------- |
-| :runit | Replaces Debian's Upstart. Used for service supervision and management. Much easier to use than SysV init and supports restarting daemons when they crash. Much easier to use and more lightweight than Upstart. <br><br>*This service is part of the multiple-process-stack.*|
-| :cron | Cron daemon. <br><br>*This service is part of the multiple-process-stack.*|
-| :syslog-ng-core | Syslog daemon so that many services - including the kernel itself - can correctly log to /var/log/syslog. If no syslog daemon is running, a lot of important messages are silently swallowed. <br><br>Only listens locally. All syslog messages are forwarded to "docker logs".<br><br>*This service is part of the multiple-process-stack.* |
-| :logrotate | Rotates and compresses logs on a regular basis. <br><br>*This service is part of the multiple-process-stack.*|
-| :ssl-tools | Add CFSSL a CloudFlare PKI/TLS swiss army knife. It's a command line tool for signing, verifying, and bundling TLS certificates. Comes with cfssl-helper tool that make it docker friendly by taking command line parameters from environment variables. <br><br>Also add jsonssl-helper to get certificates from json files, parameters are set by environment variables. |
+| Name            | Description                                                                                                                                                                                                                                                                                                                                                                |
+|:----------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| :runit          | Replaces Debian's Upstart. Used for service supervision and management. Much easier to use than SysV init and supports restarting daemons when they crash. Much easier to use and more lightweight than Upstart. <br><br>*This service is part of the multiple-process-stack.*                                                                                             |
+| :cron           | Cron daemon. <br><br>*This service is part of the multiple-process-stack.*                                                                                                                                                                                                                                                                                                 |
+| :syslog-ng-core | Syslog daemon so that many services - including the kernel itself - can correctly log to /var/log/syslog. If no syslog daemon is running, a lot of important messages are silently swallowed. <br><br>Only listens locally. All syslog messages are forwarded to "docker logs".<br><br>*This service is part of the multiple-process-stack.*                               |
+| :logrotate      | Rotates and compresses logs on a regular basis. <br><br>*This service is part of the multiple-process-stack.*                                                                                                                                                                                                                                                              |
+| :ssl-tools      | Add CFSSL a CloudFlare PKI/TLS swiss army knife. It's a command line tool for signing, verifying, and bundling TLS certificates. Comes with cfssl-helper tool that make it docker friendly by taking command line parameters from environment variables. <br><br>Also add jsonssl-helper to get certificates from json files, parameters are set by environment variables. |
 
 
 ## Advanced User Guide
