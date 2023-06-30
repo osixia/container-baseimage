@@ -297,7 +297,7 @@ def import_env_files():
 						debug("process environment file : " + filepath)
 
 						if file.endswith(ENV_FILES_YAML_EXTENSIONS):
-							env_vars = yaml.load(f)
+							env_vars = yaml.load(f, Loader=yaml.FullLoader)
 
 						elif file.endswith(ENV_FILES_JSON_EXTENSIONS):
 							env_vars = json.load(f)
