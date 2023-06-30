@@ -52,13 +52,13 @@ if [[ "${HOST_ARCH}" == 'arm' ]]; then
 fi
 
 echo "Download cfssl ..."
-echo "curl -o /usr/sbin/cfssl -SL https://github.com/osixia/cfssl/releases/download/1.5.0/cfssl_linux-${HOST_ARCH}"
-curl -o /usr/sbin/cfssl -SL "https://github.com/osixia/cfssl/releases/download/1.5.0/cfssl_linux-${HOST_ARCH}"
+echo "curl -o /usr/sbin/cfssl -SL https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssl_1.6.4_linux_${HOST_ARCH}"
+curl -o /usr/sbin/cfssl -SL "https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssl_1.6.4_linux_${HOST_ARCH}"
 chmod 700 /usr/sbin/cfssl
 
 echo "Download cfssljson ..."
-echo "curl -o /usr/sbin/cfssljson -SL https://github.com/osixia/cfssl/releases/download/1.5.0/cfssljson_linux-${HOST_ARCH}"
-curl -o /usr/sbin/cfssljson -SL "https://github.com/osixia/cfssl/releases/download/1.5.0/cfssljson_linux-${HOST_ARCH}"
+echo "curl -o /usr/sbin/cfssljson -SL https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssljson_1.6.4_linux_${HOST_ARCH}"
+curl -o /usr/sbin/cfssljson -SL "https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssljson_1.6.4_linux_${HOST_ARCH}"
 chmod 700 /usr/sbin/cfssljson
 
 echo "Project sources: https://github.com/cloudflare/cfssl"
