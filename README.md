@@ -1,3 +1,17 @@
+# Deprecation Notice for Version 1
+After many years of v1 being used in production by so many people (thank you 🙏), it’s time to move forward.
+
+The v1 branch is now officially deprecated and will no longer receive updates or fixes.
+
+If currently using v1, please consider starting the migration process and take a look at v2 here:
+👉 https://github.com/osixia/container-baseimage/tree/develop
+
+Version 2 introduces a cleaner foundation and is a complete rewrite in Go, providing improved performance, reliability, and long-term maintainability.
+
+Feedback, testing, ideas, and contributions are always welcome.
+Thank you for being part of the community ❤️
+
+
 # osixia/light-baseimage
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/osixia/light-baseimage.svg)][hub]
