@@ -64,7 +64,7 @@ func newFilesystemPaths(fsc *FilesystemConfig) *filesystemPaths {
 		GeneratorTemplates: fsc.RootPath + "/generator/templates",
 
 		RunRoot:      fsc.RunRootPath,
-		RunProcess:   fsc.RunRootPath + "/process",
+		RunProcess:   fsc.RunRootPath + "/processes",
 		RunGenerator: fsc.RunRootPath + "/generator",
 	}
 }
