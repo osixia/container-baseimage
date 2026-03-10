@@ -50,7 +50,7 @@ type filesystemPaths struct {
 	GeneratorTemplates string
 
 	RunRoot      string
-	RunProcess   string
+	RunProcesses string
 	RunGenerator string
 }
 
@@ -64,7 +64,7 @@ func newFilesystemPaths(fsc *FilesystemConfig) *filesystemPaths {
 		GeneratorTemplates: fsc.RootPath + "/generator/templates",
 
 		RunRoot:      fsc.RunRootPath,
-		RunProcess:   fsc.RunRootPath + "/processes",
+		RunProcesses: fsc.RunRootPath + "/processes",
 		RunGenerator: fsc.RunRootPath + "/generator",
 	}
 }
@@ -113,7 +113,7 @@ func (fs *filesystem) Create() error {
 		fs.paths.GeneratorTemplates,
 		fs.paths.Services,
 		fs.paths.RunRoot,
-		fs.paths.RunProcess,
+		fs.paths.RunProcesses,
 		fs.paths.RunGenerator,
 	}
 
@@ -124,7 +124,7 @@ func (fs *filesystem) Create() error {
 		}
 	}
 
-	worldWritableDirs := []string{fs.paths.RunRoot, fs.paths.RunProcess, fs.paths.RunGenerator}
+	worldWritableDirs := []string{fs.paths.RunRoot, fs.paths.RunProcesses, fs.paths.RunGenerator}
 	var worldWritablePerm iofs.FileMode = 0777
 	for _, dir := range worldWritableDirs {
 

@@ -373,14 +373,16 @@ func (lc *lifecycle) watchProcesses(w *fsnotify.Watcher) {
 
 	for {
 		select {
-		// Read from Errors.
+
 		case _, ok := <-w.Errors:
-			if !ok { // Channel was closed (i.e. Watcher.Close() was called).
+
+			if !ok { // channel was closed
 				return
 			}
-		// Read from Events.
+
 		case e, ok := <-w.Events:
-			if !ok { // Channel was closed (i.e. Watcher.Close() was called).
+
+			if !ok { // channel was closed
 				return
 			}
 

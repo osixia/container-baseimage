@@ -234,7 +234,7 @@ func (gen *generator) output(path string, dest string, excls ...string) ([]strin
 	if err != nil {
 		return nil, err
 	}
-	defer os.RemoveAll(tmpDir)
+	defer helpers.RemoveAll(tmpDir)
 
 	if err := helpers.Copy(filepath.Join(gen.fs.Paths().GeneratorTemplates, path), filepath.Join(tmpDir, dest)); err != nil {
 		return nil, err

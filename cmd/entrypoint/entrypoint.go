@@ -68,13 +68,27 @@ type entrypointFlags struct {
 
 func (o *entrypointFlags) toEntrypointOptions() (core.EntrypointOptions, error) {
 
+	var svcs []core.Service
+	var err error
+
 	if o.exec != nil {
-		services, err := core.Instance().Services().List(core.WithServicesNames(o.exec), core.HandleServicesTagPrefixInNames(services.TagNamePrefix))
+		log.Trace("search services to exec")
+
+		svcs, err = core.Instance().Services().List(core.WithServicesNames(o.exec), core.HandleServicesTagPrefixInNames(services.TagNamePrefix))
 		if err != nil {
 			return o.EntrypointOptions, err
 		}
-		o.Services = services
+	} else {
+		log.Trace("no service is specified, search all services linked to the entrypoint")
+
+		svcs, err = core.Instance().Services().List(core.WithServicesLinked(true))
+		if err != nil {
+			return o.EntrypointOptions, err
+		}
 	}
+
+	log.Tracef("services found: %v", svcs)
+	o.Services = svcs
 
 	if o.runOnlyLifecycleStep != "" {
 		switch o.runOnlyLifecycleStep {
@@ -95,8 +109,27 @@ func (o *entrypointFlags) toEntrypointOptions() (core.EntrypointOptions, error) 
 	o.RestartProcesses = o.restart.Value
 
 	if o.debug {
+		// force log level to debug at least
+		if log.Level() < log.LevelDebug {
+			if err := log.SetLevel(log.Levels[log.LevelDebug]); err != nil {
+				log.Error(err.Error())
+			}
+		}
+
 		// append debug packages to packages to install
 		o.InstallPackages = append(o.InstallPackages, core.Instance().Distribution().Config().DebugPackages...)
+
+		// run bash
+		o.RunBash = true
+	}
+
+	// skip process is set but we want to run bash
+	if o.SkipProcess && o.RunBash {
+		// empty services to run
+		o.Services = nil
+
+		// set skip process to false so bash is run
+		o.SkipProcess = false
 	}
 
 	return o.EntrypointOptions, nil
@@ -122,12 +155,6 @@ var EntrypointCmd = &cobra.Command{
 			os.Exit(0)
 		}
 		log.Infof("Container image: %v", containerImage)
-
-		if entrypointCmdFlags.debug && log.Level() < log.LevelDebug {
-			if err := log.SetLevel(log.Levels[log.LevelDebug]); err != nil {
-				log.Error(err.Error())
-			}
-		}
 
 		epo, err := entrypointCmdFlags.toEntrypointOptions()
 		if err != nil {
@@ -179,7 +206,7 @@ func init() {
 
 	EntrypointCmd.Flags().BoolVarP(&entrypointCmdFlags.UnsecureFastWrite, "unsecure-fast-write", "w", false, "disable fsync and friends with eatmydata LD_PRELOAD library\n")
 
-	EntrypointCmd.Flags().BoolVarP(&entrypointCmdFlags.debug, "debug", "d", false, "set log level to debug and install debug packages")
+	EntrypointCmd.Flags().BoolVarP(&entrypointCmdFlags.debug, "debug", "d", false, "set log level to debug, install debug packages and run Bash")
 	EntrypointCmd.Flags().StringSliceVarP(&entrypointCmdFlags.InstallPackages, "install-packages", "i", nil, "install packages\n")
 
 	EntrypointCmd.Flags().BoolVarP(&entrypointCmdFlags.version, "version", "v", false, "print container image version\n")

@@ -153,12 +153,12 @@ func (prcs *processes) Get(name string) Process {
 }
 
 func (prcs *processes) new(name string) *process {
-	rf := filepath.Join(prcs.fs.Paths().RunProcess, name)
+	rf := filepath.Join(prcs.fs.Paths().RunProcesses, name)
 
 	pf := rf + prcs.config.PIDFileSuffix
 	df := rf + prcs.config.WantedDownFileSuffix
 
-	td := filepath.Join(prcs.fs.Paths().RunProcess, name, prcs.config.TagsDir)
+	td := filepath.Join(prcs.fs.Paths().RunProcesses, name, prcs.config.TagsDir)
 
 	return &process{
 		name:           name,
@@ -231,7 +231,7 @@ func (prcs *processes) List(opts ...ProcessesListOption) ([]Process, error) {
 		}
 	} else {
 		// search all processes in processes directory
-		processesDir := prcs.fs.Paths().RunProcess
+		processesDir := prcs.fs.Paths().RunProcesses
 
 		files, err := os.ReadDir(processesDir)
 		if err != nil {
@@ -354,7 +354,7 @@ func (prcs *processes) Stop(ps []Process) error {
 }
 
 func (prcs *processes) NewWatcher() (*fsnotify.Watcher, error) {
-	return helpers.NewFSWatcher(prcs.fs.Paths().RunProcess)
+	return helpers.NewWatcher(prcs.fs.Paths().RunProcesses)
 }
 
 // Processes

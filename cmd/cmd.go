@@ -17,6 +17,7 @@ const (
 	entrypointGroupID = "entrypoint"
 	runtimeGroupID    = "runtime"
 	envGroupID        = "env"
+	filesystemGroupID = "fs"
 	loggerGroupID     = "logger"
 )
 
@@ -53,6 +54,11 @@ func init() {
 	})
 
 	cmd.AddGroup(&cobra.Group{
+		ID:    filesystemGroupID,
+		Title: "Filesystem Command:",
+	})
+
+	cmd.AddGroup(&cobra.Group{
 		ID:    loggerGroupID,
 		Title: "Logger Command:",
 	})
@@ -70,6 +76,7 @@ func init() {
 	cmd.AddCommand(packages.PackagesCmd)
 	cmd.AddCommand(processes.ProcessesCmd)
 	cmd.AddCommand(services.ServicesCmd)
+	cmd.AddCommand(watchCmd)
 
 	cmd.AddCommand(environmentFilesCmd)
 	cmd.AddCommand(envsubstCmd)

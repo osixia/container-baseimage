@@ -70,14 +70,11 @@ func (ep *entrypoint) Run(ctx context.Context, epo EntrypointOptions) (int, erro
 		return 1, err
 	}
 
-	// services to run
-	services, err := ep.getServices(epo.Services)
-	if err != nil {
-		return 1, err
-	}
+	// order services to run by priority
+	ep.svcs.SortByPriority(epo.Services)
 
 	// prepare services to run
-	if err := ep.prepareServices(ctx, services); err != nil {
+	if err := ep.prepareServices(ctx, epo.Services); err != nil {
 		return 1, err
 	}
 
@@ -92,7 +89,7 @@ func (ep *entrypoint) Run(ctx context.Context, epo EntrypointOptions) (int, erro
 	log.Debugf("Environment variables:\n%v", strings.Join(os.Environ(), "\n"))
 
 	// run entrypoint lifecycle
-	lc := newLifecycle(ep.prcs, &epo.LifecycleOptions, services)
+	lc := newLifecycle(ep.prcs, &epo.LifecycleOptions, epo.Services)
 
 	lc.run(ctx)
 
@@ -105,29 +102,6 @@ func (ep *entrypoint) Run(ctx context.Context, epo EntrypointOptions) (int, erro
 	}
 
 	return lc.ExitCode(), nil
-}
-
-func (ep *entrypoint) getServices(services []Service) ([]Service, error) {
-
-	log.Tracef("entrypoint.getServices called with services: %v", services)
-
-	// if no service is specified run service(s) linked to the entrypoint
-	if len(services) == 0 {
-
-		log.Trace("no service is specified, search all services linked to the entrypoint")
-
-		var err error
-		services, err = ep.svcs.List(WithServicesLinked(true), SortServicesByPriority(true))
-		if err != nil {
-			return nil, err
-		}
-		log.Tracef("services linked to entrypoint: %v", services)
-	}
-
-	// sort services by priority
-	ep.svcs.SortByPriority(services)
-
-	return services, nil
 }
 
 func (ep *entrypoint) prepareServices(ctx context.Context, services []Service) error {

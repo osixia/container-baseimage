@@ -14,7 +14,7 @@ Debian, Alpine, and Ubuntu container base images designed to build reliable cont
 
 It accelerates image development and CI/CD pipelines by offering:
 
- - Advanced build tools to reduce image layers and maximize Docker layer caching efficiency.
+ - Advanced build tools to reduce image layers and maximize layer caching efficiency.
  - A lightweight init system as the container entrypoint, providing enhanced process management, debugging capabilities, and runtime flexibility.
  - Built-in support for multi-process containers. Run all processes within a single container or split them across multiple containers as needed.
 
@@ -33,23 +33,23 @@ Includes non-root container images and supports read-only container environments
 
 Generate image templates in the **osixia-baseimage-example** directory
 
-```
+``` bash
 mkdir osixia-baseimage-example
 ```
 
-```
+``` bash
 # Debian
 docker run --rm --user $UID --volume $(pwd)/osixia-baseimage-example:/run/container/generator \
 osixia/baseimage generate bootstrap
 ```
 
-```
+``` bash
 # Alpine
 docker run --rm --user $UID --volume $(pwd)/osixia-baseimage-example:/run/container/generator \
 osixia/baseimage:alpine generate bootstrap
 ```
 
-```
+``` bash
 # Ubuntu
 docker run --rm --user $UID --volume $(pwd)/osixia-baseimage-example:/run/container/generator \
 osixia/baseimage:ubuntu generate bootstrap
@@ -58,11 +58,11 @@ osixia/baseimage:ubuntu generate bootstrap
 Note: add `--multi-process` to get a multi-process image sample.
 
 List generated directories and files in **osixia-baseimage-example** directory
-```
+``` bash
 tree -a osixia-baseimage-example
 ```
 
-```
+``` bash
 osixia-baseimage-example
 ├── Dockerfile
 ├── environment
@@ -79,7 +79,7 @@ osixia-baseimage-example
 ```
 
 Take a quick look at the Dockerfile
-```
+``` Dockerfile
 FROM osixia/baseimage
 
 ARG IMAGE="osixia/baseimage-example:latest"
@@ -102,18 +102,18 @@ COPY environment /container/environment
 ```
 
 Build the image **example/my-image:develop** using files in the **osixia-baseimage-example** directory
-```
+``` bash
 docker build --tag example/my-image:develop --build-arg IMAGE example/my-image:develop  ./osixia-baseimage-example
 ```
 
 Note: `--build-arg IMAGE example/my-image:develop` is used to set the image name inside the container
 
 Run **example/my-image:develop** image
-```
+``` bash
 docker run example/my-image:develop
 ```
 
-```
+``` log
 2026-02-26T11:30:59+01:00 INFO    Container image: example/my-image:develop
 2026-02-26T11:30:59+01:00 INFO    Loading environment variables from /container/environment/.env ...
 2026-02-26T11:30:59+01:00 INFO    Running /container/services/service-1/startup.sh ...
@@ -132,7 +132,7 @@ Detailed documentation regarding the structure, purpose, and usage of the files 
 
 ## 🗂️ Entrypoint Options
 
-```
+``` bash
 docker run --rm osixia/baseimage --help
 ```
 
@@ -180,7 +180,7 @@ Flags:
 
   -w, --unsecure-fast-write                 disable fsync and friends with eatmydata LD_PRELOAD library
 
-  -d, --debug                               set log level to debug and install debug packages
+  -d, --debug                               set log level to debug, install debug packages and run Bash
   -i, --install-packages strings            install packages
 
   -v, --version                             print container image version

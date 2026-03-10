@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"context"
 	"fmt"
 	"io/fs"
 	"os"
@@ -45,49 +46,13 @@ func Remove(name string) error {
 	return nil
 }
 
-func Symlink(target string, dest string) error {
+func RemoveAll(name string) error {
 
-	log.Tracef("Symlink called with target: %v, dest: %v", target, dest)
+	log.Tracef("RemoveAll called with name: %v", name)
+	log.Debugf("Removing %v ...", name)
 
-	dir := filepath.Dir(dest)
-
-	log.Tracef("Create directory %v", dir)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.RemoveAll(name); err != nil {
 		return err
-	}
-
-	log.Debugf("Link %v to %v", target, dest)
-	if err := os.Symlink(target, dest); err != nil {
-		if link, _ := os.Readlink(dest); link != target {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func SymlinkAll(target string, dest string) error {
-
-	log.Tracef("SymlinkAll called with target: %v, dest: %v", target, dest)
-
-	isDir, err := IsDir(target)
-	if err != nil {
-		return err
-	}
-
-	if !isDir {
-		return Symlink(target, dest)
-	}
-
-	files, err := os.ReadDir(target)
-	if err != nil {
-		return err
-	}
-
-	for _, file := range files {
-		if err := Symlink(filepath.Join(target, file.Name()), filepath.Join(dest, file.Name())); err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -206,7 +171,10 @@ func IsFile(name string) (bool, error) {
 	return true, nil
 }
 
-func NewFSWatcher(paths ...string) (*fsnotify.Watcher, error) {
+func NewWatcher(paths ...string) (*fsnotify.Watcher, error) {
+
+	log.Tracef("NewWatcher called with paths: %v", paths)
+
 	if len(paths) < 1 {
 		return nil, fmt.Errorf("paths: %w", errors.ErrRequired)
 	}
@@ -226,4 +194,50 @@ func NewFSWatcher(paths ...string) (*fsnotify.Watcher, error) {
 	}
 
 	return w, nil
+}
+
+func Watch(ctx context.Context, paths []string, scripts []string, once bool) error {
+
+	log.Tracef("Watch called with paths: %v, scripts: %v, once: %v", paths, scripts, once)
+	log.Infof("Watching changes on %v ...", paths)
+
+	w, err := NewWatcher(paths...)
+	if err != nil {
+		return err
+	}
+	defer w.Close()
+
+	for {
+		select {
+
+		case _, ok := <-w.Errors:
+			if !ok { // channel was closed
+				return nil
+			}
+
+		case e, ok := <-w.Events:
+			if !ok { // channel was closed
+				return nil
+			}
+
+			log.Tracef("recieved watch event %+v", e)
+
+			if e.Op&(fsnotify.Write|fsnotify.Create|fsnotify.Rename) != 0 {
+
+				log.Infof("Change detected on %v", e.Name)
+
+				for _, s := range scripts {
+					if err := NewExec(ctx).Command(s).Run(); err != nil {
+						return err
+					}
+				}
+			}
+
+		}
+
+		if once {
+			return nil
+		}
+	}
+
 }
