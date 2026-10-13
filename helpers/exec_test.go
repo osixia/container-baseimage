@@ -58,7 +58,7 @@ func TestReaperCollectsUnmanagedChild(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	defer cmd.Process.Release()
+	defer func() { _ = cmd.Process.Release() }()
 	deadline := time.Now().Add(2 * time.Second)
 
 	for time.Now().Before(deadline) {
@@ -225,7 +225,7 @@ func TestExecCancellationKillsProcessGroup(t *testing.T) {
 		t.Fatal("child did not become ready", err)
 	}
 
-	defer syscall.Kill(child, syscall.SIGKILL)
+	defer func() { _ = syscall.Kill(child, syscall.SIGKILL) }()
 	cancel()
 	if err := e.Wait(); err != nil {
 		t.Fatal(err)

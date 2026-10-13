@@ -55,7 +55,7 @@ func DefaultBuild(ctx context.Context, client *dagger.Client, options any) ([]*B
 
 	o := options.(*BuildOptions)
 
-	if _, err := o.BuildImageOptions.Validate(); err != nil {
+	if _, err := o.Validate(); err != nil {
 		return nil, err
 	}
 

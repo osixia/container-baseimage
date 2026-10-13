@@ -69,5 +69,5 @@ func isVersionHeader(line, startPrefix string) bool {
 
 	c := rest[0]
 
-	return !(c == '.' || c == '-' || ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z'))
+	return c != '.' && c != '-' && (c < '0' || c > '9') && (c < 'a' || c > 'z') && (c < 'A' || c > 'Z')
 }

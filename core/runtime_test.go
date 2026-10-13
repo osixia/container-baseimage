@@ -251,7 +251,7 @@ func TestLifecycleParentCancellationReapsOrphans(t *testing.T) {
 
 	// Outside PID 1, cleanup belongs to the surrounding init rather than us.
 	if os.Getpid() != 1 {
-		defer syscall.Kill(pid, syscall.SIGKILL)
+		defer func() { _ = syscall.Kill(pid, syscall.SIGKILL) }()
 	}
 
 	cancel()
