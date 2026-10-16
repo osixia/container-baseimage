@@ -19,7 +19,10 @@ go run main.go job test ../Dockerfile --target base --export /usr/sbin/container
 go run main.go job test ../Dockerfile --target nonroot --tags-suffix=-nonroot
 ```
 
-Limit a local run with `--distributions debian --arches amd64`.
+Limit a local run with `--distributions debian --arches amd64`. Pass the arch of
+the host: tests run on every built image, and other arches would be emulated.
+The CI builds and tests each arch on its own native runner, then publishes them
+together from their OCI archives (`--oci-export-to`, `--oci-import-from`).
 
 The shared `job.DefaultTest` builds/exports images and checks their entrypoint's
 version. `main.go` installs `job.Test` to run the additional checks in `tests/`:
