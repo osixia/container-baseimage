@@ -57,12 +57,6 @@ osixia/baseimage:ubuntu generate bootstrap
 
 Note: add `--multi-process` to get a multi-process image sample.
 
-Add `--stop-signal SIGQUIT` to generate a `.stop-signal` file for each service,
-for example for a graceful nginx or php-fpm shutdown. This option is also available
-with `container generate services [name]...`. Signal names are case-insensitive
-and the `SIG` prefix is optional. Without this option, no `.stop-signal` file is
-generated and services use `SIGTERM` by default.
-
 List generated directories and files in **osixia-baseimage-example** directory
 ``` bash
 tree -a osixia-baseimage-example
