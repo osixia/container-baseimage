@@ -1,13 +1,5 @@
 # osixia/baseimage 🐳✨🌴
 
-[docker hub]: https://hub.docker.com/r/osixia/baseimage
-[github]: https://github.com/osixia/container-baseimage
-
-[![Docker Pulls](https://img.shields.io/docker/pulls/osixia/baseimage.svg?style=flat-square)][docker hub]
-[![Docker Stars](https://img.shields.io/docker/stars/osixia/baseimage.svg?style=flat-square)][docker hub]
-[![GitHub Stars](https://img.shields.io/github/stars/osixia/container-baseimage?label=github%20stars&style=flat-square)][github]
-[![Contributors](https://img.shields.io/github/contributors/osixia/container-baseimage?style=flat-square)](https://github.com/osixia/container-baseimage/graphs/contributors)
-
 Debian, Alpine, and Ubuntu container base images designed to build reliable containers quickly.
 
 **This image provides a simple, opinionated solution for building single- or multi-process container images with a minimal number of layers and an optimized build process.**
@@ -20,14 +12,13 @@ It accelerates image development and CI/CD pipelines by offering:
 
 Includes non-root container images and supports read-only container environments.
 
-![osixia/baseimage logo.](./docs/assets/images/osixia-container-baseimage.jpg)
+![osixia/baseimage logo.](https://opensource.osixia.net/assets/images/osixia-container-baseimage.jpg)
 
 - [osixia/baseimage 🐳✨🌴](#osixiabaseimage-)
   - [⚡ Quickstart](#-quickstart)
   - [🗂️ Entrypoint Options](#️-entrypoint-options)
   - [📄 Documentation](#-documentation)
-  - [🔀 Contributing](#-contributing)
-  - [🔓 License](#-license)
+  - [⭐ Source Code](#-source-code)
 
 ## ⚡ Quickstart
 
@@ -56,12 +47,6 @@ osixia/baseimage:ubuntu generate bootstrap
 ```
 
 Note: add `--multi-process` to get a multi-process image sample.
-
-Add `--stop-signal SIGQUIT` to generate a `.stop-signal` file for each service,
-for example for a graceful nginx or php-fpm shutdown. This option is also available
-with `container generate services [name]...`. Signal names are case-insensitive
-and the `SIG` prefix is optional. Without this option, no `.stop-signal` file is
-generated and services use `SIGTERM` by default.
 
 List generated directories and files in **osixia-baseimage-example** directory
 ``` bash
@@ -229,16 +214,6 @@ Use "container [command] --help" for more information about a command.
 
 See full documentation and complete features list on [osixia/baseimage documentation](https://opensource.osixia.net/projects/container-images/baseimage/).
 
-## 🔀 Contributing
+## ⭐ Source Code
 
-If you find this project useful here's how you can help:
-
-- Send a pull request with new features and bug fixes.
-- Help new users with [issues](https://github.com/osixia/container-baseimage/issues) they may encounter.
-- Support the development of this image and star [this repo][github] and the image [docker hub repository][docker hub].
-
-This project uses [dagger-build](https://github.com/osixia/dagger-build) to build, test, and deploy images. The image matrix and baseimage-specific tests live in the [build directory](build/), together with useful command lines.
-
-## 🔓 License
-
-This project is licensed under the terms of the MIT license. See [LICENSE.md](LICENSE.md) file for more information.
+Browse source code and contribute to this project on [GitHub](https://github.com/osixia/container-baseimage).
