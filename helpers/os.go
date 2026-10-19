@@ -221,7 +221,7 @@ func Watch(ctx context.Context, paths []string, scripts []string, once bool) err
 	log.Tracef("Watch called with paths: %v, scripts: %v, once: %v", paths, scripts, once)
 	log.Infof("Watching changes on %s ...", strings.Join(paths, ", "))
 
-	files := make(map[string]bool)
+	files := make(map[string]os.FileInfo)
 	dirs := make(map[string]bool)
 	watched := make(map[string]bool)
 	var watchPaths []string
@@ -241,7 +241,7 @@ func Watch(ctx context.Context, paths []string, scripts []string, once bool) err
 		if info.IsDir() {
 			dirs[path] = true
 		} else {
-			files[path] = true
+			files[path] = info
 			watchPath = filepath.Dir(path)
 		}
 
@@ -279,32 +279,52 @@ func Watch(ctx context.Context, paths []string, scripts []string, once bool) err
 				return nil
 			}
 
-			if !files[e.Name] && !dirs[e.Name] && !dirs[filepath.Dir(e.Name)] {
+			if e.Op&(fsnotify.Write|fsnotify.Create|fsnotify.Rename) == 0 {
+				continue
+			}
+
+			changed := files[e.Name] != nil || dirs[e.Name] || dirs[filepath.Dir(e.Name)]
+			for path, previous := range files {
+				if filepath.Dir(path) != filepath.Dir(e.Name) {
+					continue
+				}
+				// A sibling symlink can retarget the file without changing its
+				// name, as with Kubernetes projected volumes replacing ..data.
+				current, err := os.Stat(path)
+				if err != nil {
+					if os.IsNotExist(err) {
+						continue // Keep the last target until the replacement appears.
+					}
+					return err
+				}
+				if !os.SameFile(previous, current) {
+					changed = true
+				}
+				files[path] = current
+			}
+			if !changed {
 				continue
 			}
 
 			log.Tracef("recieved watch event %+v", e)
 
-			if e.Op&(fsnotify.Write|fsnotify.Create|fsnotify.Rename) != 0 {
+			log.Infof("Change detected on %v", e.Name)
 
-				log.Infof("Change detected on %v", e.Name)
-
-				for _, s := range scripts {
-					parts, err := shlex.Split(s)
-					if err != nil {
-						return fmt.Errorf("failed to parse watched command: %w", err)
-					}
-					if len(parts) == 0 {
-						continue
-					}
-					if err := NewExec(ctx).Command(parts[0], parts[1:]...).Run(); err != nil {
-						return err
-					}
+			for _, s := range scripts {
+				parts, err := shlex.Split(s)
+				if err != nil {
+					return fmt.Errorf("failed to parse watched command: %w", err)
 				}
-
-				if once {
-					return nil
+				if len(parts) == 0 {
+					continue
 				}
+				if err := NewExec(ctx).Command(parts[0], parts[1:]...).Run(); err != nil {
+					return err
+				}
+			}
+
+			if once {
+				return nil
 			}
 
 		}

@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Detect watched files retargeted by sibling symlink replacements, including
+  Kubernetes Secret and ConfigMap `..data` updates.
+
 ## 2.0.0
 
 Originally released as osixia/light-baseimage on July 23, 2015.
