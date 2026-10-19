@@ -50,6 +50,7 @@ type filesystemPaths struct {
 	GeneratorTemplates string
 
 	RunRoot      string
+	RunTmp       string
 	RunProcesses string
 	RunGenerator string
 }
@@ -64,6 +65,7 @@ func newFilesystemPaths(fsc *FilesystemConfig) *filesystemPaths {
 		GeneratorTemplates: fsc.RootPath + "/generator/templates",
 
 		RunRoot:      fsc.RunRootPath,
+		RunTmp:       fsc.RunRootPath + "/tmp",
 		RunProcesses: fsc.RunRootPath + "/processes",
 		RunGenerator: fsc.RunRootPath + "/generator",
 	}
@@ -125,6 +127,9 @@ func (fs *filesystem) Create() error {
 		if err := helpers.ConfigureRuntimeDirectory(dir); err != nil {
 			return fmt.Errorf("securing runtime directory %q: %w", dir, err)
 		}
+	}
+	if err := helpers.ConfigureTemporaryDirectory(fs.paths.RunTmp); err != nil {
+		return fmt.Errorf("securing temporary directory %q: %w", fs.paths.RunTmp, err)
 	}
 
 	return nil

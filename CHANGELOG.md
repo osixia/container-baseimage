@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Added
+
+- Create `/run/container/tmp` as a shared temporary directory under the configured
+  runtime root, without changing `TMPDIR`.
+
 ### Fixed
 
 - Detect watched files retargeted by sibling symlink replacements, including

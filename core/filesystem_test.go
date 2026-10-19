@@ -97,3 +97,53 @@ func TestLoadDotEnvParseErrorDoesNotLeakValues(t *testing.T) {
 		})
 	}
 }
+
+func TestRuntimeTemporaryFiles(t *testing.T) {
+	tc := newTestCore(t)
+	path := tc.fs.Paths().RunTmp
+	info, err := os.Stat(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if info.Mode().Perm() != 0777 || info.Mode()&os.ModeSticky == 0 {
+		t.Fatalf("expected shared temporary directory with sticky bit, got %v", info.Mode())
+	}
+	file, err := os.CreateTemp(path, "runtime-check-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := file.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if filepath.Dir(file.Name()) != path {
+		t.Fatalf("temporary file created outside runtime directory: %v", file.Name())
+	}
+	if err := os.Chmod(path, 0700); err != nil {
+		t.Fatal(err)
+	}
+	if err := tc.fs.Create(); err != nil {
+		t.Fatal(err)
+	}
+	info, err = os.Stat(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if info.Mode().Perm() != 0700 {
+		t.Fatalf("existing temporary directory permissions changed: %v", info.Mode())
+	}
+}
+
+func TestRuntimeTemporaryDirectoryRejectsSymlink(t *testing.T) {
+	tc := newTestCore(t)
+	outside := t.TempDir()
+	path := tc.fs.Paths().RunTmp
+	if err := os.Remove(path); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(outside, path); err != nil {
+		t.Fatal(err)
+	}
+	if err := tc.fs.Create(); err == nil {
+		t.Fatal("expected an error on a symlinked temporary directory")
+	}
+}

@@ -73,6 +73,16 @@ func closeQuietly(f *os.File) {
 // (e.g. Kubernetes fsGroup setgid). An existing directory (image layer, volume,
 // tmpfs) is used as is: its permissions belong to whoever created or mounted it.
 func ConfigureRuntimeDirectory(path string) error {
+	return configureRuntimeDirectory(path, 0777)
+}
+
+// ConfigureTemporaryDirectory creates a shared temporary directory with the
+// sticky bit. Existing directory permissions and inherited setgid are preserved.
+func ConfigureTemporaryDirectory(path string) error {
+	return configureRuntimeDirectory(path, 01777)
+}
+
+func configureRuntimeDirectory(path string, mode uint32) error {
 
 	parent, err := openDirectory(filepath.Dir(path), 0755)
 	if err != nil {
@@ -100,7 +110,7 @@ func ConfigureRuntimeDirectory(path string) error {
 	if err := unix.Fstat(fd, &stat); err != nil {
 		return &os.PathError{Op: "stat", Path: path, Err: err}
 	}
-	if err := unix.Fchmod(fd, stat.Mode&07777|0777); err != nil {
+	if err := unix.Fchmod(fd, stat.Mode&07777|mode); err != nil {
 		return &os.PathError{Op: "chmod", Path: path, Err: err}
 	}
 	return nil
