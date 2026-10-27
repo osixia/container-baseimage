@@ -1,4 +1,4 @@
-ARG GOLANG_IMAGE="golang:1.26.9"
+ARG GOLANG_IMAGE="golang:1.26.10"
 ARG BASE_IMAGE="debian:trixie-slim"
 
 # step 1: build container binary

@@ -2,7 +2,7 @@
 
 The reusable packages now live in [osixia/dagger-build](https://github.com/osixia/dagger-build).
 This directory keeps the existing CLI entrypoint, image matrix, custom build
-arguments, and baseimage-specific integration tests. Requires Go 1.26.9 and
+arguments, and baseimage-specific integration tests. Requires Go 1.26.10 and
 uses Dagger SDK/engine 0.21.10.
 
 The library is pinned to a published commit in `go.mod`. Go downloads it as a

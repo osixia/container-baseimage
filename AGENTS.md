@@ -141,7 +141,7 @@ arbitraire hors du chemin prévu, en particulier lorsqu'il tourne en root.
 | `.github/workflows/go.yml` | Lint des deux modules, ShellCheck, govulncheck, pipeline Dagger et publication sur tags. |
 | `docs/` | Exemples mono/multi-processus et tutoriels Nginx / PHP-FPM. |
 
-Les deux modules, le Dockerfile (`golang:1.26.9`) et la CI utilisent Go `1.26.9`.
+Les deux modules, le Dockerfile (`golang:1.26.10`) et la CI utilisent Go `1.26.10`.
 Le module `build/` utilise le SDK Dagger `0.21.10`.
 `build/main.go` conserve la matrice d'images et les personnalisations du projet.
 Les packages partagés viennent de `github.com/osixia/dagger-build`, figé sur

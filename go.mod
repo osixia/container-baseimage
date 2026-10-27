@@ -1,6 +1,6 @@
 module github.com/osixia/container-baseimage
 
-go 1.26.9
+go 1.26.10
 
 require (
 	github.com/a8m/envsubst v1.4.3
